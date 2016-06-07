@@ -16,7 +16,10 @@ TagAndProbe = cms.EDFilter("TauTagAndProbeFilter",
         muons = cms.InputTag("goodMuons")
 )
 
+Ntuplizer = cms.EDAnalyzer("Ntuplizer")
+
 TAndPseq = cms.Sequence(
     goodMuons + 
-    TagAndProbe
+    TagAndProbe +
+    Ntuplizer
 )

@@ -21,3 +21,6 @@ process.p = cms.Path(
 # Silence output
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 1
+
+# Adding ntuplizer
+process.TFileService=cms.Service('TFileService',fileName=cms.string('NTuple.root'))
