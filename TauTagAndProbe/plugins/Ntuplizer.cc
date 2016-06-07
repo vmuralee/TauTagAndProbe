@@ -102,6 +102,8 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
 
     this -> Initialize();
 
+    cout << "### ANALYZE CALLED" << endl;
+
     _indexevents = iEvent.id().event();
     _runNumber = iEvent.id().run();
     _lumi = iEvent.luminosityBlock();
@@ -115,6 +117,7 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     for (size_t imu = 0; imu < muonHandle -> size(); ++imu )
     {
         const pat::MuonRef mu = (*muonHandle)[imu] ;
+	cout << "##### MUON PT: " << mu -> pt() << endl;
         this -> _muonsPtVector.push_back(mu -> pt());
     }
 

@@ -57,7 +57,7 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
     for (size_t imu = 0; imu < muonHandle->size(); ++imu )
     {
         const pat::MuonRef mu = (*muonHandle)[imu] ;
-        cout << mu->pt() << endl;
+        cout << "### FILTERED MUON PT: " << mu->pt() << endl;
     }
 
     iEvent.put(resultMuon);
