@@ -38,7 +38,7 @@ TagAndProbe = cms.EDFilter("TauTagAndProbeFilter",
 )
 
 Ntuplizer = cms.EDAnalyzer("Ntuplizer",
-    treeName = cms.string("testtree"),
+    treeName = cms.string("TagAndProbe"),
     muons = cms.InputTag("TagAndProbe")
 )
 
