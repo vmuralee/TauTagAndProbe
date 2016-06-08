@@ -31,13 +31,13 @@ class TauTagAndProbeFilter : public edm::EDFilter {
 
         EDGetTokenT<pat::TauRefVector>   _tausTag;
         EDGetTokenT<pat::MuonRefVector>  _muonsTag;
-        // EDGetTokenT<MuonRefVector>  _metTag;
+        EDGetTokenT<pat::METCollection>  _metTag;
 };
 
 TauTagAndProbeFilter::TauTagAndProbeFilter(const edm::ParameterSet & iConfig) :
-_tausTag(consumes<pat::TauRefVector>  (iConfig.getParameter<InputTag>("taus"))),
-_muonsTag(consumes<pat::MuonRefVector>(iConfig.getParameter<InputTag>("muons")))
-// _metTag(consumes<pat::TauRefVector>(iConfig.getParameter<InputTag>("met"))),
+_tausTag  (consumes<pat::TauRefVector>  (iConfig.getParameter<InputTag>("taus"))),
+_muonsTag (consumes<pat::MuonRefVector> (iConfig.getParameter<InputTag>("muons"))),
+_metTag   (consumes<pat::METCollection> (iConfig.getParameter<InputTag>("met")))
 {
     produces <pat::TauRefVector>  (); // probe
     produces <pat::MuonRefVector> (); // tag
@@ -51,14 +51,37 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
     auto_ptr<pat::MuonRefVector> resultMuon ( new pat::MuonRefVector );
     auto_ptr<pat::TauRefVector>  resultTau  ( new pat::TauRefVector  );
 
-    // search for the tag in the event
+    // ---------------------   search for the tag in the event --------------------
     Handle<pat::MuonRefVector> muonHandle;
     iEvent.getByToken (_muonsTag, muonHandle);
-    for (size_t imu = 0; imu < muonHandle->size(); ++imu )
-    {
-        const pat::MuonRef mu = (*muonHandle)[imu] ;
-        cout << "### FILTERED MUON PT: " << mu->pt() << endl;
-    }
+
+    // reject events with more than 1 mu in the event (reject DY) 
+    // FIXME: mu threshold is 5 GeV in miniAOD, need 10
+    // or without mu (should not happen in SingleMu dataset)
+    // if (muonHandle->size() != 1) return false;
+
+    // for loop is now dummy, leaving it for debug    
+    // for (size_t imu = 0; imu < muonHandle->size(); ++imu )
+    // {
+    //     const pat::MuonRef mu = (*muonHandle)[imu] ;
+    //     cout << "### FILTERED MUON PT: " << mu->pt() << endl;
+    // }
+    
+    if (muonHandle->size() < 1) return false;    
+    const pat::MuonRef mu = (*muonHandle)[0] ;
+    // if (mu->pt() <= 20 || )
+    resultMuon->push_back (mu);
+
+    //---------------------   get the met for mt computation etc. -----------------
+    Handle<pat::METCollection> metHandle;
+    iEvent.getByToken (_metTag, metHandle);
+    const pat::MET* met = &((*metHandle)[0]);
+
+    // Handle<pat::TauRefVector> tauHandle;
+    // iEvent.getByToken (_tausTag, tauHandle);
+    // if (tauHandle->size() < 1) return false;    
+    // const pat::TauRef tau = (*tauHandle)[0] ;
+    // resultTau->push_back (tau);    
 
     iEvent.put(resultMuon);
     iEvent.put(resultTau);
