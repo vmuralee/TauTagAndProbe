@@ -29,6 +29,8 @@ class TauTagAndProbeFilter : public edm::EDFilter {
     private:
         bool filter(edm::Event &, edm::EventSetup const&);
 
+        float ComputeMT(math::XYZTLorentzVector visP4, pat::MET& met);
+
         EDGetTokenT<pat::TauRefVector>   _tausTag;
         EDGetTokenT<pat::MuonRefVector>  _muonsTag;
         EDGetTokenT<pat::METCollection>  _metTag;
@@ -69,6 +71,7 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
     
     if (muonHandle->size() < 1) return false;    
     const pat::MuonRef mu = (*muonHandle)[0] ;
+
     // if (mu->pt() <= 20 || )
     resultMuon->push_back (mu);
 
@@ -87,6 +90,16 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
     iEvent.put(resultTau);
 
     return true;
+}
+
+float TauTagAndProbeFilter::ComputeMT (math::XYZTLorentzVector visP4, pat::MET& met)
+{
+    math::XYZTLorentzVector METP4 (met.px(), met.py(), 0, met.pt());   
+    float scalSum = met.pt() + visP4.pt();
+    math::XYZTLorentzVector vecSum (visP4);
+    vecSum += METP4;
+    float vecSumPt = vecSum.pt();
+    return sqrt (scalSum*scalSum - vecSumPt*vecSumPt);
 }
 
 #include <FWCore/Framework/interface/MakerMacros.h>
