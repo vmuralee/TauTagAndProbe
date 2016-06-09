@@ -14,6 +14,8 @@
 #include <DataFormats/PatCandidates/interface/CompositeCandidate.h>
 
 #include <iostream>
+#include <utility>
+#include <vector>
 
 using namespace edm;
 using namespace std;
@@ -29,7 +31,7 @@ class TauTagAndProbeFilter : public edm::EDFilter {
     private:
         bool filter(edm::Event &, edm::EventSetup const&);
 
-        float ComputeMT(math::XYZTLorentzVector visP4, pat::MET& met);
+        float ComputeMT(math::XYZTLorentzVector visP4, const pat::MET& met);
 
         EDGetTokenT<pat::TauRefVector>   _tausTag;
         EDGetTokenT<pat::MuonRefVector>  _muonsTag;
@@ -58,9 +60,8 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
     iEvent.getByToken (_muonsTag, muonHandle);
 
     // reject events with more than 1 mu in the event (reject DY) 
-    // FIXME: mu threshold is 5 GeV in miniAOD, need 10
     // or without mu (should not happen in SingleMu dataset)
-    // if (muonHandle->size() != 1) return false;
+    if (muonHandle->size() != 1) return false;
 
     // for loop is now dummy, leaving it for debug    
     // for (size_t imu = 0; imu < muonHandle->size(); ++imu )
@@ -69,30 +70,42 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
     //     cout << "### FILTERED MUON PT: " << mu->pt() << endl;
     // }
     
-    if (muonHandle->size() < 1) return false;    
     const pat::MuonRef mu = (*muonHandle)[0] ;
-
-    // if (mu->pt() <= 20 || )
-    resultMuon->push_back (mu);
 
     //---------------------   get the met for mt computation etc. -----------------
     Handle<pat::METCollection> metHandle;
     iEvent.getByToken (_metTag, metHandle);
-    const pat::MET* met = &((*metHandle)[0]);
+    const pat::MET& met = (*metHandle)[0];
 
-    // Handle<pat::TauRefVector> tauHandle;
-    // iEvent.getByToken (_tausTag, tauHandle);
-    // if (tauHandle->size() < 1) return false;    
-    // const pat::TauRef tau = (*tauHandle)[0] ;
-    // resultTau->push_back (tau);    
+    float mt = ComputeMT (mu->p4(), met);
+    if (mt >= 30) return false; // reject W+jets
 
+    Handle<pat::TauRefVector> tauHandle;
+    iEvent.getByToken (_tausTag, tauHandle);
+    if (tauHandle->size() < 1) return false;    
+
+    vector<pair<float, int>> tausIdxPtVec;
+    for (uint itau = 0; itau < tauHandle->size(); ++itau)
+    {
+        const pat::TauRef tau = (*tauHandle)[itau] ;
+        math::XYZTLorentzVector pSum = mu->p4() + tau->p4();
+        if (pSum.mass() <= 40 || pSum.mass() >= 80) continue; // visible mass in (40, 80)
+        tausIdxPtVec.push_back(make_pair(tau->pt(), itau));
+    }
+    if (tausIdxPtVec.size() == 0) return false; 
+    if (tausIdxPtVec.size() > 1) sort (tausIdxPtVec.begin(), tausIdxPtVec.end()); // will be sorted by first idx i.e. highest pt
+    int tauIdx = tausIdxPtVec.back().second;
+    const pat::TauRef tau = (*tauHandle)[tauIdx] ;
+
+    resultTau->push_back (tau);    
+    resultMuon->push_back (mu);
     iEvent.put(resultMuon);
     iEvent.put(resultTau);
 
     return true;
 }
 
-float TauTagAndProbeFilter::ComputeMT (math::XYZTLorentzVector visP4, pat::MET& met)
+float TauTagAndProbeFilter::ComputeMT (math::XYZTLorentzVector visP4, const pat::MET& met)
 {
     math::XYZTLorentzVector METP4 (met.px(), met.py(), 0, met.pt());   
     float scalSum = met.pt() + visP4.pt();
