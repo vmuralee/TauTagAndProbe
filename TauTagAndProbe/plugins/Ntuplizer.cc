@@ -19,6 +19,7 @@
 #include <DataFormats/PatCandidates/interface/Muon.h>
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "FWCore/Common/interface/TriggerNames.h"
+#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 
 
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
@@ -36,6 +37,7 @@ class Ntuplizer : public edm::EDAnalyzer {
         virtual void beginJob() ;
         virtual void analyze(const edm::Event&, const edm::EventSetup&);
         virtual void endJob() ;
+        virtual void beginRun(edm::Run const&, edm::EventSetup const&);
         void Initialize(); 
         
         TTree *_tree;
@@ -50,7 +52,17 @@ class Ntuplizer : public edm::EDAnalyzer {
         edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> _triggerObjects;
         edm::EDGetTokenT<edm::TriggerResults> _triggerBits;
 
-        std::vector<Float_t> _muonsPtVector;
+        edm::InputTag _processName;
+
+        std::vector<Float_t> _tauPtVector;
+        std::vector<uint> _tauTriggeredVector;
+
+        unsigned int _doubleMediumIsoPFTau32Index;
+        unsigned int _doubleMediumIsoPFTau35Index;
+        unsigned int _doubleMediumIsoPFTau40Index;
+
+        HLTConfigProvider _hltConfig;
+
         
 };
 
@@ -62,6 +74,7 @@ _triggerObjects(consumes<pat::TriggerObjectStandAloneCollection>(iConfig.getPara
 _triggerBits(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("triggerResultsLabel")))
 {
     this -> _treeName = iConfig.getParameter<std::string>("treeName");
+    this -> _processName = iConfig.getParameter<edm::InputTag>("triggerResultsLabel");
     this -> Initialize();
     return;
 }
@@ -69,13 +82,31 @@ _triggerBits(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("
 Ntuplizer::~Ntuplizer()
 {}
 
+void Ntuplizer::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
+{
+    Bool_t changedConfig = false;
+    
+    if(!this -> _hltConfig.init(iRun, iSetup, this -> _processName.process(), changedConfig)){
+        edm::LogError("HLTMatchingFilter") << "Initialization of HLTConfigProvider failed!!"; 
+        return;
+    }
+
+    const edm::TriggerNames::Strings& triggerNames = this -> _hltConfig.triggerNames();
+    for(unsigned int j=0; j < triggerNames.size(); j++)
+    {
+        if (triggerNames[j].find("HLT_DoubleMediumIsoPFTau32_Trk1_eta2p1_Reg_v") != std::string::npos) this -> _doubleMediumIsoPFTau32Index = j;
+        if (triggerNames[j].find("HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg_v") != std::string::npos) this -> _doubleMediumIsoPFTau35Index = j;
+        if (triggerNames[j].find("HLT_DoubleMediumIsoPFTau40_Trk1_eta2p1_Reg_v") != std::string::npos) this -> _doubleMediumIsoPFTau40Index = j;
+    } 
+    
+} ;
 
 void Ntuplizer::Initialize() {
     this -> _indexevents = 0;
     this -> _runNumber = 0;
     this -> _lumi = 0;
 
-    this -> _muonsPtVector.clear();    
+    this -> _tauPtVector.clear();    
 }
 
 
@@ -85,11 +116,12 @@ void Ntuplizer::beginJob()
     this -> _tree = fs -> make<TTree>(this -> _treeName.c_str(), this -> _treeName.c_str());
 
     //Branches
-    this -> _tree->Branch("EventNumber",&_indexevents,"EventNumber/l");
-    this -> _tree->Branch("RunNumber",&_runNumber,"RunNumber/I");
-    this -> _tree->Branch("lumi",&_lumi,"lumi/I");
-
-    this -> _tree->Branch("muonsPt", &_muonsPtVector);
+    this -> _tree -> Branch("EventNumber",&_indexevents,"EventNumber/l");
+    this -> _tree -> Branch("RunNumber",&_runNumber,"RunNumber/I");
+    this -> _tree -> Branch("lumi",&_lumi,"lumi/I");
+    this -> _tree -> Branch("tauPt", &_tauPtVector);
+    this -> _tree -> Branch("isTriggered", &_tauTriggeredVector);
+    
     return;
 }
 
@@ -126,21 +158,25 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     {
         obj.unpackPathNames(names);
         const edm::TriggerNames::Strings& triggerNames = names.triggerNames();
-        for (unsigned int x = 0; x < names.size(); x++)
-        {
-            bool isTriggered = false;
-            if (triggerNames[x].find("HLT_DoubleMediumIsoPFTau32_Trk1_eta2p1_Reg_v") != std::string::npos) isTriggered = true;
-            if (triggerNames[x].find("HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg_v") != std::string::npos) isTriggered = true;
-            if (triggerNames[x].find("HLT_DoubleMediumIsoPFTau40_Trk1_eta2p1_Reg_v") != std::string::npos) isTriggered = true;
-        }
+
+        uint isTriggered = 0;
+        if ((obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau32Index], true, false)) || 
+            (obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau35Index], true, false)) ||
+            (obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau40Index], true, false))) isTriggered = 1;
+
+        this -> _tauPtVector.push_back(obj.pt());
+        this -> _tauTriggeredVector.push_back(isTriggered);
+        
     }
 
+    /*
     for (size_t imu = 0; imu < muonHandle -> size(); ++imu )
     {
         const pat::MuonRef mu = (*muonHandle)[imu] ;
         std::cout << "##### MUON PT: " << mu -> pt() << std::endl;
         this -> _muonsPtVector.push_back(mu -> pt());
     }
+    */ 
 
     this -> _tree -> Fill();
     

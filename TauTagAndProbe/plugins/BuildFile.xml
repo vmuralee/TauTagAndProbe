@@ -27,6 +27,7 @@
 <use name="CommonTools/Utils"/>
 <use name="CommonTools/UtilAlgos"/>
 <use name="FWCore/ServiceRegistry"/>
+<use name="HLTrigger/HLTcore"/>
 
 <flags EDM_PLUGIN="1"/>
 
