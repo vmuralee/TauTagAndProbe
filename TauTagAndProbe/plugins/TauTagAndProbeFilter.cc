@@ -90,6 +90,7 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
         const pat::TauRef tau = (*tauHandle)[itau] ;
         math::XYZTLorentzVector pSum = mu->p4() + tau->p4();
         if (pSum.mass() <= 40 || pSum.mass() >= 80) continue; // visible mass in (40, 80)
+        if (mu->charge() / tau->charge() > 0 ) continue; // pair must be OS
         tausIdxPtVec.push_back(make_pair(tau->pt(), itau));
     }
     if (tausIdxPtVec.size() == 0) return false; 
