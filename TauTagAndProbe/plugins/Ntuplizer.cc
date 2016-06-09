@@ -18,12 +18,11 @@
 #include <FWCore/Utilities/interface/InputTag.h>
 #include <DataFormats/PatCandidates/interface/Muon.h>
 #include "FWCore/ServiceRegistry/interface/Service.h"
+#include "FWCore/Common/interface/TriggerNames.h"
 
 
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
-using namespace std;
-using namespace edm;
 
 class Ntuplizer : public edm::EDAnalyzer {
     public:
@@ -47,7 +46,9 @@ class Ntuplizer : public edm::EDAnalyzer {
         Int_t           _runNumber;
         Int_t           _lumi;
 
-        EDGetTokenT<pat::MuonRefVector>  _muonsTag;
+        edm::EDGetTokenT<pat::MuonRefVector>  _muonsTag;
+        edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> _triggerObjects;
+        edm::EDGetTokenT<edm::TriggerResults> _triggerBits;
 
         std::vector<Float_t> _muonsPtVector;
         
@@ -56,7 +57,9 @@ class Ntuplizer : public edm::EDAnalyzer {
 
 // ----Constructor and Destructor -----
 Ntuplizer::Ntuplizer(const edm::ParameterSet& iConfig) :
-_muonsTag(consumes<pat::MuonRefVector>(iConfig.getParameter<InputTag>("muons")))
+_muonsTag(consumes<pat::MuonRefVector>(iConfig.getParameter<edm::InputTag>("muons"))),
+_triggerObjects(consumes<pat::TriggerObjectStandAloneCollection>(iConfig.getParameter<edm::InputTag>("triggerSet"))),
+_triggerBits(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("triggerResultsLabel")))
 {
     this -> _treeName = iConfig.getParameter<std::string>("treeName");
     this -> Initialize();
@@ -102,22 +105,40 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
 
     this -> Initialize();
 
-    cout << "### ANALYZE CALLED" << endl;
-
     _indexevents = iEvent.id().event();
     _runNumber = iEvent.id().run();
     _lumi = iEvent.luminosityBlock();
 
-    auto_ptr<pat::MuonRefVector> resultMuon(new pat::MuonRefVector);
+    std::auto_ptr<pat::MuonRefVector> resultMuon(new pat::MuonRefVector);
 
     // search for the tag in the event
-    Handle<pat::MuonRefVector> muonHandle;
-    iEvent.getByToken(_muonsTag, muonHandle);
+    edm::Handle<pat::MuonRefVector> muonHandle;
+    edm::Handle<pat::TriggerObjectStandAloneCollection> triggerObjects;
+    edm::Handle<edm::TriggerResults> triggerBits;
+
+    iEvent.getByToken(this -> _muonsTag, muonHandle);
+    iEvent.getByToken(this -> _triggerObjects, triggerObjects);
+    iEvent.getByToken(this -> _triggerBits, triggerBits);
+
+    const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
+
+    for (pat::TriggerObjectStandAlone obj : *triggerObjects)
+    {
+        obj.unpackPathNames(names);
+        const edm::TriggerNames::Strings& triggerNames = names.triggerNames();
+        for (unsigned int x = 0; x < names.size(); x++)
+        {
+            bool isTriggered = false;
+            if (triggerNames[x].find("HLT_DoubleMediumIsoPFTau32_Trk1_eta2p1_Reg_v") != std::string::npos) isTriggered = true;
+            if (triggerNames[x].find("HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg_v") != std::string::npos) isTriggered = true;
+            if (triggerNames[x].find("HLT_DoubleMediumIsoPFTau40_Trk1_eta2p1_Reg_v") != std::string::npos) isTriggered = true;
+        }
+    }
 
     for (size_t imu = 0; imu < muonHandle -> size(); ++imu )
     {
         const pat::MuonRef mu = (*muonHandle)[imu] ;
-	cout << "##### MUON PT: " << mu -> pt() << endl;
+        std::cout << "##### MUON PT: " << mu -> pt() << std::endl;
         this -> _muonsPtVector.push_back(mu -> pt());
     }
 

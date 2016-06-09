@@ -52,7 +52,9 @@ TagAndProbe = cms.EDFilter("TauTagAndProbeFilter",
 
 Ntuplizer = cms.EDAnalyzer("Ntuplizer",
     treeName = cms.string("TagAndProbe"),
-    muons = cms.InputTag("TagAndProbe")
+    muons = cms.InputTag("TagAndProbe"),
+    triggerSet = cms.InputTag("selectedPatTrigger"),
+    triggerResultsLabel = cms.InputTag("TriggerResults", "", "HLT")
 )
 
 TAndPseq = cms.Sequence(
