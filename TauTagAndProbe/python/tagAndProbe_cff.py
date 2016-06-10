@@ -65,3 +65,22 @@ TAndPseq = cms.Sequence(
     TagAndProbe +
     Ntuplizer
 )
+
+#### enter here to run on MC (performance on gen matched taus) ####
+isMC = True
+
+if isMC:
+
+    genMatchedTaus = cms.EDFilter("genMatchTauFilter",
+            taus = cms.InputTag("goodTaus")
+        )
+
+    goodMuons.filter = cms.bool(False)
+    # Ntuplizer.taus = cms.InputTag("genMatchedTaus")
+
+    TAndPseq = cms.Sequence(
+        goodMuons      +
+        goodTaus       + 
+        genMatchedTaus + 
+        Ntuplizer
+    )
