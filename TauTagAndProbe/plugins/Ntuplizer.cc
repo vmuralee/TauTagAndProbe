@@ -160,9 +160,14 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
         const edm::TriggerNames::Strings& triggerNames = names.triggerNames();
 
         uint isTriggered = 0;
-        if ((obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau32Index], true, false)) || 
+        if (
+            (obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau32Index], true, false)) || 
             (obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau35Index], true, false)) ||
-            (obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau40Index], true, false))) isTriggered = 1;
+            (obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau40Index], true, false))
+        ){
+             isTriggered = 1;
+             //std::cout << "########## TRIGGERED ############" << std::endl;
+        }
 
         this -> _tauPtVector.push_back(obj.pt());
         this -> _tauTriggeredVector.push_back(isTriggered);
