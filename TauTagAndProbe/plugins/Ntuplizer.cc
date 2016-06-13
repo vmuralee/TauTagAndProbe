@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <string>
 #include <map>
+#include <vector>
 #include <utility>
 #include <TNtuple.h>
 
@@ -35,9 +36,10 @@ class Ntuplizer : public edm::EDAnalyzer {
     private:
         //----edm control---
         virtual void beginJob() ;
-        virtual void analyze(const edm::Event&, const edm::EventSetup&);
-        virtual void endJob() ;
         virtual void beginRun(edm::Run const&, edm::EventSetup const&);
+        virtual void analyze(const edm::Event&, const edm::EventSetup&);
+        virtual void endJob();
+        virtual void endRun(edm::Run const&, edm::EventSetup const&);
         void Initialize(); 
         
         TTree *_tree;
@@ -91,15 +93,23 @@ void Ntuplizer::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
         return;
     }
 
+    this -> _doubleMediumIsoPFTau32Index = -1;
+    this -> _doubleMediumIsoPFTau35Index = -1;
+    this -> _doubleMediumIsoPFTau40Index = -1;
+
     const edm::TriggerNames::Strings& triggerNames = this -> _hltConfig.triggerNames();
     for(unsigned int j=0; j < triggerNames.size(); j++)
     {
-        if (triggerNames[j].find("HLT_DoubleMediumIsoPFTau32_Trk1_eta2p1_Reg_v") != std::string::npos) this -> _doubleMediumIsoPFTau32Index = j;
+        // if (triggerNames[j].find("HLT_DoubleMediumIsoPFTau32_Trk1_eta2p1_Reg_v") != std::string::npos) this -> _doubleMediumIsoPFTau32Index = j;
+        if (triggerNames[j].find("HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg_v") != std::string::npos) this -> _doubleMediumIsoPFTau32Index = j;
+        
         if (triggerNames[j].find("HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg_v") != std::string::npos) this -> _doubleMediumIsoPFTau35Index = j;
         if (triggerNames[j].find("HLT_DoubleMediumIsoPFTau40_Trk1_eta2p1_Reg_v") != std::string::npos) this -> _doubleMediumIsoPFTau40Index = j;
+        std::cout << j << " -- " << triggerNames[j] << std::endl;
+
     } 
     
-} ;
+}
 
 void Ntuplizer::Initialize() {
     this -> _indexevents = 0;
@@ -132,6 +142,11 @@ void Ntuplizer::endJob()
 }
 
 
+void Ntuplizer::endRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
+{
+    return;
+}
+
 void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
 {
 
@@ -153,7 +168,8 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     iEvent.getByToken(this -> _triggerBits, triggerBits);
 
     const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
-
+    
+    int idx = 0;
     for (pat::TriggerObjectStandAlone obj : *triggerObjects)
     {
         obj.unpackPathNames(names);
@@ -169,9 +185,35 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
              //std::cout << "########## TRIGGERED ############" << std::endl;
         }
 
+//last , L3
+        bool nameTF = obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau32Index], true, false);
+        bool nameFT = obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau32Index], false, true);
+        bool nameFF = obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau32Index], false, false);
+        bool nameTT = obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau32Index], true, true);
+
+
+        std::string found = triggerNames[this -> _doubleMediumIsoPFTau32Index];
+        found += std::string("AAA");
+        // // std::cout << "fOUND: " << triggerNames[this -> _doubleMediumIsoPFTau32Index] << std::endl;
+
+        // if ( obj.pt() > 40 ) 
+        //      std::cout << nameTF << " " << nameFT << " " << nameFF << " " << nameTT << std::endl;
+
+        const std::vector<std::string>& vLabels = obj.filterLabels();
+        for (std::string str : vLabels)
+        {
+            if (str == std::string("hltDoublePFTau35TrackPt1MediumIsolationDz02Reg"))
+            {
+                std::cout << idx << " trovato " << obj.hasTriggerObjectType(trigger::TriggerTau) << " " << obj.hasTriggerObjectType(trigger::TriggerL1TauJet) << " " <<
+                nameTF << " " << nameFT << " " << nameFF << " " << nameTT << " " <<
+                obj.pt() << " " << obj.eta() << " " << obj.phi() << " " << obj.energy() << std::endl;
+                // break;
+            }
+        }
+
         this -> _tauPtVector.push_back(obj.pt());
         this -> _tauTriggeredVector.push_back(isTriggered);
-        
+        ++idx;
     }
 
     /*
