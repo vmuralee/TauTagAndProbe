@@ -192,7 +192,6 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
             obj.unpackPathNames(names);
             const edm::TriggerNames::Strings& triggerNames = names.triggerNames();
 
-
             // if ((obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau32Index], true, false)) || 
             //     (obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau35Index], true, false)) ||
             //     (obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau40Index], true, false))) isTriggered = 1;
@@ -202,7 +201,6 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
             // bool nameFF = obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau32Index], false, false);
             // bool nameTT = obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau32Index], true, true);
 
-
             std::string found = triggerNames[this -> _doubleMediumIsoPFTau32Index];
             found += std::string("AAA");
             // // std::cout << "fOUND: " << triggerNames[this -> _doubleMediumIsoPFTau32Index] << std::endl;
@@ -211,9 +209,9 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
             //      std::cout << nameTF << " " << nameFT << " " << nameFF << " " << nameTT << std::endl;
 
             const std::vector<std::string>& vLabels = obj.filterLabels();
-            for (std::string str : vLabels)
+            for (std::string label : vLabels)
             {
-                if (str == std::string("hltDoublePFTau35TrackPt1MediumIsolationDz02Reg"))
+                if (label == std::string("hltDoublePFTau35TrackPt1MediumIsolationDz02Reg"))
                 {
                     isTriggered = 1;
                     // std::cout << idx << " trovato " << obj.hasTriggerObjectType(trigger::TriggerTau) << " " << obj.hasTriggerObjectType(trigger::TriggerL1TauJet) << " " <<
