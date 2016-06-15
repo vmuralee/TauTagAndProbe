@@ -211,7 +211,7 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
             const std::vector<std::string>& vLabels = obj.filterLabels();
             for (std::string label : vLabels)
             {
-                if (label == std::string("hltDoublePFTau35TrackPt1MediumIsolationDz02Reg"))
+                if (label == std::string("hltOverlapFilterIsoMu17MediumIsoPFTau40Reg"))
                 {
                     isTriggered = 1;
                     // std::cout << idx << " trovato " << obj.hasTriggerObjectType(trigger::TriggerTau) << " " << obj.hasTriggerObjectType(trigger::TriggerL1TauJet) << " " <<
