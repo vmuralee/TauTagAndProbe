@@ -18,6 +18,7 @@
 #include <FWCore/Framework/interface/ESHandle.h>
 #include <FWCore/Utilities/interface/InputTag.h>
 #include <DataFormats/PatCandidates/interface/Muon.h>
+#include <DataFormats/PatCandidates/interface/Tau.h>
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
@@ -51,13 +52,16 @@ class Ntuplizer : public edm::EDAnalyzer {
         Int_t           _lumi;
 
         edm::EDGetTokenT<pat::MuonRefVector>  _muonsTag;
+        edm::EDGetTokenT<pat::TauRefVector>   _tauTag;
         edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> _triggerObjects;
         edm::EDGetTokenT<edm::TriggerResults> _triggerBits;
 
         edm::InputTag _processName;
 
-        std::vector<Float_t> _tauPtVector;
-        std::vector<uint> _tauTriggeredVector;
+        // std::vector<Float_t> _tauPtVector;
+        // std::vector<uint> _tauTriggeredVector;
+        float _tauPt;
+        int   _tauTriggered;
 
         unsigned int _doubleMediumIsoPFTau32Index;
         unsigned int _doubleMediumIsoPFTau35Index;
@@ -71,9 +75,10 @@ class Ntuplizer : public edm::EDAnalyzer {
 
 // ----Constructor and Destructor -----
 Ntuplizer::Ntuplizer(const edm::ParameterSet& iConfig) :
-_muonsTag(consumes<pat::MuonRefVector>(iConfig.getParameter<edm::InputTag>("muons"))),
-_triggerObjects(consumes<pat::TriggerObjectStandAloneCollection>(iConfig.getParameter<edm::InputTag>("triggerSet"))),
-_triggerBits(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("triggerResultsLabel")))
+_muonsTag       (consumes<pat::MuonRefVector>                     (iConfig.getParameter<edm::InputTag>("muons"))),
+_tauTag         (consumes<pat::TauRefVector>                      (iConfig.getParameter<edm::InputTag>("taus"))),
+_triggerObjects (consumes<pat::TriggerObjectStandAloneCollection> (iConfig.getParameter<edm::InputTag>("triggerSet"))),
+_triggerBits    (consumes<edm::TriggerResults>                    (iConfig.getParameter<edm::InputTag>("triggerResultsLabel")))
 {
     this -> _treeName = iConfig.getParameter<std::string>("treeName");
     this -> _processName = iConfig.getParameter<edm::InputTag>("triggerResultsLabel");
@@ -116,7 +121,9 @@ void Ntuplizer::Initialize() {
     this -> _runNumber = 0;
     this -> _lumi = 0;
 
-    this -> _tauPtVector.clear();    
+    // this -> _tauPtVector.clear();    
+    this -> _tauPt = -1.;    
+    this -> _tauTriggered = 0;    
 }
 
 
@@ -129,8 +136,10 @@ void Ntuplizer::beginJob()
     this -> _tree -> Branch("EventNumber",&_indexevents,"EventNumber/l");
     this -> _tree -> Branch("RunNumber",&_runNumber,"RunNumber/I");
     this -> _tree -> Branch("lumi",&_lumi,"lumi/I");
-    this -> _tree -> Branch("tauPt", &_tauPtVector);
-    this -> _tree -> Branch("isTriggered", &_tauTriggeredVector);
+    // this -> _tree -> Branch("tauPt", &_tauPtVector);
+    // this -> _tree -> Branch("isTriggered", &_tauTriggeredVector);
+    this -> _tree -> Branch("tauPt", &_tauPt);
+    this -> _tree -> Branch("isTriggered", &_tauTriggered);
     
     return;
 }
@@ -156,60 +165,72 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     _runNumber = iEvent.id().run();
     _lumi = iEvent.luminosityBlock();
 
-    std::auto_ptr<pat::MuonRefVector> resultMuon(new pat::MuonRefVector);
+    // std::auto_ptr<pat::MuonRefVector> resultMuon(new pat::MuonRefVector);
 
     // search for the tag in the event
     edm::Handle<pat::MuonRefVector> muonHandle;
+    edm::Handle<pat::TauRefVector>  tauHandle;
     edm::Handle<pat::TriggerObjectStandAloneCollection> triggerObjects;
     edm::Handle<edm::TriggerResults> triggerBits;
 
     iEvent.getByToken(this -> _muonsTag, muonHandle);
+    iEvent.getByToken(this -> _tauTag,   tauHandle);
     iEvent.getByToken(this -> _triggerObjects, triggerObjects);
     iEvent.getByToken(this -> _triggerBits, triggerBits);
 
     const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
-    
-    int idx = 0;
+    const pat::TauRef tau = (*tauHandle)[0] ;
+
+    // int idx = 0;
+    uint isTriggered = 0;
     for (pat::TriggerObjectStandAlone obj : *triggerObjects)
     {
-        obj.unpackPathNames(names);
-        const edm::TriggerNames::Strings& triggerNames = names.triggerNames();
-
-        uint isTriggered = 0;
-
-        // if ((obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau32Index], true, false)) || 
-        //     (obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau35Index], true, false)) ||
-        //     (obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau40Index], true, false))) isTriggered = 1;
-//last , L3
-        bool nameTF = obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau32Index], true, false);
-        bool nameFT = obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau32Index], false, true);
-        bool nameFF = obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau32Index], false, false);
-        bool nameTT = obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau32Index], true, true);
-
-
-        std::string found = triggerNames[this -> _doubleMediumIsoPFTau32Index];
-        found += std::string("AAA");
-        // // std::cout << "fOUND: " << triggerNames[this -> _doubleMediumIsoPFTau32Index] << std::endl;
-
-        // if ( obj.pt() > 40 ) 
-        //      std::cout << nameTF << " " << nameFT << " " << nameFF << " " << nameTT << std::endl;
-
-        const std::vector<std::string>& vLabels = obj.filterLabels();
-        for (std::string str : vLabels)
+        // std::cout << "XXXX " << deltaR2 (*tau, obj) << std::endl;
+        if (deltaR (*tau, obj) < 0.5)
         {
-            if (str == std::string("hltDoublePFTau35TrackPt1MediumIsolationDz02Reg"))
+
+            obj.unpackPathNames(names);
+            const edm::TriggerNames::Strings& triggerNames = names.triggerNames();
+
+
+            // if ((obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau32Index], true, false)) || 
+            //     (obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau35Index], true, false)) ||
+            //     (obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau40Index], true, false))) isTriggered = 1;
+    //last , L3
+            // bool nameTF = obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau32Index], true, false);
+            // bool nameFT = obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau32Index], false, true);
+            // bool nameFF = obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau32Index], false, false);
+            // bool nameTT = obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau32Index], true, true);
+
+
+            std::string found = triggerNames[this -> _doubleMediumIsoPFTau32Index];
+            found += std::string("AAA");
+            // // std::cout << "fOUND: " << triggerNames[this -> _doubleMediumIsoPFTau32Index] << std::endl;
+
+            // if ( obj.pt() > 40 ) 
+            //      std::cout << nameTF << " " << nameFT << " " << nameFF << " " << nameTT << std::endl;
+
+            const std::vector<std::string>& vLabels = obj.filterLabels();
+            for (std::string str : vLabels)
             {
-                std::cout << idx << " trovato " << obj.hasTriggerObjectType(trigger::TriggerTau) << " " << obj.hasTriggerObjectType(trigger::TriggerL1TauJet) << " " <<
-                nameTF << " " << nameFT << " " << nameFF << " " << nameTT << " " <<
-                obj.pt() << " " << obj.eta() << " " << obj.phi() << " " << obj.energy() << std::endl;
-                // break;
+                if (str == std::string("hltDoublePFTau35TrackPt1MediumIsolationDz02Reg"))
+                {
+                    isTriggered = 1;
+                    // std::cout << idx << " trovato " << obj.hasTriggerObjectType(trigger::TriggerTau) << " " << obj.hasTriggerObjectType(trigger::TriggerL1TauJet) << " " <<
+                    // nameTF << " " << nameFT << " " << nameFF << " " << nameTT << " " <<
+                    // obj.pt() << " " << obj.eta() << " " << obj.phi() << " " << obj.energy() << std::endl;
+                    // break;
+                }
             }
         }
-
-        this -> _tauPtVector.push_back(obj.pt());
-        this -> _tauTriggeredVector.push_back(isTriggered);
-        ++idx;
     }
+
+    // this -> _tauPtVector.push_back(tau->pt());
+    // this -> _tauTriggeredVector.push_back(isTriggered);
+    this -> _tauPt = tau->pt();
+    this -> _tauTriggered = isTriggered;
+
+    // ++idx;
 
     /*
     for (size_t imu = 0; imu < muonHandle -> size(); ++imu )

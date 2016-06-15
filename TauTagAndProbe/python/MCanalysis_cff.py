@@ -35,7 +35,8 @@ genMatchedTaus = cms.EDFilter("genMatchTauFilter",
 # Ntuplizer.taus = cms.InputTag("genMatchedTaus")
 Ntuplizer = cms.EDAnalyzer("Ntuplizer",
     treeName = cms.string("TagAndProbe"),
-    muons = cms.InputTag("TagAndProbe"),
+    muons = cms.InputTag("goodMuons"),
+    taus  = cms.InputTag("genMatchedTaus"),
     triggerSet = cms.InputTag("selectedPatTrigger"),
     triggerResultsLabel = cms.InputTag("TriggerResults", "", "HLT")
 )
