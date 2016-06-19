@@ -56,22 +56,22 @@ class Ntuplizer : public edm::EDAnalyzer {
         edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> _triggerObjects;
         edm::EDGetTokenT<edm::TriggerResults> _triggerBits;
 
-        std::vector<const std::string&> _hltPaths;
-        std::vector<const int> _hltPathIndexes;
-        std::vector<std::vector<const std::string>& >_hltFilters1;
-        std::vector<std::vector<const std::string>& > _hltFilters2;
-        std::vector<const int&> _legs1;
-        std::vector<const int&> _legs2;
+        std::vector<std::string> _hltPaths;
+        std::vector<int> _hltPathIndexes;
+        std::vector<std::vector<std::string> >_hltFilters1;
+        std::vector<std::vector<std::string> > _hltFilters2;
+        std::vector<int> _legs1;
+        std::vector<int> _legs2;
 
         edm::InputTag _processName;
 
-        std::vector<Float_t> _tauPtVector;
-        std::vector<uint> _tauTriggerBitsVector;
+        //std::vector<Float_t> _tauPtVector;
+        //std::vector<uint> _tauTriggerBitsVector;
         
         // std::vector<Float_t> _tauPtVector;
         // std::vector<uint> _tauTriggeredVector;
-        //float _tauPt;
-        //int   _tauTriggered;
+        float _tauPt;
+        int   _tauTriggered;
 
 
         HLTConfigProvider _hltConfig;
@@ -91,13 +91,13 @@ _triggerBits    (consumes<edm::TriggerResults>                    (iConfig.getPa
     this -> _processName = iConfig.getParameter<edm::InputTag>("triggerResultsLabel");
 
     //Building the trigger arrays
-    std::vector<edm::ParameterSet> HLTList = pset.getParameter <std::vector<edm::ParameterSet> > ("triggerList");
+    const std::vector<edm::ParameterSet>& HLTList = iConfig.getParameter <std::vector<edm::ParameterSet> > ("triggerList");
     for (const edm::ParameterSet& parameterSet : HLTList) {
-        this -> _hltPaths.push_back(parameterSet->getParameter<std::string>("HLT"));
-        this -> _hltFilters1.push_back(parameterSet->getParameter<std::vector<std::string> >("path1"));
-        this -> _hltFilters2.push_back(parameterSet->getParameter<std::vector<std::string> >("path2"));
-        this -> _legs1.push_back(parameterSet->getParameter<int>("leg1"));
-        this -> _legs2.push_back(parameterSet->getParameter<int>("leg2"));
+        this -> _hltPaths.push_back(parameterSet.getParameter<std::string>("HLT"));
+        this -> _hltFilters1.push_back(parameterSet.getParameter<std::vector<std::string> >("path1"));
+        this -> _hltFilters2.push_back(parameterSet.getParameter<std::vector<std::string> >("path2"));
+        this -> _legs1.push_back(parameterSet.getParameter<int>("leg1"));
+        this -> _legs2.push_back(parameterSet.getParameter<int>("leg2"));
     }
     
     this -> Initialize();
@@ -116,12 +116,12 @@ void Ntuplizer::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
         return;
     }
 
-    this -> _doubleMediumIsoPFTau32Index = -1;
-    this -> _doubleMediumIsoPFTau35Index = -1;
-    this -> _doubleMediumIsoPFTau40Index = -1;
+//    this -> _doubleMediumIsoPFTau32Index = -1;
+//    this -> _doubleMediumIsoPFTau35Index = -1;
+//    this -> _doubleMediumIsoPFTau40Index = -1;
 
     const edm::TriggerNames::Strings& triggerNames = this -> _hltConfig.triggerNames();
-
+    this -> _hltPathIndexes.clear();
     for (const std::string& hltPath : this -> _hltPaths){
         bool found = false;
         for(unsigned int j=0; j < triggerNames.size(); j++)
@@ -212,22 +212,18 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     uint isTriggered = 0;
     for (pat::TriggerObjectStandAlone obj : *triggerObjects)
     {
-/* OLD CODE
-        obj.unpackPathNames(names);
-        const edm::TriggerNames::Strings& triggerNames = names.triggerNames();
-*/
 
         // std::cout << "XXXX " << deltaR2 (*tau, obj) << std::endl;
         if (deltaR (*tau, obj) < 0.5)
         {
-
+            
             obj.unpackPathNames(names);
             const edm::TriggerNames::Strings& triggerNames = names.triggerNames();
-
             //Looking for the path
-            for  (const std::string& path : this -> _hltPaths){
-                if (obj.hasPathName(triggerNames[path], true, false)){
+            for  (int index : this -> _hltPathIndexes){
+                if ((index >= 0)&&(obj.hasPathName(triggerNames[index], true, false))){
                     //Path found, now looking for the label 1, if present in the parameter set
+                    std::cout << "#### FOUND PATH " << triggerNames[index] << " ######" << std::endl;
                     for  (const std::vector<std::string>& filters1 : this -> _hltFilters1){
                         //Checking if we have filters to look for
                         if(filters1.size() > 0) {
@@ -235,14 +231,15 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
                             const std::vector<std::string>& vLabels = obj.filterLabels();
                             for (const std::string& label : vLabels)
                             {
+                                std::cout << "LOOKING FOR LABEL " << label << std::endl;
                                 //Looking for matching filters
                                 for (const std::string& filter1 : filters1){
                                     //if (label == std::string("hltOverlapFilterIsoMu17MediumIsoPFTau40Reg"))
                                     if (label == filter1)
                                     {
                                         isTriggered = 1;
-                                        std::cout << idx << "========== TROVATO =========== " << std::endl
-                                            << label << " == " << filter1 << " con path " << path << endl;
+                                        std::cout << "========== TROVATO =========== " << std::endl
+                                            << label << " == " << filter1 << " with path " << triggerNames[index] << std::endl;
                                         // nameTF << " " << nameFT << " " << nameFF << " " << nameTT << " " <<
                                         // obj.pt() << " " << obj.eta() << " " << obj.phi() << " " << obj.energy() << std::endl;
                                         // break;

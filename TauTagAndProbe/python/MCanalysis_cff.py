@@ -2,6 +2,33 @@ import FWCore.ParameterSet.Config as cms
 
 print "Running on MC"    
 
+
+HLTLIST = cms.VPSet(
+    cms.PSet (
+        HLT = cms.string("HLT_DoubleMediumIsoPFTau32_Trk1_eta2p1_Reg_v"),
+        path1 = cms.vstring ("hltOverlapFilterIsoMu17MediumIsoPFTau32Reg"),
+        path2 = cms.vstring (""),
+        leg1 = cms.int32(15),
+        leg2 = cms.int32(15)
+    ),
+    cms.PSet (
+        HLT = cms.string("HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg_v"),
+        path1 = cms.vstring ("hltOverlapFilterIsoMu17MediumIsoPFTau35Reg"),
+        path2 = cms.vstring (""),
+        leg1 = cms.int32(15),
+        leg2 = cms.int32(15)
+    ),
+    cms.PSet (
+        HLT = cms.string("HLT_DoubleMediumIsoPFTau40_Trk1_eta2p1_Reg_v"),
+        path1 = cms.vstring ("hltOverlapFilterIsoMu17MediumIsoPFTau40Reg"),
+        path2 = cms.vstring (""),
+        leg1 = cms.int32(15),
+        leg2 = cms.int32(15)
+    )
+)
+
+
+
 # filter HLT paths for T&P
 import HLTrigger.HLTfilters.hltHighLevel_cfi as hlt
 hltFilter = hlt.hltHighLevel.clone(
@@ -46,7 +73,8 @@ Ntuplizer = cms.EDAnalyzer("Ntuplizer",
     muons = cms.InputTag("goodMuons"),
     taus  = cms.InputTag("genMatchedTaus"),
     triggerSet = cms.InputTag("selectedPatTrigger"),
-    triggerResultsLabel = cms.InputTag("TriggerResults", "", "HLT")
+    triggerResultsLabel = cms.InputTag("TriggerResults", "", "HLT"),
+    triggerList = HLTLIST
 )
 
 TAndPseq = cms.Sequence(
