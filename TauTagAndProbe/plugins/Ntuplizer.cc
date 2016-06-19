@@ -54,14 +54,18 @@ class Ntuplizer : public edm::EDAnalyzer {
         edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> _triggerObjects;
         edm::EDGetTokenT<edm::TriggerResults> _triggerBits;
 
+        std::vector<const std::string&> _hltPaths;
+        std::vector<const int> _hltPathIndexes;
+        std::vector<const std::string&> _hltFilters1;
+        std::vector<const std::string&> _hltFilters2;
+        std::vector<const int&> _legs1;
+        std::vector<const int&> _legs2;
+
         edm::InputTag _processName;
 
         std::vector<Float_t> _tauPtVector;
-        std::vector<uint> _tauTriggeredVector;
+        std::vector<uint> _tauTriggerBitsVector;
 
-        unsigned int _doubleMediumIsoPFTau32Index;
-        unsigned int _doubleMediumIsoPFTau35Index;
-        unsigned int _doubleMediumIsoPFTau40Index;
 
         HLTConfigProvider _hltConfig;
 
@@ -77,6 +81,17 @@ _triggerBits(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("
 {
     this -> _treeName = iConfig.getParameter<std::string>("treeName");
     this -> _processName = iConfig.getParameter<edm::InputTag>("triggerResultsLabel");
+
+    //Building the trigger arrays
+    std::vector<edm::ParameterSet> HLTList = pset.getParameter <std::vector<edm::ParameterSet> > ("triggerList");
+    for (const edm::ParameterSet& parameterSet : HLTList) {
+        this -> _hltPaths.push_back(parameterSet->getParameter<std::string>("HLT"));
+        this -> _hltFilters1.push_back(parameterSet->getParameter<std::string>("path1"));
+        this -> _hltFilters2.push_back(parameterSet->getParameter<std::string>("path2"));
+        this -> _legs1.push_back(parameterSet->getParameter<int>("leg1"));
+        this -> _legs2.push_back(parameterSet->getParameter<int>("leg2"));
+    }
+    
     this -> Initialize();
     return;
 }
@@ -98,16 +113,25 @@ void Ntuplizer::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
     this -> _doubleMediumIsoPFTau40Index = -1;
 
     const edm::TriggerNames::Strings& triggerNames = this -> _hltConfig.triggerNames();
-    for(unsigned int j=0; j < triggerNames.size(); j++)
-    {
-        // if (triggerNames[j].find("HLT_DoubleMediumIsoPFTau32_Trk1_eta2p1_Reg_v") != std::string::npos) this -> _doubleMediumIsoPFTau32Index = j;
-        if (triggerNames[j].find("HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg_v") != std::string::npos) this -> _doubleMediumIsoPFTau32Index = j;
-        
-        if (triggerNames[j].find("HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg_v") != std::string::npos) this -> _doubleMediumIsoPFTau35Index = j;
-        if (triggerNames[j].find("HLT_DoubleMediumIsoPFTau40_Trk1_eta2p1_Reg_v") != std::string::npos) this -> _doubleMediumIsoPFTau40Index = j;
-        std::cout << j << " -- " << triggerNames[j] << std::endl;
 
-    } 
+    for (const std::string& hltPath : this -> _hltPaths){
+        bool found = false;
+        for(unsigned int j=0; j < triggerNames.size(); j++)
+        {
+
+            if (triggerNames[j].find(hltPath) != std::string::npos) {
+                found = true;
+                this -> _hltPathIndexes.push_back(j);
+                std::cout << "### FOUND AT INDEX #" << j << " -->  " << triggerNames[j] << std::endl;
+            }
+            
+            //if (triggerNames[j].find("HLT_DoubleMediumIsoPFTau32_Trk1_eta2p1_Reg_v") != std::string::npos) this -> _doubleMediumIsoPFTau32Index = j;
+            //if (triggerNames[j].find("HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg_v") != std::string::npos) this -> _doubleMediumIsoPFTau35Index = j;
+            //if (triggerNames[j].find("HLT_DoubleMediumIsoPFTau40_Trk1_eta2p1_Reg_v") != std::string::npos) this -> _doubleMediumIsoPFTau40Index = j;
+            
+        }
+        if (!found) this -> _hltPathIndexes.push_back(-1);
+    }
     
 }
 
@@ -175,14 +199,16 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
         obj.unpackPathNames(names);
         const edm::TriggerNames::Strings& triggerNames = names.triggerNames();
 
-        uint isTriggered = 0;
+        uint triggerBits = 0;
+//TO DO: SET TRIGGER BITS bit = pow(2,x) x=0,1,2,...
         if (
-            (obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau32Index], true, false)) || 
-            (obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau35Index], true, false)) ||
-            (obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau40Index], true, false))
+            ((this -> _doubleMediumIsoPFTau32Index >= 0) && (obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau32Index], true, false))) || 
+            ((this -> _doubleMediumIsoPFTau35Index >= 0) && (obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau35Index], true, false))) ||
+            ((this -> _doubleMediumIsoPFTau40Index >= 0) && (obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau40Index], true, false)))
         ){
              isTriggered = 1;
              //std::cout << "########## TRIGGERED ############" << std::endl;
+             //Match stuff here
         }
 
 //last , L3
