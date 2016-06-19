@@ -231,7 +231,6 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
                             const std::vector<std::string>& vLabels = obj.filterLabels();
                             for (const std::string& label : vLabels)
                             {
-                                std::cout << "LOOKING FOR LABEL " << label << std::endl;
                                 //Looking for matching filters
                                 for (const std::string& filter1 : filters1){
                                     //if (label == std::string("hltOverlapFilterIsoMu17MediumIsoPFTau40Reg"))
