@@ -22,18 +22,26 @@
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
-
+#include "tParameterSet.h"
 
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
+
+/*
+██████  ███████  ██████ ██       █████  ██████   █████  ████████ ██  ██████  ███    ██
+██   ██ ██      ██      ██      ██   ██ ██   ██ ██   ██    ██    ██ ██    ██ ████   ██
+██   ██ █████   ██      ██      ███████ ██████  ███████    ██    ██ ██    ██ ██ ██  ██
+██   ██ ██      ██      ██      ██   ██ ██   ██ ██   ██    ██    ██ ██    ██ ██  ██ ██
+██████  ███████  ██████ ███████ ██   ██ ██   ██ ██   ██    ██    ██  ██████  ██   ████
+*/
 
 class Ntuplizer : public edm::EDAnalyzer {
     public:
         /// Constructor
         explicit Ntuplizer(const edm::ParameterSet&);
         /// Destructor
-        virtual ~Ntuplizer();  
-        
+        virtual ~Ntuplizer();
+
     private:
         //----edm control---
         virtual void beginJob() ;
@@ -41,8 +49,9 @@ class Ntuplizer : public edm::EDAnalyzer {
         virtual void analyze(const edm::Event&, const edm::EventSetup&);
         virtual void endJob();
         virtual void endRun(edm::Run const&, edm::EventSetup const&);
-        void Initialize(); 
-        
+        void Initialize();
+        bool isTau(const std::vector<std::string>& eventLabels, const std::vector<std::string>& filtersToLookFor);
+
         TTree *_tree;
         std::string _treeName;
         // -------------------------------------
@@ -56,18 +65,14 @@ class Ntuplizer : public edm::EDAnalyzer {
         edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> _triggerObjects;
         edm::EDGetTokenT<edm::TriggerResults> _triggerBits;
 
-        std::vector<std::string> _hltPaths;
-        std::vector<int> _hltPathIndexes;
-        std::vector<std::vector<std::string> >_hltFilters1;
-        std::vector<std::vector<std::string> > _hltFilters2;
-        std::vector<int> _legs1;
-        std::vector<int> _legs2;
+        //!Contains the parameters
+        tVParameterSet _parameters;
 
         edm::InputTag _processName;
 
         //std::vector<Float_t> _tauPtVector;
         //std::vector<uint> _tauTriggerBitsVector;
-        
+
         // std::vector<Float_t> _tauPtVector;
         // std::vector<uint> _tauTriggeredVector;
         float _tauPt;
@@ -76,9 +81,16 @@ class Ntuplizer : public edm::EDAnalyzer {
 
         HLTConfigProvider _hltConfig;
 
-        
+
 };
 
+/*
+██ ███    ███ ██████  ██      ███████ ███    ███ ███████ ███    ██ ████████  █████  ████████ ██  ██████  ███    ██
+██ ████  ████ ██   ██ ██      ██      ████  ████ ██      ████   ██    ██    ██   ██    ██    ██ ██    ██ ████   ██
+██ ██ ████ ██ ██████  ██      █████   ██ ████ ██ █████   ██ ██  ██    ██    ███████    ██    ██ ██    ██ ██ ██  ██
+██ ██  ██  ██ ██      ██      ██      ██  ██  ██ ██      ██  ██ ██    ██    ██   ██    ██    ██ ██    ██ ██  ██ ██
+██ ██      ██ ██      ███████ ███████ ██      ██ ███████ ██   ████    ██    ██   ██    ██    ██  ██████  ██   ████
+*/
 
 // ----Constructor and Destructor -----
 Ntuplizer::Ntuplizer(const edm::ParameterSet& iConfig) :
@@ -93,13 +105,15 @@ _triggerBits    (consumes<edm::TriggerResults>                    (iConfig.getPa
     //Building the trigger arrays
     const std::vector<edm::ParameterSet>& HLTList = iConfig.getParameter <std::vector<edm::ParameterSet> > ("triggerList");
     for (const edm::ParameterSet& parameterSet : HLTList) {
-        this -> _hltPaths.push_back(parameterSet.getParameter<std::string>("HLT"));
-        this -> _hltFilters1.push_back(parameterSet.getParameter<std::vector<std::string> >("path1"));
-        this -> _hltFilters2.push_back(parameterSet.getParameter<std::vector<std::string> >("path2"));
-        this -> _legs1.push_back(parameterSet.getParameter<int>("leg1"));
-        this -> _legs2.push_back(parameterSet.getParameter<int>("leg2"));
+        tParameterSet pSet;
+        pSet.hltPath = parameterSet.getParameter<std::string>("HLT");
+        pSet.hltFilters1 = parameterSet.getParameter<std::vector<std::string> >("path1");
+        pSet.hltFilters2 = parameterSet.getParameter<std::vector<std::string> >("path2");
+        pSet.leg1 = parameterSet.getParameter<int>("leg1");
+        pSet.leg2 = parameterSet.getParameter<int>("leg2");
+        this -> _parameters.push_back(pSet);
     }
-    
+
     this -> Initialize();
     return;
 }
@@ -110,9 +124,9 @@ Ntuplizer::~Ntuplizer()
 void Ntuplizer::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
 {
     Bool_t changedConfig = false;
-    
+
     if(!this -> _hltConfig.init(iRun, iSetup, this -> _processName.process(), changedConfig)){
-        edm::LogError("HLTMatchingFilter") << "Initialization of HLTConfigProvider failed!!"; 
+        edm::LogError("HLTMatchingFilter") << "Initialization of HLTConfigProvider failed!!";
         return;
     }
 
@@ -121,36 +135,30 @@ void Ntuplizer::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
 //    this -> _doubleMediumIsoPFTau40Index = -1;
 
     const edm::TriggerNames::Strings& triggerNames = this -> _hltConfig.triggerNames();
-    this -> _hltPathIndexes.clear();
-    for (const std::string& hltPath : this -> _hltPaths){
+    std::cout << " ===== LOOKING FOR THE PATH INDEXES =====" << std::endl;
+    for (tParameterSet& parameter : this -> _parameters){
+        const std::string& hltPath = parameter.hltPath;
         bool found = false;
         for(unsigned int j=0; j < triggerNames.size(); j++)
         {
-
             if (triggerNames[j].find(hltPath) != std::string::npos) {
                 found = true;
-                this -> _hltPathIndexes.push_back(j);
-                std::cout << "### FOUND AT INDEX #" << j << " -->  " << triggerNames[j] << std::endl;
+                parameter.hltPathIndex = j;
+                std::cout << "### FOUND AT INDEX #" << j << " --> " << triggerNames[j] << std::endl;
             }
-            
-            //if (triggerNames[j].find("HLT_DoubleMediumIsoPFTau32_Trk1_eta2p1_Reg_v") != std::string::npos) this -> _doubleMediumIsoPFTau32Index = j;
-            //if (triggerNames[j].find("HLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Reg_v") != std::string::npos) this -> _doubleMediumIsoPFTau35Index = j;
-            //if (triggerNames[j].find("HLT_DoubleMediumIsoPFTau40_Trk1_eta2p1_Reg_v") != std::string::npos) this -> _doubleMediumIsoPFTau40Index = j;
-            
         }
-        if (!found) this -> _hltPathIndexes.push_back(-1);
+        if (!found) parameter.hltPathIndex = -1;
     }
-    
+
 }
 
 void Ntuplizer::Initialize() {
     this -> _indexevents = 0;
     this -> _runNumber = 0;
     this -> _lumi = 0;
-
-    // this -> _tauPtVector.clear();    
-    this -> _tauPt = -1.;    
-    this -> _tauTriggered = 0;    
+    // this -> _tauPtVector.clear();
+    this -> _tauPt = -1.;
+    this -> _tauTriggered = 0;
 }
 
 
@@ -167,7 +175,7 @@ void Ntuplizer::beginJob()
     // this -> _tree -> Branch("isTriggered", &_tauTriggeredVector);
     this -> _tree -> Branch("tauPt", &_tauPt);
     this -> _tree -> Branch("isTriggered", &_tauTriggered);
-    
+
     return;
 }
 
@@ -212,66 +220,25 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     uint isTriggered = 0;
     for (pat::TriggerObjectStandAlone obj : *triggerObjects)
     {
-
         // std::cout << "XXXX " << deltaR2 (*tau, obj) << std::endl;
         if (deltaR (*tau, obj) < 0.5)
         {
-            
             obj.unpackPathNames(names);
             const edm::TriggerNames::Strings& triggerNames = names.triggerNames();
             //Looking for the path
-            for  (int index : this -> _hltPathIndexes){
-                if ((index >= 0)&&(obj.hasPathName(triggerNames[index], true, false))){
+            for (const tParameterSet& parameter : this -> _parameters){
+                if ((parameter.hltPathIndex >= 0)&&(obj.hasPathName(triggerNames[parameter.hltPathIndex], true, false))){
                     //Path found, now looking for the label 1, if present in the parameter set
-                    std::cout << "#### FOUND PATH " << triggerNames[index] << " ######" << std::endl;
-                    for  (const std::vector<std::string>& filters1 : this -> _hltFilters1){
-                        //Checking if we have filters to look for
-                        if(filters1.size() > 0) {
-                            //Retrieving filter list for the event
-                            const std::vector<std::string>& vLabels = obj.filterLabels();
-                            for (const std::string& label : vLabels)
-                            {
-                                //Looking for matching filters
-                                for (const std::string& filter1 : filters1){
-                                    //if (label == std::string("hltOverlapFilterIsoMu17MediumIsoPFTau40Reg"))
-                                    if (label == filter1)
-                                    {
-                                        isTriggered = 1;
-                                        std::cout << "========== TROVATO =========== " << std::endl
-                                            << label << " == " << filter1 << " with path " << triggerNames[index] << std::endl;
-                                        // nameTF << " " << nameFT << " " << nameFF << " " << nameTT << " " <<
-                                        // obj.pt() << " " << obj.eta() << " " << obj.phi() << " " << obj.energy() << std::endl;
-                                        // break;
-                                    }
-                                }
-                            }
-                        }
+                    std::cout << "==== FOUND PATH " << triggerNames[parameter.hltPathIndex] << " ====" << std::endl;
+                    //Retrieving filter list for the event
+                    const std::vector<std::string>& vLabels = obj.filterLabels();
+                    const std::vector<std::string>& filters = (parameter.leg1 == 15)? (parameter.hltFilters1):(parameter.hltFilters2);
+                    if (this -> isTau(vLabels, filters)){
+                        std::cout << "#### FOUND TAU ####" << std::endl;
+                        isTriggered = true;
                     }
                 }
             }
-
-            // if ((obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau32Index], true, false)) || 
-            //     (obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau35Index], true, false)) ||
-            //     (obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau40Index], true, false))) isTriggered = 1;
-    //last , L3
-            // bool nameTF = obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau32Index], true, false);
-            // bool nameFT = obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau32Index], false, true);
-            // bool nameFF = obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau32Index], false, false);
-            // bool nameTT = obj.hasPathName(triggerNames[this -> _doubleMediumIsoPFTau32Index], true, true);
-/*
-            const std::vector<std::string>& vLabels = obj.filterLabels();
-            for (std::string label : vLabels)
-            {
-                if (label == std::string("hltOverlapFilterIsoMu17MediumIsoPFTau40Reg"))
-                {
-                    isTriggered = 1;
-                    // std::cout << idx << " trovato " << obj.hasTriggerObjectType(trigger::TriggerTau) << " " << obj.hasTriggerObjectType(trigger::TriggerL1TauJet) << " " <<
-                    // nameTF << " " << nameFT << " " << nameFF << " " << nameTT << " " <<
-                    // obj.pt() << " " << obj.eta() << " " << obj.phi() << " " << obj.energy() << std::endl;
-                    // break;
-                }
-            }
-*/
         }
     }
 
@@ -289,10 +256,33 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
         std::cout << "##### MUON PT: " << mu -> pt() << std::endl;
         this -> _muonsPtVector.push_back(mu -> pt());
     }
-    */ 
+    */
 
     this -> _tree -> Fill();
-    
+
+}
+
+bool Ntuplizer::isTau(const std::vector<std::string>& eventLabels, const std::vector<std::string>& filtersToLookFor) {
+    bool tau = true;
+    for (const std::string& filter : filtersToLookFor)
+    {
+        //Looking for matching filters
+        bool found = false;
+        for (const std::string& label : eventLabels)
+        {
+            //if (label == std::string("hltOverlapFilterIsoMu17MediumIsoPFTau40Reg"))
+            if (label == filter)
+            {
+
+                std::cout << "#### FOUND FILTER " << label << " == " << filter << " ####" << std::endl;
+
+                found = true;
+            }
+        }
+        if(!found) tau = false;
+    }
+
+    return tau;
 }
 
 #include <FWCore/Framework/interface/MakerMacros.h>

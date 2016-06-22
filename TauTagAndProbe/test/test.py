@@ -1,16 +1,16 @@
 import FWCore.ParameterSet.Config as cms
 process = cms.Process("TagAndProbe")
 
-isMC = True
+isMC = False
 
-process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff") 
+process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 
 if not isMC: # will use 80X
     from Configuration.AlCa.autoCond import autoCond
     process.GlobalTag.globaltag = '80X_dataRun2_Prompt_v8'
     process.load('TauTagAndProbe.TauTagAndProbe.tagAndProbe_cff')
 else:
-    process.GlobalTag.globaltag = '76X_mcRun2_asymptotic_RunIIFall15DR76_v1' #MC 25 ns miniAODv2    
+    process.GlobalTag.globaltag = '76X_mcRun2_asymptotic_RunIIFall15DR76_v1' #MC 25 ns miniAODv2
     # process.GlobalTag.globaltag = '76X_dataRun2_16Dec2015_v0'
     process.load('TauTagAndProbe.TauTagAndProbe.MCanalysis_cff')
 
