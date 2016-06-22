@@ -9,6 +9,7 @@
 #include <vector>
 #include <utility>
 #include <TNtuple.h>
+#include <bitset>
 
 
 #include "FWCore/Framework/interface/EDAnalyzer.h"
@@ -25,6 +26,11 @@
 #include "tParameterSet.h"
 
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
+
+
+
+//Set this variable to decide the number of triggers that you want to check simultaneously
+#define NUMBER_OF_MAXIMUM_TRIGGERS 64
 
 
 /*
@@ -70,13 +76,12 @@ class Ntuplizer : public edm::EDAnalyzer {
 
         edm::InputTag _processName;
 
-        //std::vector<Float_t> _tauPtVector;
-        //std::vector<uint> _tauTriggerBitsVector;
+        std::vector<std::string> _tauTriggerNames;
+        unsigned long _tauTriggerBits;
+        //! Maximum
+        std::bitset<NUMBER_OF_MAXIMUM_TRIGGERS> _tauTriggerBitSet;
 
-        // std::vector<Float_t> _tauPtVector;
-        // std::vector<uint> _tauTriggeredVector;
         float _tauPt;
-        int   _tauTriggered;
 
 
         HLTConfigProvider _hltConfig;
@@ -130,10 +135,6 @@ void Ntuplizer::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
         return;
     }
 
-//    this -> _doubleMediumIsoPFTau32Index = -1;
-//    this -> _doubleMediumIsoPFTau35Index = -1;
-//    this -> _doubleMediumIsoPFTau40Index = -1;
-
     const edm::TriggerNames::Strings& triggerNames = this -> _hltConfig.triggerNames();
     std::cout << " ===== LOOKING FOR THE PATH INDEXES =====" << std::endl;
     for (tParameterSet& parameter : this -> _parameters){
@@ -144,6 +145,7 @@ void Ntuplizer::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
             if (triggerNames[j].find(hltPath) != std::string::npos) {
                 found = true;
                 parameter.hltPathIndex = j;
+                this -> _tauTriggerNames.push_back(triggerNames[j]);
                 std::cout << "### FOUND AT INDEX #" << j << " --> " << triggerNames[j] << std::endl;
             }
         }
@@ -156,9 +158,7 @@ void Ntuplizer::Initialize() {
     this -> _indexevents = 0;
     this -> _runNumber = 0;
     this -> _lumi = 0;
-    // this -> _tauPtVector.clear();
     this -> _tauPt = -1.;
-    this -> _tauTriggered = 0;
 }
 
 
@@ -171,10 +171,8 @@ void Ntuplizer::beginJob()
     this -> _tree -> Branch("EventNumber",&_indexevents,"EventNumber/l");
     this -> _tree -> Branch("RunNumber",&_runNumber,"RunNumber/I");
     this -> _tree -> Branch("lumi",&_lumi,"lumi/I");
-    // this -> _tree -> Branch("tauPt", &_tauPtVector);
-    // this -> _tree -> Branch("isTriggered", &_tauTriggeredVector);
+    this -> _tree -> Branch("tauTriggerBits", &_tauTriggerBits, "l");
     this -> _tree -> Branch("tauPt", &_tauPt);
-    this -> _tree -> Branch("isTriggered", &_tauTriggered);
 
     return;
 }
@@ -193,7 +191,6 @@ void Ntuplizer::endRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
 
 void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
 {
-
     this -> Initialize();
 
     _indexevents = iEvent.id().event();
@@ -216,16 +213,15 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
     const pat::TauRef tau = (*tauHandle)[0] ;
 
-    // int idx = 0;
-    uint isTriggered = 0;
+    std::cout << this -> _tauTriggerBitSet.reset();
     for (pat::TriggerObjectStandAlone obj : *triggerObjects)
     {
-        // std::cout << "XXXX " << deltaR2 (*tau, obj) << std::endl;
         if (deltaR (*tau, obj) < 0.5)
         {
             obj.unpackPathNames(names);
             const edm::TriggerNames::Strings& triggerNames = names.triggerNames();
             //Looking for the path
+            unsigned int x = 0;
             for (const tParameterSet& parameter : this -> _parameters){
                 if ((parameter.hltPathIndex >= 0)&&(obj.hasPathName(triggerNames[parameter.hltPathIndex], true, false))){
                     //Path found, now looking for the label 1, if present in the parameter set
@@ -234,29 +230,18 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
                     const std::vector<std::string>& vLabels = obj.filterLabels();
                     const std::vector<std::string>& filters = (parameter.leg1 == 15)? (parameter.hltFilters1):(parameter.hltFilters2);
                     if (this -> isTau(vLabels, filters)){
-                        std::cout << "#### FOUND TAU ####" << std::endl;
-                        isTriggered = true;
+                        std::cout << "#### FOUND TAU @ " << x << " ####" << std::endl;
+                        this -> _tauTriggerBitSet[x] = true;
+                        std::cout << this -> _tauTriggerBitSet.to_string() << std::endl;
                     }
                 }
+                x++;
             }
         }
     }
 
-    // this -> _tauPtVector.push_back(tau->pt());
-    // this -> _tauTriggeredVector.push_back(isTriggered);
     this -> _tauPt = tau->pt();
-    this -> _tauTriggered = isTriggered;
-
-    // ++idx;
-
-    /*
-    for (size_t imu = 0; imu < muonHandle -> size(); ++imu )
-    {
-        const pat::MuonRef mu = (*muonHandle)[imu] ;
-        std::cout << "##### MUON PT: " << mu -> pt() << std::endl;
-        this -> _muonsPtVector.push_back(mu -> pt());
-    }
-    */
+    this -> _tauTriggerBits = this -> _tauTriggerBitSet.to_ulong();
 
     this -> _tree -> Fill();
 
