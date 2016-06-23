@@ -261,7 +261,7 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
 }
 
 bool Ntuplizer::isTau(const std::vector<std::string>& eventLabels, const std::vector<std::string>& filtersToLookFor) {
-    bool tau = true;
+    
     for (const std::string& filter : filtersToLookFor)
     {
         //Looking for matching filters
@@ -277,10 +277,10 @@ bool Ntuplizer::isTau(const std::vector<std::string>& eventLabels, const std::ve
                 found = true;
             }
         }
-        if(!found) tau = false;
+        if(!found) return false;
     }
 
-    return tau;
+    return true;
 }
 
 #include <FWCore/Framework/interface/MakerMacros.h>
