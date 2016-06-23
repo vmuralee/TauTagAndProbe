@@ -76,7 +76,6 @@ class Ntuplizer : public edm::EDAnalyzer {
 
         edm::InputTag _processName;
 
-        std::vector<std::string> _tauTriggerNames;
         unsigned long _tauTriggerBits;
         //! Maximum
         std::bitset<NUMBER_OF_MAXIMUM_TRIGGERS> _tauTriggerBitSet;
@@ -107,17 +106,29 @@ _triggerBits    (consumes<edm::TriggerResults>                    (iConfig.getPa
     this -> _treeName = iConfig.getParameter<std::string>("treeName");
     this -> _processName = iConfig.getParameter<edm::InputTag>("triggerResultsLabel");
 
+    std::vector< std::string > triggerNames;
+
     //Building the trigger arrays
     const std::vector<edm::ParameterSet>& HLTList = iConfig.getParameter <std::vector<edm::ParameterSet> > ("triggerList");
     for (const edm::ParameterSet& parameterSet : HLTList) {
         tParameterSet pSet;
         pSet.hltPath = parameterSet.getParameter<std::string>("HLT");
+        triggerNames.push_back(pSet.hltPath);
         pSet.hltFilters1 = parameterSet.getParameter<std::vector<std::string> >("path1");
         pSet.hltFilters2 = parameterSet.getParameter<std::vector<std::string> >("path2");
         pSet.leg1 = parameterSet.getParameter<int>("leg1");
         pSet.leg2 = parameterSet.getParameter<int>("leg2");
         this -> _parameters.push_back(pSet);
     }
+
+    edm::Service<TFileService> fs;
+    TFile & file = fs -> file();
+
+    //Can be recovered with
+    //std::vector<std:string> > *triggerNames;
+    //file0 -> GetObject<std::vector<std::string> >("triggerNames", triggerNames)
+    file.WriteObjectAny(&triggerNames, "std::vector<std::string>" ,"triggerNames");
+
 
     this -> Initialize();
     return;
@@ -145,7 +156,7 @@ void Ntuplizer::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
             if (triggerNames[j].find(hltPath) != std::string::npos) {
                 found = true;
                 parameter.hltPathIndex = j;
-                this -> _tauTriggerNames.push_back(triggerNames[j]);
+
                 std::cout << "### FOUND AT INDEX #" << j << " --> " << triggerNames[j] << std::endl;
             }
         }
@@ -167,11 +178,13 @@ void Ntuplizer::beginJob()
     edm::Service<TFileService> fs;
     this -> _tree = fs -> make<TTree>(this -> _treeName.c_str(), this -> _treeName.c_str());
 
+
+
     //Branches
     this -> _tree -> Branch("EventNumber",&_indexevents,"EventNumber/l");
     this -> _tree -> Branch("RunNumber",&_runNumber,"RunNumber/I");
     this -> _tree -> Branch("lumi",&_lumi,"lumi/I");
-    this -> _tree -> Branch("tauTriggerBits", &_tauTriggerBits, "l");
+    this -> _tree -> Branch("tauTriggerBits", &_tauTriggerBits, "tauTriggerBits/l");
     this -> _tree -> Branch("tauPt", &_tauPt);
 
     return;
