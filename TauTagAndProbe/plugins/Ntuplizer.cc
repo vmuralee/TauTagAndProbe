@@ -65,10 +65,16 @@ class Ntuplizer : public edm::EDAnalyzer {
         ULong64_t       _indexevents;
         Int_t           _runNumber;
         Int_t           _lumi;
-        float _tauPt;
         unsigned long _tauTriggerBits;
-        float _eta;
-        float _phi;
+        float _tauPt;
+        float _tauEta;
+        float _tauPhi;
+        float _hltPt;
+        float _hltEta;
+        float _hltPhi;
+        Bool_t _hasTriggerMuonType;
+        Bool_t _hasTriggerTauType;
+        Bool_t _isMatched;
 
         edm::EDGetTokenT<pat::MuonRefVector>  _muonsTag;
         edm::EDGetTokenT<pat::TauRefVector>   _tauTag;
@@ -171,6 +177,10 @@ void Ntuplizer::Initialize() {
     this -> _runNumber = 0;
     this -> _lumi = 0;
     this -> _tauPt = -1.;
+    this -> _isMatched = false;
+    this -> _hltPt = -1;
+    this -> _hltEta = 666;
+    this -> _hltPhi = 666;
 }
 
 
@@ -179,16 +189,20 @@ void Ntuplizer::beginJob()
     edm::Service<TFileService> fs;
     this -> _tree = fs -> make<TTree>(this -> _treeName.c_str(), this -> _treeName.c_str());
 
-
-
     //Branches
     this -> _tree -> Branch("EventNumber",&_indexevents,"EventNumber/l");
     this -> _tree -> Branch("RunNumber",&_runNumber,"RunNumber/I");
     this -> _tree -> Branch("lumi",&_lumi,"lumi/I");
     this -> _tree -> Branch("tauTriggerBits", &_tauTriggerBits, "tauTriggerBits/l");
-    this -> _tree -> Branch("tauPt", &_tauPt, "tauPt/F");
-    this -> _tree -> Branch("eta", &_eta, "eta/F");
-    this -> _tree -> Branch("phi", &_phi, "phi/F");
+    this -> _tree -> Branch("tauPt",  &_tauPt,  "tauPt/F");
+    this -> _tree -> Branch("tauEta", &_tauEta, "tauEta/F");
+    this -> _tree -> Branch("tauPhi", &_tauPhi, "tauPhi/F");
+    this -> _tree -> Branch("hltPt",  &_hltPt,  "hltPt/F");
+    this -> _tree -> Branch("hltEta", &_hltEta, "hltEta/F");
+    this -> _tree -> Branch("hltPhi", &_hltPhi, "hltPhi/F");
+    this -> _tree -> Branch("hasTriggerMuonType", &_hasTriggerMuonType, "hasTriggerMuonType/O");
+    this -> _tree -> Branch("hasTriggerTauType", &_hasTriggerTauType, "hasTriggerTauType/O");
+    this -> _tree -> Branch("isMatched", &_isMatched, "isMatched/O");
 
     return;
 }
@@ -230,23 +244,33 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     const pat::TauRef tau = (*tauHandle)[0] ;
 
     this -> _tauTriggerBitSet.reset();
-    for (pat::TriggerObjectStandAlone obj : *triggerObjects)
+    for (pat::TriggerObjectStandAlone  obj : *triggerObjects)
     {
         if (deltaR (*tau, obj) < 0.5)
         {
+            this -> _isMatched = true;
+            this -> _hasTriggerTauType = obj.hasTriggerObjectType(trigger::TriggerTau);
+            this -> _hasTriggerMuonType = obj.hasTriggerObjectType(trigger::TriggerMuon);
+
             obj.unpackPathNames(names);
             const edm::TriggerNames::Strings& triggerNames = names.triggerNames();
             //Looking for the path
             unsigned int x = 0;
-            for (const tParameterSet& parameter : this -> _parameters){
-                if ((parameter.hltPathIndex >= 0)&&(obj.hasPathName(triggerNames[parameter.hltPathIndex], true, false))){
+            for (const tParameterSet& parameter : this -> _parameters)
+            {
+                if ((parameter.hltPathIndex >= 0)&&(obj.hasPathName(triggerNames[parameter.hltPathIndex], true, false)))
+                {
                     //Path found, now looking for the label 1, if present in the parameter set
                     //std::cout << "==== FOUND PATH " << triggerNames[parameter.hltPathIndex] << " ====" << std::endl;
                     //Retrieving filter list for the event
                     const std::vector<std::string>& vLabels = obj.filterLabels();
                     const std::vector<std::string>& filters = (parameter.leg1 == 15)? (parameter.hltFilters1):(parameter.hltFilters2);
-                    if (this -> isTau(vLabels, filters)){
+                    if (this -> isTau(vLabels, filters))
+                    {
                         //std::cout << "#### FOUND TAU WITH HLT PATH " << x << " ####" << std::endl;
+                        this -> _hltPt = obj.pt();
+                        this -> _hltEta = obj.eta();
+                        this -> _hltPhi = obj.phi();
                         this -> _tauTriggerBitSet[x] = true;
                         //std::cout << this -> _tauTriggerBitSet.to_string() << std::endl;
                     }
@@ -256,11 +280,11 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
         }
     }
 
-    this -> _tauPt = tau->pt();
-    this -> _eta = tau->eta();
-    this -> _phi = tau->phi();
+    this -> _tauPt = tau -> pt();
+    this -> _tauEta = tau -> eta();
+    this -> _tauPhi = tau -> phi();
     this -> _tauTriggerBits = this -> _tauTriggerBitSet.to_ulong();
-
+    std::cout << "++++++++++ FILL ++++++++++" << std::endl;
     this -> _tree -> Fill();
 
 }
