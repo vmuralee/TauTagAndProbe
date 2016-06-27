@@ -49,6 +49,11 @@ hltFilter = hlt.hltHighLevel.clone(
     throw = cms.bool(True) #if True: throws exception if a trigger path is invalid
 )
 
+## only events where slimmedMuons has exactly 1 muon
+muonNumberFilter = cms.EDFilter ("muonNumberFilter",
+    src = cms.InputTag("slimmedMuons")
+)
+
 ## good muons for T&P
 goodMuons = cms.EDFilter("PATMuonRefSelector",
         src = cms.InputTag("slimmedMuons"),
@@ -100,10 +105,11 @@ Ntuplizer = cms.EDAnalyzer("Ntuplizer",
 )
 
 TAndPseq = cms.Sequence(
-    hltFilter   +
-    goodMuons   +
-    goodTaus    +
-    ~bjets      +
-    TagAndProbe +
+    hltFilter        +
+    muonNumberFilter + 
+    goodMuons        +
+    goodTaus         +
+    ~bjets           +
+    TagAndProbe      +
     Ntuplizer
 )
