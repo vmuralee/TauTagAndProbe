@@ -3,7 +3,7 @@
 from ROOT import *
 from array import array
 
-fIn = TFile.Open('NTuple_Merge.root')
+fIn = TFile.Open('NTuple.root')
 tree = fIn.Get('Ntuplizer/TagAndProbe')
 
 binning = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 45, 50, 60, 70, 80, 90, 100, 150]
@@ -57,6 +57,8 @@ for bitIndex in range(0, len(triggerNamesList)):
     hTurnOn = hPassList[bitIndex].Clone("hTurnOn_" + triggerNamesList[bitIndex])
     hTurnOn.Divide(hTotList[bitIndex])
     hTurnOn.Write()
+    hPassList[bitIndex].Write()
+    hTotList[bitIndex].Write()
 
 
 raw_input()
