@@ -9,7 +9,9 @@ tree = fIn.Get('Ntuplizer/TagAndProbe')
 binning = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 45, 50, 60, 70, 80, 90, 100, 150]
 bins = array('d', binning)
 
-triggerNamesList = fIn.Get("triggerNames")
+triggerNamesTree = fIn.Get("Ntuplizer/triggerNames")
+
+triggerNamesList = []
 
 
 # hpass = TH1F ("hpass", "hpass", 75, 0, 150)
@@ -17,6 +19,10 @@ triggerNamesList = fIn.Get("triggerNames")
 hPassList = []
 hTotList = []
 turnOnList = []
+
+for iTrig in range (0, triggerNamesTree.GetEntries()):
+    triggerNamesTree.GetEntry(iTrig)
+    triggerNamesList.append(triggerNamesTree.triggerNames.Data())
 
 #Preparing the Histograms
 for bitIndex in range(0, len(triggerNamesList)):

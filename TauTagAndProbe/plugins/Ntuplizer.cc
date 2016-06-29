@@ -9,6 +9,7 @@
 #include <vector>
 #include <utility>
 #include <TNtuple.h>
+#include <TString.h>
 #include <bitset>
 
 
@@ -59,6 +60,7 @@ class Ntuplizer : public edm::EDAnalyzer {
         bool isTau(const std::vector<std::string>& eventLabels, const std::vector<std::string>& filtersToLookFor);
 
         TTree *_tree;
+        TTree *_triggerNamesTree;
         std::string _treeName;
         // -------------------------------------
         // variables to be filled in output tree
@@ -113,28 +115,25 @@ _triggerBits    (consumes<edm::TriggerResults>                    (iConfig.getPa
     this -> _treeName = iConfig.getParameter<std::string>("treeName");
     this -> _processName = iConfig.getParameter<edm::InputTag>("triggerResultsLabel");
 
-    std::vector< std::string > triggerNames;
+    TString triggerName;
+    edm::Service<TFileService> fs;
+    this -> _triggerNamesTree = fs -> make<TTree>("triggerNames", "triggerNames");
+    this -> _triggerNamesTree -> Branch("triggerNames",&triggerName);
 
     //Building the trigger arrays
     const std::vector<edm::ParameterSet>& HLTList = iConfig.getParameter <std::vector<edm::ParameterSet> > ("triggerList");
     for (const edm::ParameterSet& parameterSet : HLTList) {
         tParameterSet pSet;
         pSet.hltPath = parameterSet.getParameter<std::string>("HLT");
-        triggerNames.push_back(pSet.hltPath);
+        triggerName = pSet.hltPath;
         pSet.hltFilters1 = parameterSet.getParameter<std::vector<std::string> >("path1");
         pSet.hltFilters2 = parameterSet.getParameter<std::vector<std::string> >("path2");
         pSet.leg1 = parameterSet.getParameter<int>("leg1");
         pSet.leg2 = parameterSet.getParameter<int>("leg2");
         this -> _parameters.push_back(pSet);
+
+        this -> _triggerNamesTree -> Fill();
     }
-
-    edm::Service<TFileService> fs;
-    TFile & file = fs -> file();
-
-    //Can be recovered with
-    //std::vector<std:string> > *triggerNames;
-    //file0 -> GetObject<std::vector<std::string> >("triggerNames", triggerNames)
-    file.WriteObjectAny(&triggerNames, "std::vector<std::string>" ,"triggerNames");
 
 
     this -> Initialize();
