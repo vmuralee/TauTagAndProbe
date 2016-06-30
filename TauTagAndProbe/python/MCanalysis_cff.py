@@ -4,10 +4,17 @@ print "Running on MC"
 
 
 HLTLIST = cms.VPSet(
+    #cms.PSet (
+    #    HLT = cms.string("HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v"),
+    #    path1 = cms.vstring ("hltL3crIsoL1sMu16erTauJet20erL1f0L2f10QL3f17QL3trkIsoFiltered0p09", "hltOverlapFilterIsoMu17LooseIsoPFTau20"),
+    #    path2 = cms.vstring ("hltPFTau20TrackLooseIsoAgainstMuon", "hltOverlapFilterIsoMu17LooseIsoPFTau20"),
+    #    leg1 = cms.int32(13),
+    #    leg2 = cms.int32(15)
+    #)
     cms.PSet (
-        HLT = cms.string("HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v"),
-        path1 = cms.vstring ("hltL3crIsoL1sMu16erTauJet20erL1f0L2f10QL3f17QL3trkIsoFiltered0p09", "hltOverlapFilterIsoMu17LooseIsoPFTau20"),
-        path2 = cms.vstring ("hltPFTau20TrackLooseIsoAgainstMuon", "hltOverlapFilterIsoMu17LooseIsoPFTau20"),
+        HLT = cms.string("HLT_IsoMu17_eta2p1_LooseIsoPFTau20_SingleL1_v"),
+        path1 = cms.vstring ("hltL3crIsoL1sSingleMu16erL1f0L2f10QL3f17QL3trkIsoFiltered0p09", "hltOverlapFilterSingleIsoMu17LooseIsoPFTau20"),
+        path2 = cms.vstring ("hltPFTau20TrackLooseIsoAgainstMuon", "hltOverlapFilterSingleIsoMu17LooseIsoPFTau20"),
         leg1 = cms.int32(13),
         leg2 = cms.int32(15)
     )
@@ -32,7 +39,7 @@ goodMuons = cms.EDFilter("PATMuonRefSelector",
                 '&& ( (pfIsolationR03().sumChargedHadronPt + max(pfIsolationR03().sumNeutralHadronEt + pfIsolationR03().sumPhotonEt - 0.5 * pfIsolationR03().sumPUPt, 0.0)) / pt() ) < 0.1 ' # isolation
                 '&& isMediumMuon()' # quality -- medium muon
         ),
-        filter = cms.bool(False)
+        filter = cms.bool(True)
 )
 
 ## good taus - apply analysis selection

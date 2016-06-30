@@ -21,7 +21,7 @@ using namespace edm;
 using namespace std;
 // using namespace reco;
 
- 
+
 class TauTagAndProbeFilter : public edm::EDFilter {
 
     public:
@@ -59,17 +59,17 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
     Handle<pat::MuonRefVector> muonHandle;
     iEvent.getByToken (_muonsTag, muonHandle);
 
-    // reject events with more than 1 mu in the event (reject DY) 
+    // reject events with more than 1 mu in the event (reject DY)
     // or without mu (should not happen in SingleMu dataset)
     if (muonHandle->size() != 1) return false;
 
-    // for loop is now dummy, leaving it for debug    
+    // for loop is now dummy, leaving it for debug
     // for (size_t imu = 0; imu < muonHandle->size(); ++imu )
     // {
     //     const pat::MuonRef mu = (*muonHandle)[imu] ;
     //     cout << "### FILTERED MUON PT: " << mu->pt() << endl;
     // }
-    
+
     const pat::MuonRef mu = (*muonHandle)[0] ;
 
     //---------------------   get the met for mt computation etc. -----------------
@@ -82,7 +82,7 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
 
     Handle<pat::TauRefVector> tauHandle;
     iEvent.getByToken (_tausTag, tauHandle);
-    if (tauHandle->size() < 1) return false;    
+    if (tauHandle->size() < 1) return false;
 
     vector<pair<float, int>> tausIdxPtVec;
     for (uint itau = 0; itau < tauHandle->size(); ++itau)
@@ -93,12 +93,14 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
         if (mu->charge() / tau->charge() > 0 ) continue; // pair must be OS
         tausIdxPtVec.push_back(make_pair(tau->pt(), itau));
     }
-    if (tausIdxPtVec.size() == 0) return false; 
+    if (tausIdxPtVec.size() == 0) return false;
     if (tausIdxPtVec.size() > 1) sort (tausIdxPtVec.begin(), tausIdxPtVec.end()); // will be sorted by first idx i.e. highest pt
     int tauIdx = tausIdxPtVec.back().second;
-    const pat::TauRef tau = (*tauHandle)[tauIdx] ;
+    const pat::TauRef tau = (*tauHandle)[tauIdx];
 
-    resultTau->push_back (tau);    
+    if (deltaR(*tau, *mu) < 0.5) return false;;
+
+    resultTau->push_back (tau);
     resultMuon->push_back (mu);
     iEvent.put(resultMuon);
     iEvent.put(resultTau);
@@ -108,7 +110,7 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
 
 float TauTagAndProbeFilter::ComputeMT (math::XYZTLorentzVector visP4, const pat::MET& met)
 {
-    math::XYZTLorentzVector METP4 (met.px(), met.py(), 0, met.pt());   
+    math::XYZTLorentzVector METP4 (met.px(), met.py(), 0, met.pt());
     float scalSum = met.pt() + visP4.pt();
     math::XYZTLorentzVector vecSum (visP4);
     vecSum += METP4;

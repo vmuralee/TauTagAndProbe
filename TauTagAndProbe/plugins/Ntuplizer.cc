@@ -57,7 +57,7 @@ class Ntuplizer : public edm::EDAnalyzer {
         virtual void endJob();
         virtual void endRun(edm::Run const&, edm::EventSetup const&);
         void Initialize();
-        bool isTau(const std::vector<std::string>& eventLabels, const std::vector<std::string>& filtersToLookFor);
+        bool hasFilters(const pat::TriggerObjectStandAlone&  obj , const std::vector<std::string>& filtersToLookFor);
 
         TTree *_tree;
         TTree *_triggerNamesTree;
@@ -159,6 +159,7 @@ void Ntuplizer::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
         bool found = false;
         for(unsigned int j=0; j < triggerNames.size(); j++)
         {
+            //std::cout << triggerNames[j] << std::endl;
             if (triggerNames[j].find(hltPath) != std::string::npos) {
                 found = true;
                 parameter.hltPathIndex = j;
@@ -225,6 +226,7 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     _indexevents = iEvent.id().event();
     _runNumber = iEvent.id().run();
     _lumi = iEvent.luminosityBlock();
+//    bool trovato = false;
 
     // std::auto_ptr<pat::MuonRefVector> resultMuon(new pat::MuonRefVector);
 
@@ -241,6 +243,7 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
 
     const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
     const pat::TauRef tau = (*tauHandle)[0] ;
+    const pat::MuonRef muon = (*muonHandle)[0] ;
 
     this -> _tauTriggerBitSet.reset();
     for (pat::TriggerObjectStandAlone  obj : *triggerObjects)
@@ -262,9 +265,8 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
                     //Path found, now looking for the label 1, if present in the parameter set
                     //std::cout << "==== FOUND PATH " << triggerNames[parameter.hltPathIndex] << " ====" << std::endl;
                     //Retrieving filter list for the event
-                    const std::vector<std::string>& vLabels = obj.filterLabels();
                     const std::vector<std::string>& filters = (parameter.leg1 == 15)? (parameter.hltFilters1):(parameter.hltFilters2);
-                    if (this -> isTau(vLabels, filters))
+                    if (this -> hasFilters(obj, filters))
                     {
                         //std::cout << "#### FOUND TAU WITH HLT PATH " << x << " ####" << std::endl;
                         this -> _hltPt = obj.pt();
@@ -283,13 +285,14 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     this -> _tauEta = tau -> eta();
     this -> _tauPhi = tau -> phi();
     this -> _tauTriggerBits = this -> _tauTriggerBitSet.to_ulong();
-    std::cout << "++++++++++ FILL ++++++++++" << std::endl;
+    //std::cout << "++++++++++ FILL ++++++++++" << std::endl;
     this -> _tree -> Fill();
 
 }
 
-bool Ntuplizer::isTau(const std::vector<std::string>& eventLabels, const std::vector<std::string>& filtersToLookFor) {
+bool Ntuplizer::hasFilters(const pat::TriggerObjectStandAlone&  obj , const std::vector<std::string>& filtersToLookFor) {
 
+    const std::vector<std::string>& eventLabels = obj.filterLabels();
     for (const std::string& filter : filtersToLookFor)
     {
         //Looking for matching filters
@@ -301,7 +304,6 @@ bool Ntuplizer::isTau(const std::vector<std::string>& eventLabels, const std::ve
             {
 
                 //std::cout << "#### FOUND FILTER " << label << " == " << filter << " ####" << std::endl;
-
                 found = true;
             }
         }

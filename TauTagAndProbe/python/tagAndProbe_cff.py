@@ -44,7 +44,7 @@ HLTLIST = cms.VPSet(
 
 hltFilter = hlt.hltHighLevel.clone(
     TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),
-    HLTPaths = ['HLT_IsoMu20_v*'],
+    HLTPaths = ['HLT_IsoMu22_v*'],
     andOr = cms.bool(True), # how to deal with multiple triggers: True (OR) accept if ANY is true, False (AND) accept if ALL are true
     throw = cms.bool(True) #if True: throws exception if a trigger path is invalid
 )
@@ -106,7 +106,7 @@ Ntuplizer = cms.EDAnalyzer("Ntuplizer",
 
 TAndPseq = cms.Sequence(
     hltFilter        +
-    muonNumberFilter + 
+    muonNumberFilter +
     goodMuons        +
     goodTaus         +
     ~bjets           +
