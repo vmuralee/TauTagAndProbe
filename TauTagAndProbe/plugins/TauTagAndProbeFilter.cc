@@ -84,19 +84,36 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
     iEvent.getByToken (_tausTag, tauHandle);
     if (tauHandle->size() < 1) return false;
 
-    vector<pair<float, int>> tausIdxPtVec;
+    vector<pair<float, int>> tausIdxPtVecSS;
+    vector<pair<float, int>> tausIdxPtVecOS;
     for (uint itau = 0; itau < tauHandle->size(); ++itau)
     {
         const pat::TauRef tau = (*tauHandle)[itau] ;
         math::XYZTLorentzVector pSum = mu->p4() + tau->p4();
         if (pSum.mass() <= 40 || pSum.mass() >= 80) continue; // visible mass in (40, 80)
-        if (mu->charge() / tau->charge() > 0 ) continue; // pair must be OS
-        tausIdxPtVec.push_back(make_pair(tau->pt(), itau));
+        if (mu->charge() / tau->charge() > 0 ){ // pair must be OS
+            tausIdxPtVecSS.push_back(make_pair(tau->pt(), itau));
+        } else {
+            tausIdxPtVecOS.push_back(make_pair(tau->pt(), itau));
+        }
     }
-    if (tausIdxPtVec.size() == 0) return false;
-    if (tausIdxPtVec.size() > 1) sort (tausIdxPtVec.begin(), tausIdxPtVec.end()); // will be sorted by first idx i.e. highest pt
-    int tauIdx = tausIdxPtVec.back().second;
-    const pat::TauRef tau = (*tauHandle)[tauIdx];
+
+    const pat::TauRef tau;
+
+    bool isOS = true;
+
+    if ((tausIdxPtVecSS.size() == 0) && (tausIdxPtVecOS.size() == 0)) return;
+
+    if (tausIdxPtVecOS.size() != 0){
+        if (tausIdxPtVecOS.size() > 1) sort (tausIdxPtVecOS.begin(), tausIdxPtVecOS.end()); // will be sorted by first idx i.e. highest pt
+        int tauIdx = tausIdxPtVecOS.back().second;
+        tau = (*tauHandle)[tauIdx];
+    } else {
+        if (tausIdxPtVecSS.size() > 1) sort (tausIdxPtVecSS.begin(), tausIdxPtVecSS.end()); // will be sorted by first idx i.e. highest pt
+        int tauIdx = tausIdxPtVecSS.back().second;
+        tau = (*tauHandle)[tauIdx];
+        return false;
+    }
 
     if (deltaR(*tau, *mu) < 0.5) return false;;
 
