@@ -39,6 +39,13 @@ HLTLIST = cms.VPSet(
         path2 = cms.vstring ("hltPFTau20TrackLooseIsoAgainstMuon", "hltOverlapFilterSingleIsoMu21LooseIsoPFTau20"),
         leg1 = cms.int32(13),
         leg2 = cms.int32(15)
+    ),
+    cms.PSet (
+        HLT = cms.string("HLT_IsoMu19_eta2p1_MediumIsoPFTau32_Trk1_eta2p1_Reg_v"),
+        path1 = cms.vstring ("hltL3crIsoL1sMu18erIsoTau26erL1f0L2f10QL3f19QL3trkIsoFiltered0p09", "hltOverlapFilterIsoMu19MediumIsoPFTau32Reg"),
+        path2 = cms.vstring ("hltPFTau32TrackPt1MediumIsolationL1HLTMatchedReg", "hltOverlapFilterIsoMu19MediumIsoPFTau32Reg"),
+        leg1 = cms.int32(13),
+        leg2 = cms.int32(15)
     )
 )
 
