@@ -77,6 +77,7 @@ class Ntuplizer : public edm::EDAnalyzer {
         Bool_t _hasTriggerMuonType;
         Bool_t _hasTriggerTauType;
         Bool_t _isMatched;
+        Bool_t _isOS;
 
         edm::EDGetTokenT<pat::MuonRefVector>  _muonsTag;
         edm::EDGetTokenT<pat::TauRefVector>   _tauTag;
@@ -203,6 +204,7 @@ void Ntuplizer::beginJob()
     this -> _tree -> Branch("hasTriggerMuonType", &_hasTriggerMuonType, "hasTriggerMuonType/O");
     this -> _tree -> Branch("hasTriggerTauType", &_hasTriggerTauType, "hasTriggerTauType/O");
     this -> _tree -> Branch("isMatched", &_isMatched, "isMatched/O");
+    this -> _tree -> Branch("isOS", &_isOS, "isOS/O");
 
     return;
 }
@@ -244,6 +246,8 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
     const pat::TauRef tau = (*tauHandle)[0] ;
     const pat::MuonRef muon = (*muonHandle)[0] ;
+
+    this -> _isOS = (muon -> charge() / tau -> charge() < 0) ? true : false;
 
     this -> _tauTriggerBitSet.reset();
     for (pat::TriggerObjectStandAlone  obj : *triggerObjects)
