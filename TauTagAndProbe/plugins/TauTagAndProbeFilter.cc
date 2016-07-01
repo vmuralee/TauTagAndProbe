@@ -98,22 +98,20 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
         }
     }
 
-    const pat::TauRef tau;
 
-    bool isOS = true;
+    pat::TauRef tau;
 
-    if ((tausIdxPtVecSS.size() == 0) && (tausIdxPtVecOS.size() == 0)) return;
-
-    if (tausIdxPtVecOS.size() != 0){
+    if (tausIdxPtVecOS.size() != 0)
+    {
         if (tausIdxPtVecOS.size() > 1) sort (tausIdxPtVecOS.begin(), tausIdxPtVecOS.end()); // will be sorted by first idx i.e. highest pt
         int tauIdx = tausIdxPtVecOS.back().second;
         tau = (*tauHandle)[tauIdx];
-    } else {
+    } else if (tausIdxPtVecSS.size() != 0 )
+    {
         if (tausIdxPtVecSS.size() > 1) sort (tausIdxPtVecSS.begin(), tausIdxPtVecSS.end()); // will be sorted by first idx i.e. highest pt
         int tauIdx = tausIdxPtVecSS.back().second;
         tau = (*tauHandle)[tauIdx];
-        return false;
-    }
+    } else return false;//They are both 0!
 
     if (deltaR(*tau, *mu) < 0.5) return false;;
 
