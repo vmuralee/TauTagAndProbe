@@ -25,7 +25,7 @@ HLTLIST = cms.VPSet(
 # filter HLT paths for T&P
 import HLTrigger.HLTfilters.hltHighLevel_cfi as hlt
 hltFilter = hlt.hltHighLevel.clone(
-    TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),
+    TriggerResultsTag = cms.InputTag("TriggerResults","","HLT2"),
     HLTPaths = ['HLT_IsoMu18_v*'],
     andOr = cms.bool(True), # how to deal with multiple triggers: True (OR) accept if ANY is true, False (AND) accept if ALL are true
     throw = cms.bool(True) #if True: throws exception if a trigger path is invalid
@@ -66,7 +66,7 @@ Ntuplizer = cms.EDAnalyzer("Ntuplizer",
     muons = cms.InputTag("goodMuons"),
     taus  = cms.InputTag("genMatchedTaus"),
     triggerSet = cms.InputTag("selectedPatTrigger"),
-    triggerResultsLabel = cms.InputTag("TriggerResults", "", "HLT"),
+    triggerResultsLabel = cms.InputTag("TriggerResults", "", "HLT2"),
     triggerList = HLTLIST
 )
 
