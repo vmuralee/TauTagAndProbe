@@ -91,6 +91,7 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
         const pat::TauRef tau = (*tauHandle)[itau] ;
         math::XYZTLorentzVector pSum = mu->p4() + tau->p4();
         if (pSum.mass() <= 40 || pSum.mass() >= 80) continue; // visible mass in (40, 80)
+        if (deltaR(*tau, *mu) < 0.5) continue;
         if (mu -> charge() / tau -> charge() > 0 ){
             tausIdxPtVecSS.push_back(make_pair(tau -> pt(), itau));
         } else {
@@ -112,8 +113,6 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
         int tauIdx = tausIdxPtVecSS.back().second;
         tau = (*tauHandle)[tauIdx];
     } else return false;//They are both 0!
-
-    if (deltaR(*tau, *mu) < 0.5) return false;
 
     resultTau->push_back (tau);
     resultMuon->push_back (mu);
