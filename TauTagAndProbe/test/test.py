@@ -1,9 +1,31 @@
+import FWCore.ParameterSet.VarParsing as VarParsing
+import FWCore.PythonUtilities.LumiList as LumiList
 import FWCore.ParameterSet.Config as cms
 process = cms.Process("TagAndProbe")
 
-isMC = True
+isMC = False
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+
+#### handling of cms line options for tier3 submission
+#### the following are dummy defaults, so that one can normally use the config changing file list by hand etc.
+
+options = VarParsing.VarParsing ('analysis')
+options.register ('skipEvents',
+                  -1, # default value
+                  VarParsing.VarParsing.multiplicity.singleton, # singleton or list
+                  VarParsing.VarParsing.varType.int,          # string, int, or float
+                  "Number of events to skip")
+options.register ('JSONfile',
+                  "", # default value
+                  VarParsing.VarParsing.multiplicity.singleton, # singleton or list
+                  VarParsing.VarParsing.varType.string,          # string, int, or float
+                  "JSON file (empty for no JSON)")
+options.outputFile = 'NTuple.root'
+options.inputFiles = []
+options.maxEvents  = -999
+options.parseArguments()
+
 
 if not isMC: # will use 80X
     from Configuration.AlCa.autoCond import autoCond
@@ -11,7 +33,7 @@ if not isMC: # will use 80X
     process.load('TauTagAndProbe.TauTagAndProbe.tagAndProbe_cff')
     process.source = cms.Source("PoolSource",
         fileNames = cms.untracked.vstring(
-            # '/store/data/Run2016B/SingleMuon/MINIAOD/PromptReco-v2/000/274/199/00000/082EC2A0-4C28-E611-BC61-02163E014412.root',
+            '/store/data/Run2016B/SingleMuon/MINIAOD/PromptReco-v2/000/274/199/00000/082EC2A0-4C28-E611-BC61-02163E014412.root',
             # '/store/data/Run2016B/SingleMuon/MINIAOD/PromptReco-v2/000/274/199/00000/1014078C-4C28-E611-85FB-02163E0141C1.root',
             # '/store/data/Run2016B/SingleMuon/MINIAOD/PromptReco-v2/000/274/199/00000/203E5176-4C28-E611-B4F8-02163E014743.root',
             # '/store/data/Run2016B/SingleMuon/MINIAOD/PromptReco-v2/000/274/199/00000/32508866-4C28-E611-A38D-02163E011BAF.root',
@@ -47,6 +69,23 @@ process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(100000)
 )
 
+if options.JSONfile:
+    print "Using JSON: " , options.JSONfile
+    process.source.lumisToProcess = LumiList.LumiList(filename = options.JSONfile).getVLuminosityBlockRange()
+
+if options.inputFiles:
+    process.source.fileNames = cms.untracked.vstring(options.inputFiles)
+
+process.maxEvents = cms.untracked.PSet(
+    input = cms.untracked.int32(100000)
+)
+
+if options.maxEvents >= -1:
+    process.maxEvents.input = cms.untracked.int32(options.maxEvents)
+if options.skipEvents >= 0:
+    process.source.skipEvents = cms.untracked.uint32(options.skipEvents)
+
+
 process.p = cms.Path(
     process.TAndPseq
 )
@@ -56,4 +95,5 @@ process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 # Adding ntuplizer
-process.TFileService=cms.Service('TFileService',fileName=cms.string('NTuple.root'))
+# process.TFileService=cms.Service('TFileService',fileName=cms.string(options.outputFile))
+process.TFileService=cms.Service('TFileService',fileName=cms.string('Ntuple.root'))
