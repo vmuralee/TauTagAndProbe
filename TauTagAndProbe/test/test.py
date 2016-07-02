@@ -95,5 +95,4 @@ process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 # Adding ntuplizer
-# process.TFileService=cms.Service('TFileService',fileName=cms.string(options.outputFile))
-process.TFileService=cms.Service('TFileService',fileName=cms.string('Ntuple.root'))
+process.TFileService=cms.Service('TFileService',fileName=cms.string(options.outputFile))
