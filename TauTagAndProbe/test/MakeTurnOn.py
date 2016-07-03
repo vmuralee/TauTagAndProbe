@@ -3,7 +3,7 @@
 from ROOT import *
 from array import array
 
-fIn = TFile.Open('NTuple.root')
+fIn = TFile.Open('NTuple_Merge_2Lug.root')
 tree = fIn.Get('Ntuplizer/TagAndProbe')
 
 binning = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 45, 50, 60, 70, 80, 90, 100, 150]
@@ -16,18 +16,22 @@ triggerNamesList = []
 
 # hpass = TH1F ("hpass", "hpass", 75, 0, 150)
 # htot = TH1F ("htot", "htot", 75, 0, 150)
-hPassList = []
-hTotList = []
+hPassListSS = []
+hPassListOS = []
+hTotListSS = []
+hTotListOS = []
 turnOnList = []
 
-for iTrig in range (0, triggerNamesTree.GetEntries()):
+for iTrig in range (0, 6):
     triggerNamesTree.GetEntry(iTrig)
     triggerNamesList.append(triggerNamesTree.triggerNames.Data())
 
 #Preparing the Histograms
 for bitIndex in range(0, len(triggerNamesList)):
-    hPassList.append(TH1F("hPass_"+triggerNamesList[bitIndex], "hPass_"+triggerNamesList[bitIndex], len(binning)-1, bins))
-    hTotList.append(TH1F("hTot_"+triggerNamesList[bitIndex], "hTot_"+triggerNamesList[bitIndex], len(binning)-1, bins))
+    hPassListOS.append(TH1F("hPassOS_"+triggerNamesList[bitIndex], "hPassOS_"+triggerNamesList[bitIndex], len(binning)-1, bins))
+    hTotListOS.append(TH1F("hTotOS_"+triggerNamesList[bitIndex], "hTotOS_"+triggerNamesList[bitIndex], len(binning)-1, bins))
+    hPassListSS.append(TH1F("hPassSS_"+triggerNamesList[bitIndex], "hPassSS_"+triggerNamesList[bitIndex], len(binning)-1, bins))
+    hTotListSS.append(TH1F("hTotSS_"+triggerNamesList[bitIndex], "hTotSS_"+triggerNamesList[bitIndex], len(binning)-1, bins))
     turnOnList.append(TGraphAsymmErrors())
 
 
@@ -36,11 +40,15 @@ for iEv in range (0, tree.GetEntries()):
     tree.GetEntry(iEv)
     pt = tree.tauPt
     triggerBits = tree.tauTriggerBits
-
     for bitIndex in range(0, len(triggerNamesList)):
-        hTotList[bitIndex].Fill(pt)
-        if ((triggerBits >> bitIndex) & 1) == 1:
-            hPassList[bitIndex].Fill(pt)
+        if tree.isOS == True:
+            hTotListOS[bitIndex].Fill(pt)
+            if ((triggerBits >> bitIndex) & 1) == 1:
+                hPassListOS[bitIndex].Fill(pt)
+        else:
+            hTotListSS[bitIndex].Fill(pt)
+            if ((triggerBits >> bitIndex) & 1) == 1:
+                hPassListSS[bitIndex].Fill(pt)
 
 #Calculating and saving the efficiencies
 
@@ -50,7 +58,9 @@ c1.SetGridy()
 fOut = TFile ("turnOn.root", "recreate")
 
 for bitIndex in range(0, len(triggerNamesList)):
-    turnOnList[bitIndex].Divide(hPassList[bitIndex], hTotList[bitIndex], "cl=0.683 b(1,1) mode")
+    hPassListOS[bitIndex].Add(hPassListSS[bitIndex], -1)
+    hTotListOS[bitIndex].Add(hTotListSS[bitIndex], -1)
+    turnOnList[bitIndex].Divide(hPassListOS[bitIndex], hTotListOS[bitIndex], "cl=0.683 b(1,1) mode")
     turnOnList[bitIndex].SetMarkerStyle(8)
     turnOnList[bitIndex].SetMarkerSize(0.8)
     turnOnList[bitIndex].SetMarkerColor(kRed)
@@ -60,11 +70,11 @@ for bitIndex in range(0, len(triggerNamesList)):
     turnOnList[bitIndex].Draw("AP")
     c1.Update()
     c1.Print("turnOn_" + triggerNamesList[bitIndex] + ".pdf", "pdf")
-    hTurnOn = hPassList[bitIndex].Clone("hTurnOn_" + triggerNamesList[bitIndex])
-    hTurnOn.Divide(hTotList[bitIndex])
+    hTurnOn = hPassListOS[bitIndex].Clone("hTurnOn_" + triggerNamesList[bitIndex])
+    hTurnOn.Divide(hTotListOS[bitIndex])
     hTurnOn.Write()
-    hPassList[bitIndex].Write()
-    hTotList[bitIndex].Write()
+    hPassListOS[bitIndex].Write()
+    hTotListOS[bitIndex].Write()
 
 
 raw_input()
