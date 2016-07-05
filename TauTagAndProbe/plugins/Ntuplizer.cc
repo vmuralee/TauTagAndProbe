@@ -318,7 +318,7 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
             this -> _l1tPhi = bx0TauIt -> phi();
             this -> _l1tIso = bx0TauIt -> hwIso();
             this -> _l1tQual = bx0TauIt -> hwQual();
-            std::cout << "FOUND L1T TAU" << std::endl;
+            
             
         }
     }
@@ -328,7 +328,7 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     this -> _tauEta = tau -> eta();
     this -> _tauPhi = tau -> phi();
     this -> _tauTriggerBits = this -> _tauTriggerBitSet.to_ulong();
-    std::cout << "++++++++++ FILL ++++++++++" << std::endl;
+    //std::cout << "++++++++++ FILL ++++++++++" << std::endl;
     this -> _tree -> Fill();
 
 }
