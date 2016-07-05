@@ -1,5 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
+print "Running on data"
+
 # filter HLT paths for T&P
 import HLTrigger.HLTfilters.hltHighLevel_cfi as hlt
 
@@ -108,7 +110,8 @@ Ntuplizer = cms.EDAnalyzer("Ntuplizer",
     taus = cms.InputTag("TagAndProbe"),
     triggerList = HLTLIST,
     triggerSet = cms.InputTag("selectedPatTrigger"),
-    triggerResultsLabel = cms.InputTag("TriggerResults", "", "HLT")
+    triggerResultsLabel = cms.InputTag("TriggerResults", "", "HLT"),
+    L1Tau = cms.InputTag("caloStage2Digis", "Tau", "RECO")
 )
 
 TAndPseq = cms.Sequence(

@@ -67,6 +67,7 @@ Ntuplizer = cms.EDAnalyzer("Ntuplizer",
     taus  = cms.InputTag("genMatchedTaus"),
     triggerSet = cms.InputTag("selectedPatTrigger"),
     triggerResultsLabel = cms.InputTag("TriggerResults", "", "HLT2"),
+    L1Tau = cms.InputTag("caloStage2Digis", "Tau", "HLT2"),
     triggerList = HLTLIST
 )
 

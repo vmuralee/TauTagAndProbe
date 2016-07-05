@@ -24,6 +24,9 @@
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
+#include "DataFormats/L1Trigger/interface/Tau.h"
+
+
 #include "tParameterSet.h"
 
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
@@ -74,6 +77,11 @@ class Ntuplizer : public edm::EDAnalyzer {
         float _hltPt;
         float _hltEta;
         float _hltPhi;
+        int _l1tQual;
+        float _l1tPt;
+        float _l1tEta;
+        float _l1tPhi;
+        int _l1tIso;
         Bool_t _hasTriggerMuonType;
         Bool_t _hasTriggerTauType;
         Bool_t _isMatched;
@@ -83,6 +91,7 @@ class Ntuplizer : public edm::EDAnalyzer {
         edm::EDGetTokenT<pat::TauRefVector>   _tauTag;
         edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> _triggerObjects;
         edm::EDGetTokenT<edm::TriggerResults> _triggerBits;
+        edm::EDGetTokenT<l1t::TauBxCollection> _L1TauTag  ;
 
         //!Contains the parameters
         tVParameterSet _parameters;
@@ -111,7 +120,8 @@ Ntuplizer::Ntuplizer(const edm::ParameterSet& iConfig) :
 _muonsTag       (consumes<pat::MuonRefVector>                     (iConfig.getParameter<edm::InputTag>("muons"))),
 _tauTag         (consumes<pat::TauRefVector>                      (iConfig.getParameter<edm::InputTag>("taus"))),
 _triggerObjects (consumes<pat::TriggerObjectStandAloneCollection> (iConfig.getParameter<edm::InputTag>("triggerSet"))),
-_triggerBits    (consumes<edm::TriggerResults>                    (iConfig.getParameter<edm::InputTag>("triggerResultsLabel")))
+_triggerBits    (consumes<edm::TriggerResults>                    (iConfig.getParameter<edm::InputTag>("triggerResultsLabel"))),
+_L1TauTag       (consumes<l1t::TauBxCollection>                   (iConfig.getParameter<edm::InputTag>("L1Tau")))
 {
     this -> _treeName = iConfig.getParameter<std::string>("treeName");
     this -> _processName = iConfig.getParameter<edm::InputTag>("triggerResultsLabel");
@@ -182,6 +192,11 @@ void Ntuplizer::Initialize() {
     this -> _hltPt = -1;
     this -> _hltEta = 666;
     this -> _hltPhi = 666;
+    this -> _l1tPt = -1;
+    this -> _l1tEta = 666;
+    this -> _l1tPhi = 666;
+    this -> _l1tQual = -1;
+    this -> _l1tIso = -1;
 }
 
 
@@ -201,6 +216,11 @@ void Ntuplizer::beginJob()
     this -> _tree -> Branch("hltPt",  &_hltPt,  "hltPt/F");
     this -> _tree -> Branch("hltEta", &_hltEta, "hltEta/F");
     this -> _tree -> Branch("hltPhi", &_hltPhi, "hltPhi/F");
+    this -> _tree -> Branch("l1tPt",  &_l1tPt,  "l1tPt/F");
+    this -> _tree -> Branch("l1tEta", &_l1tEta, "l1tEta/F");
+    this -> _tree -> Branch("l1tPhi", &_l1tPhi, "l1tPhi/F");
+    this -> _tree -> Branch("l1tQual", &_l1tQual, "l1tQual/I");
+    this -> _tree -> Branch("l1tIso", &_l1tIso, "l1tIso/I");
     this -> _tree -> Branch("hasTriggerMuonType", &_hasTriggerMuonType, "hasTriggerMuonType/O");
     this -> _tree -> Branch("hasTriggerTauType", &_hasTriggerTauType, "hasTriggerTauType/O");
     this -> _tree -> Branch("isMatched", &_isMatched, "isMatched/O");
@@ -228,7 +248,6 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     _indexevents = iEvent.id().event();
     _runNumber = iEvent.id().run();
     _lumi = iEvent.luminosityBlock();
-//    bool trovato = false;
 
     // std::auto_ptr<pat::MuonRefVector> resultMuon(new pat::MuonRefVector);
 
@@ -243,10 +262,12 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     iEvent.getByToken(this -> _triggerObjects, triggerObjects);
     iEvent.getByToken(this -> _triggerBits, triggerBits);
 
+
+//! TagAndProbe on HLT taus
     const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
     const pat::TauRef tau = (*tauHandle)[0] ;
     const pat::MuonRef muon = (*muonHandle)[0] ;
-
+    
     this -> _isOS = (muon -> charge() / tau -> charge() < 0) ? true : false;
 
     this -> _tauTriggerBitSet.reset();
@@ -285,11 +306,29 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
         }
     }
 
+    //! TagAndProbe on L1T taus
+
+    edm::Handle< BXVector<l1t::Tau> >  L1TauHandle;
+    iEvent.getByToken(_L1TauTag, L1TauHandle);
+
+    for (l1t::TauBxCollection::const_iterator bx0TauIt = L1TauHandle->begin(0); bx0TauIt != L1TauHandle->end(0) ; bx0TauIt++) {
+        if (deltaR(*tau, *bx0TauIt) < 0.5) {
+            this -> _l1tPt = bx0TauIt -> pt();
+            this -> _l1tEta = bx0TauIt -> eta();
+            this -> _l1tPhi = bx0TauIt -> phi();
+            this -> _l1tIso = bx0TauIt -> hwIso();
+            this -> _l1tQual = bx0TauIt -> hwQual();
+            std::cout << "FOUND L1T TAU" << std::endl;
+            
+        }
+    }
+    
+
     this -> _tauPt = tau -> pt();
     this -> _tauEta = tau -> eta();
     this -> _tauPhi = tau -> phi();
     this -> _tauTriggerBits = this -> _tauTriggerBitSet.to_ulong();
-    //std::cout << "++++++++++ FILL ++++++++++" << std::endl;
+    std::cout << "++++++++++ FILL ++++++++++" << std::endl;
     this -> _tree -> Fill();
 
 }

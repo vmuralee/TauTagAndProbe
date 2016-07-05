@@ -39,16 +39,17 @@ for bitIndex in range(0, len(triggerNamesList)):
 for iEv in range (0, tree.GetEntries()):
     tree.GetEntry(iEv)
     pt = tree.tauPt
-    triggerBits = tree.tauTriggerBits
-    for bitIndex in range(0, len(triggerNamesList)):
-        if tree.isOS == True:
-            hTotListOS[bitIndex].Fill(pt)
-            if ((triggerBits >> bitIndex) & 1) == 1:
-                hPassListOS[bitIndex].Fill(pt)
-        else:
-            hTotListSS[bitIndex].Fill(pt)
-            if ((triggerBits >> bitIndex) & 1) == 1:
-                hPassListSS[bitIndex].Fill(pt)
+    if pt < 85:
+        triggerBits = tree.tauTriggerBits
+        for bitIndex in range(0, len(triggerNamesList)):
+            if tree.isOS == True:
+                hTotListOS[bitIndex].Fill(pt)
+                if ((triggerBits >> bitIndex) & 1) == 1:
+                    hPassListOS[bitIndex].Fill(pt)
+            else:
+                hTotListSS[bitIndex].Fill(pt)
+                if ((triggerBits >> bitIndex) & 1) == 1:
+                    hPassListSS[bitIndex].Fill(pt)
 
 #Calculating and saving the efficiencies
 
@@ -57,7 +58,44 @@ c1.SetGridx()
 c1.SetGridy()
 fOut = TFile ("turnOn.root", "recreate")
 
-for bitIndex in range(0, len(triggerNamesList)):
+'''hPassListOS[5].SetMarkerStyle(8)
+hPassListOS[5].SetMarkerSize(0.8)
+hPassListOS[5].SetMarkerColor(kRed)
+hPassListOS[5].GetXaxis().SetTitle("p_t (GeV)");
+hPassListOS[5].GetYaxis().SetTitle("Efficiency");
+hPassListOS[5].SetTitle(triggerNamesList[5] + " turn-on curve")
+hPassListOS[5].Draw("AP")
+c1.Update()
+c1.Print("trigPassOS.pdf", "pdf")
+hPassListSS[5].SetMarkerStyle(8)
+hPassListSS[5].SetMarkerSize(0.8)
+hPassListSS[5].SetMarkerColor(kRed)
+hPassListSS[5].GetXaxis().SetTitle("p_t (GeV)");
+hPassListSS[5].GetYaxis().SetTitle("Efficiency");
+hPassListSS[5].SetTitle(triggerNamesList[5] + " turn-on curve")
+hPassListSS[5].Draw("AP")
+c1.Update()
+c1.Print("trigPassSS.pdf", "pdf")
+hTotListOS[5].SetMarkerStyle(8)
+hTotListOS[5].SetMarkerSize(0.8)
+hTotListOS[5].SetMarkerColor(kRed)
+hTotListOS[5].GetXaxis().SetTitle("p_t (GeV)");
+hTotListOS[5].GetYaxis().SetTitle("Efficiency");
+hTotListOS[5].SetTitle(triggerNamesList[5] + " turn-on curve")
+hTotListOS[5].Draw("AP")
+c1.Update()
+c1.Print("trigTotOS.pdf", "pdf")
+hTotListSS[5].SetMarkerStyle(8)
+hTotListSS[5].SetMarkerSize(0.8)
+hTotListSS[5].SetMarkerColor(kRed)
+hTotListSS[5].GetXaxis().SetTitle("p_t (GeV)");
+hTotListSS[5].GetYaxis().SetTitle("Efficiency");
+hTotListSS[5].SetTitle(triggerNamesList[5] + " turn-on curve")
+hTotListSS[5].Draw("AP")
+c1.Update()
+c1.Print("trigTotSS.pdf", "pdf")'''
+
+for bitIndex in range(5, len(triggerNamesList)):
     hPassListOS[bitIndex].Add(hPassListSS[bitIndex], -1)
     hTotListOS[bitIndex].Add(hTotListSS[bitIndex], -1)
     turnOnList[bitIndex].Divide(hPassListOS[bitIndex], hTotListOS[bitIndex], "cl=0.683 b(1,1) mode")
