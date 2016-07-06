@@ -29,7 +29,7 @@ hTotListL1T_OS = []
 turnOnList_HLT = []
 turnOnList_L1T = []
 
-for iTrig in range (0, 1):
+for iTrig in range (0, 6):
     triggerNamesTree.GetEntry(iTrig)
     triggerNamesList.append(triggerNamesTree.triggerNames.Data())
 
@@ -58,18 +58,17 @@ for iEv in range (0, tree.GetEntries()):
     pt = tree.tauPt
 
     #HLT Plots
-    if pt < 85:
-        triggerBits = tree.tauTriggerBits
-        for bitIndex in range(0, len(triggerNamesList)):
-            if tree.isOS == True:
-                hTotListHLT_OS[bitIndex].Fill(pt)
-                if ((triggerBits >> bitIndex) & 1) == 1:
-                    hPassListHLT_OS[bitIndex].Fill(pt)
-            else:
-                hTotListHLT_SS[bitIndex].Fill(pt)
-                if ((triggerBits >> bitIndex) & 1) == 1:
-                    hPassListHLT_SS[bitIndex].Fill(pt)
-    
+    triggerBits = tree.tauTriggerBits
+    for bitIndex in range(0, len(triggerNamesList)):
+        if tree.isOS == True:
+            hTotListHLT_OS[bitIndex].Fill(pt)
+            if ((triggerBits >> bitIndex) & 1) == 1:
+                hPassListHLT_OS[bitIndex].Fill(pt)
+        else:
+            hTotListHLT_SS[bitIndex].Fill(pt)
+            if ((triggerBits >> bitIndex) & 1) == 1:
+                hPassListHLT_SS[bitIndex].Fill(pt)
+
     #L1 Plots
     l1tPt = tree.l1tPt
     for cutIndex in range (0, len(l1tCuts)):
@@ -82,6 +81,7 @@ for iEv in range (0, tree.GetEntries()):
             if l1tPt > l1tCuts[cutIndex] :
                 hPassListL1T_SS[cutIndex].Fill(pt)
 
+
 print "Calculating efficiencies"
 
 #Calculating and saving the efficiencies
@@ -91,10 +91,17 @@ c1.SetGridx()
 c1.SetGridy()
 fOut = TFile ("turnOn.root", "recreate")
 
+for bitIndex in range(5, len(triggerNamesList)):
 
-'''for bitIndex in range(5, len(triggerNamesList)):
     hPassListHLT_OS[bitIndex].Add(hPassListHLT_SS[bitIndex], -1)
     hTotListHLT_OS[bitIndex].Add(hTotListHLT_SS[bitIndex], -1)
+
+    for binIndex in range(1, hPassListHLT_OS[bitIndex].GetNbinsX() - 1):
+        #print hPassListHLT_OS[bitIndex].GetBinContent(bitIndex)," > ", hTotListHLT_OS[bitIndex].GetBinContent(bitIndex)
+        if hPassListHLT_OS[bitIndex].GetBinContent(binIndex) > hTotListHLT_OS[bitIndex].GetBinContent(binIndex):
+            #print "Bin: ", binIndex, "   ", hPassListHLT_OS[bitIndex].GetBinContent(binIndex)," > ", hTotListHLT_OS[bitIndex].GetBinContent(binIndex)
+            hPassListHLT_OS[bitIndex].SetBinContent(binIndex, hTotListHLT_OS[bitIndex].GetBinContent(binIndex))
+
     turnOnList_HLT[bitIndex].Divide(hPassListHLT_OS[bitIndex], hTotListHLT_OS[bitIndex], "cl=0.683 b(1,1) mode")
     turnOnList_HLT[bitIndex].SetMarkerStyle(8)
     turnOnList_HLT[bitIndex].SetMarkerSize(0.8)
@@ -109,11 +116,16 @@ fOut = TFile ("turnOn.root", "recreate")
     hTurnOn.Divide(hTotListHLT_OS[bitIndex])
     hTurnOn.Write()
     hPassListHLT_OS[bitIndex].Write()
-    hTotListHLT_OS[bitIndex].Write()'''
+    hTotListHLT_OS[bitIndex].Write()
 
 for cutIndex in range(0, len(l1tCuts)):
     hPassListL1T_OS[cutIndex].Add(hPassListL1T_SS[cutIndex], -1)
     hTotListL1T_OS[cutIndex].Add(hTotListL1T_SS[cutIndex], -1)
+    for binIndex in range(1, hPassListL1T_OS[cutIndex].GetNbinsX() - 1):
+        #print hPassListHLT_OS[bitIndex].GetBinContent(bitIndex)," > ", hTotListHLT_OS[bitIndex].GetBinContent(bitIndex)
+        if hPassListL1T_OS[cutIndex].GetBinContent(binIndex) > hTotListL1T_OS[cutIndex].GetBinContent(binIndex):
+            #print "Bin: ", binIndex, "   ", hPassListHLT_OS[bitIndex].GetBinContent(binIndex)," > ", hTotListHLT_OS[bitIndex].GetBinContent(binIndex)
+            hPassListL1T_OS[cutIndex].SetBinContent(binIndex, hTotListL1T_OS[cutIndex].GetBinContent(binIndex))
     turnOnList_L1T[cutIndex].Divide(hPassListL1T_OS[cutIndex], hTotListL1T_OS[cutIndex], "cl=0.683 b(1,1) mode")
     turnOnList_L1T[cutIndex].SetMarkerStyle(8)
     turnOnList_L1T[cutIndex].SetMarkerSize(0.8)
