@@ -12,8 +12,8 @@ l1tResolution2 = TH1I("L1TriggerReso2", "L1T resolution for offline pt between 6
 hltResolution2 = TH1I("HLTriggerReso2", "HLT resolution for offline pt between 60 and 100 GeV", 100, -100, 100)
 #x = resolution
 #y = R
-l1tResolutionVsDR = TH2I("L1TriggerResoVsDR", "L1T resolution vs DR", 100, -100, 100, 30, -0.1, 0.2)
-hltResolutionVsDR = TH2I("HLTriggerResoVsDR", "HLT resolution vs DR", 100, -100, 100, 30, -0.1, 0.2)
+l1tResolutionVsDR = TH2I("L1TriggerResoVsDR", "L1T resolution vs DR", 100, -100, 100, 50, -0.1, 0.6)
+hltResolutionVsDR = TH2I("HLTriggerResoVsDR", "HLT resolution vs DR", 100, -100, 100, 50, -0.1, 0.6)
 
 for iEv in range (0, tree.GetEntries()):
     tree.GetEntry(iEv)
@@ -22,7 +22,8 @@ for iEv in range (0, tree.GetEntries()):
     ptHLT = tree.hltPt
     deltaPtL1T = ptOffline - ptL1T
     deltaPtHLT = ptOffline - ptHLT
-    deltaR = ((tree.tauEta - tree.hltEta)**2 + (tree.tauPhi - tree.hltPhi)**2)**0.5
+    deltaRHLT = ((tree.tauEta - tree.hltEta)**2 + (tree.tauPhi - tree.hltPhi)**2)**0.5
+    deltaRL1T = ((tree.tauEta - tree.l1tEta)**2 + (tree.tauPhi - tree.l1tPhi)**2)**0.5
     
     if (ptOffline > 40)  and (ptOffline < 60):
         l1tResolution1.Fill(deltaPtL1T)
@@ -31,7 +32,8 @@ for iEv in range (0, tree.GetEntries()):
         l1tResolution2.Fill(deltaPtL1T)
         hltResolution2.Fill(deltaPtHLT)
 
-    hltResolutionVsDR.Fill(deltaPtHLT, deltaR)
+    hltResolutionVsDR.Fill(deltaPtHLT, deltaRHLT)
+    l1tResolutionVsDR.Fill(deltaPtL1T, deltaRL1T)
   
 l1tResolution1.GetXaxis().SetTitle("ptOffline - ptL1T")
 #l1tResolution1.Draw()
@@ -52,9 +54,14 @@ hltResolution2.GetXaxis().SetTitle("ptOffline - ptHLT")
 
 hltResolutionVsDR.GetXaxis().SetTitle("ptOffline - ptHLT")
 hltResolutionVsDR.GetYaxis().SetTitle("Delta R")
-hltResolutionVsDR.Draw("COLZ")
-c1.Update()
-c1.Print("hltResoVsDR.pdf", "pdf")
+#hltResolutionVsDR.Draw("COLZ")
+#c1.Update()
+#c1.Print("hltResoVsDR.pdf", "pdf")
 
+l1tResolutionVsDR.GetXaxis().SetTitle("ptOffline - ptHLT")
+l1tResolutionVsDR.GetYaxis().SetTitle("Delta R")
+l1tResolutionVsDR.Draw("COLZ")
+c1.Update()
+c1.Print("l1tResoVsDR.pdf", "pdf")
 
 raw_input()

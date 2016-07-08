@@ -241,6 +241,7 @@ void Ntuplizer::endRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
     return;
 }
 
+
 void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
 {
     this -> Initialize();
@@ -271,9 +272,11 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     this -> _isOS = (muon -> charge() / tau -> charge() < 0) ? true : false;
 
     this -> _tauTriggerBitSet.reset();
+    
     for (pat::TriggerObjectStandAlone  obj : *triggerObjects)
     {
-        if (deltaR (*tau, obj) < 0.5)
+        const float dR = deltaR (*tau, obj);
+        if ( dR < 0.5)
         {
             this -> _isMatched = true;
             this -> _hasTriggerTauType = obj.hasTriggerObjectType(trigger::TriggerTau);
@@ -310,19 +313,24 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
 
     edm::Handle< BXVector<l1t::Tau> >  L1TauHandle;
     iEvent.getByToken(_L1TauTag, L1TauHandle);
-
-    for (l1t::TauBxCollection::const_iterator bx0TauIt = L1TauHandle->begin(0); bx0TauIt != L1TauHandle->end(0) ; bx0TauIt++) {
-        if (deltaR(*tau, *bx0TauIt) < 0.5) {
-            this -> _l1tPt = bx0TauIt -> pt();
-            this -> _l1tEta = bx0TauIt -> eta();
-            this -> _l1tPhi = bx0TauIt -> phi();
-            this -> _l1tIso = bx0TauIt -> hwIso();
-            this -> _l1tQual = bx0TauIt -> hwQual();
-            
-            
+    
+    float minDR = 0.5; //Uncomment for new match algo
+    
+    for (l1t::TauBxCollection::const_iterator bx0TauIt = L1TauHandle->begin(0); bx0TauIt != L1TauHandle->end(0) ; bx0TauIt++)
+    {
+        const float dR = deltaR(*tau, *bx0TauIt);
+        if (dR < minDR) //Uncomment for new match algo
+        //if (dR < 0.5) //Uncomment for old match algo
+        {
+            minDR = dR; //Uncomment for new match algo
+            const l1t::Tau& l1tTau = *bx0TauIt;
+            this -> _l1tPt = l1tTau.pt();
+            this -> _l1tEta = l1tTau.eta();
+            this -> _l1tPhi = l1tTau.phi();
+            this -> _l1tIso = l1tTau.hwIso();
+            this -> _l1tQual = l1tTau.hwQual();
         }
     }
-    
 
     this -> _tauPt = tau -> pt();
     this -> _tauEta = tau -> eta();
@@ -355,6 +363,7 @@ bool Ntuplizer::hasFilters(const pat::TriggerObjectStandAlone&  obj , const std:
 
     return true;
 }
+
 
 #include <FWCore/Framework/interface/MakerMacros.h>
 DEFINE_FWK_MODULE(Ntuplizer);
