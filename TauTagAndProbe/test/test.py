@@ -66,7 +66,7 @@ else:
     )
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(100000)
+    input = cms.untracked.int32(200000)
 )
 
 if options.JSONfile:
