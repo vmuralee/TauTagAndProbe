@@ -86,6 +86,7 @@ class Ntuplizer : public edm::EDAnalyzer {
         Bool_t _hasTriggerTauType;
         Bool_t _isMatched;
         Bool_t _isOS;
+        int _foundJet;
 
         edm::EDGetTokenT<pat::MuonRefVector>  _muonsTag;
         edm::EDGetTokenT<pat::TauRefVector>   _tauTag;
@@ -197,6 +198,7 @@ void Ntuplizer::Initialize() {
     this -> _l1tPhi = 666;
     this -> _l1tQual = -1;
     this -> _l1tIso = -1;
+    this -> _foundJet = 0;
 }
 
 
@@ -225,6 +227,7 @@ void Ntuplizer::beginJob()
     this -> _tree -> Branch("hasTriggerTauType", &_hasTriggerTauType, "hasTriggerTauType/O");
     this -> _tree -> Branch("isMatched", &_isMatched, "isMatched/O");
     this -> _tree -> Branch("isOS", &_isOS, "isOS/O");
+    this -> _tree -> Branch("foundJet", &_foundJet, "isOS/I");
 
     return;
 }
@@ -272,6 +275,8 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     this -> _isOS = (muon -> charge() / tau -> charge() < 0) ? true : false;
 
     this -> _tauTriggerBitSet.reset();
+
+    
     
     for (pat::TriggerObjectStandAlone  obj : *triggerObjects)
     {
@@ -286,10 +291,12 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
             const edm::TriggerNames::Strings& triggerNames = names.triggerNames();
             //Looking for the path
             unsigned int x = 0;
+            bool foundTrigger = false;
             for (const tParameterSet& parameter : this -> _parameters)
             {
                 if ((parameter.hltPathIndex >= 0)&&(obj.hasPathName(triggerNames[parameter.hltPathIndex], true, false)))
                 {
+                    foundTrigger = true;
                     //Path found, now looking for the label 1, if present in the parameter set
                     //std::cout << "==== FOUND PATH " << triggerNames[parameter.hltPathIndex] << " ====" << std::endl;
                     //Retrieving filter list for the event
@@ -306,8 +313,10 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
                 }
                 x++;
             }
+            if (foundTrigger) this -> _foundJet++;
         }
     }
+
 
     //! TagAndProbe on L1T taus
 
@@ -335,6 +344,10 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     this -> _tauPt = tau -> pt();
     this -> _tauEta = tau -> eta();
     this -> _tauPhi = tau -> phi();
+
+    //float deltaPt = this -> _hltPt - this -> _tauPt;
+    //if (this -> _foundJet > 1 ) std::cout << "deltaPt: " << deltaPt << " con foundJet " << this -> _foundJet << " hltPt " << this -> _hltPt << endl;
+
     this -> _tauTriggerBits = this -> _tauTriggerBitSet.to_ulong();
     //std::cout << "++++++++++ FILL ++++++++++" << std::endl;
     this -> _tree -> Fill();
