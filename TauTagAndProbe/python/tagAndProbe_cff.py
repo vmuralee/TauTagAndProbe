@@ -67,7 +67,7 @@ muonNumberFilter = cms.EDFilter ("muonNumberFilter",
 goodMuons = cms.EDFilter("PATMuonRefSelector",
         src = cms.InputTag("slimmedMuons"),
         cut = cms.string(
-                'pt > 10 && abs(eta) < 2.1 ' # kinematics
+                'pt > 24 && abs(eta) < 2.1 ' # kinematics
                 '&& ( (pfIsolationR03().sumChargedHadronPt + max(pfIsolationR03().sumNeutralHadronEt + pfIsolationR03().sumPhotonEt - 0.5 * pfIsolationR03().sumPUPt, 0.0)) / pt() ) < 0.1 ' # isolation
                 '&& isMediumMuon()' # quality -- medium muon
         ),
@@ -81,7 +81,7 @@ goodTaus = cms.EDFilter("PATTauRefSelector",
                 'pt > 20 && abs(eta) < 2.5 ' #kinematics
                 '&& abs(charge) > 0 && abs(charge) < 2 ' #sometimes 2 prongs have charge != 1
                 '&& tauID("decayModeFinding") > 0.5 ' # tau ID
-                '&& tauID("byCombinedIsolationDeltaBetaCorrRaw3Hits") < 3.0 ' # tau iso - NOTE: can as well use boolean discriminators with WP
+                '&& tauID("byTightIsolationMVArun2v1DBoldDMwLT") > 0.5 '
                 '&& tauID("againstMuonTight3") > 0.5 ' # anti Muon tight
                 '&& tauID("againstElectronVLooseMVA6") > 0.5 ' # anti-Ele loose
         ),
