@@ -84,8 +84,9 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
     iEvent.getByToken (_tausTag, tauHandle);
     if (tauHandle->size() < 1) return false;
 
-    vector<pair<float, int>> tausIdxPtVecSS;
-    vector<pair<float, int>> tausIdxPtVecOS;
+    //vector<pair<float, int>> tausIdxPtVecSS;
+    //vector<pair<float, int>> tausIdxPtVecOS;
+    vector<pair<float, int>> tausIdxPtVec;
     for (uint itau = 0; itau < tauHandle->size(); ++itau)
     {
         const pat::TauRef tau = (*tauHandle)[itau] ;
@@ -101,18 +102,23 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
         // }
 
         // min iso
+        //float isoMVA = tau->tauID("byIsolationMVArun2v1DBoldDMwLTraw");
+        //if (mu -> charge() / tau -> charge() > 0 ){
+        //    tausIdxPtVecSS.push_back(make_pair(isoMVA, itau));
+        //} else {
+        //    tausIdxPtVecOS.push_back(make_pair(isoMVA, itau));
+        //}
+
+        // min iso
         float isoMVA = tau->tauID("byIsolationMVArun2v1DBoldDMwLTraw");
-        if (mu -> charge() / tau -> charge() > 0 ){
-            tausIdxPtVecSS.push_back(make_pair(isoMVA, itau));
-        } else {
-            tausIdxPtVecOS.push_back(make_pair(isoMVA, itau));
-        }
+        tausIdxPtVec.push_back(make_pair(isoMVA, itau));
 
     }
 
 
     pat::TauRef tau;
 
+    /*
     if (tausIdxPtVecOS.size() != 0)
     {
         if (tausIdxPtVecOS.size() > 1) sort (tausIdxPtVecOS.begin(), tausIdxPtVecOS.end()); // will be sorted by first idx i.e. highest pt
@@ -126,6 +132,12 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
         int tauIdx = tausIdxPtVecSS.at(0).second; // min iso
         tau = (*tauHandle)[tauIdx];
     } else return false;//They are both 0!
+    */
+
+    if (tausIdxPtVec.size() == 0) return; //No tau found
+    if (tausIdxPtVec.size() > 1) sort (tausIdxPtVecOS.begin(), tausIdxPtVecOS.end()); //Sort if multiple taus
+    int tauIdx = tausIdxPtVec.at(0).second; // min iso
+    tau = (*tauHandle)[tauIdx];
 
     resultTau->push_back (tau);
     resultMuon->push_back (mu);

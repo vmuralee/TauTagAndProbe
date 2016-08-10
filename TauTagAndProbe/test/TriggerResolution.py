@@ -5,7 +5,7 @@ from array import array
 
 gStyle.SetOptStat(111111)
 
-fIn = TFile.Open('NTuple_Merge_22Lug.root')
+fIn = TFile.Open('NTuple_Merge_3Ago_MaxIso.root')
 tree = fIn.Get('Ntuplizer/TagAndProbe')
 
 l1tResolution1 = TH1I("L1TriggerReso1", "L1T resolution for offline pt between 20 and 40 GeV", 100, -100, 100)
