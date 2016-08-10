@@ -3,7 +3,7 @@ import FWCore.PythonUtilities.LumiList as LumiList
 import FWCore.ParameterSet.Config as cms
 process = cms.Process("TagAndProbe")
 
-isMC = True
+isMC = False
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 

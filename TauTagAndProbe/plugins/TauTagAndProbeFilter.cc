@@ -95,11 +95,11 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
         if (deltaR(*tau, *mu) < 0.5) continue;
 
         // max pt
-        // if (mu -> charge() / tau -> charge() > 0 ){
-        //     tausIdxPtVecSS.push_back(make_pair(tau -> pt(), itau));
-        // } else {
-        //     tausIdxPtVecOS.push_back(make_pair(tau -> pt(), itau));
-        // }
+//        if (mu -> charge() / tau -> charge() > 0 ){
+//            tausIdxPtVecSS.push_back(make_pair(tau -> pt(), itau));
+//        } else {
+//             tausIdxPtVecOS.push_back(make_pair(tau -> pt(), itau));
+//        }
 
         // min iso
         //float isoMVA = tau->tauID("byIsolationMVArun2v1DBoldDMwLTraw");
