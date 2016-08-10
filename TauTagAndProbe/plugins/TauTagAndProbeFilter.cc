@@ -134,8 +134,8 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
     } else return false;//They are both 0!
     */
 
-    if (tausIdxPtVec.size() == 0) return; //No tau found
-    if (tausIdxPtVec.size() > 1) sort (tausIdxPtVecOS.begin(), tausIdxPtVecOS.end()); //Sort if multiple taus
+    if (tausIdxPtVec.size() == 0) return false; //No tau found
+    if (tausIdxPtVec.size() > 1) sort (tausIdxPtVec.begin(), tausIdxPtVec.end()); //Sort if multiple taus
     int tauIdx = tausIdxPtVec.at(0).second; // min iso
     tau = (*tauHandle)[tauIdx];
 
