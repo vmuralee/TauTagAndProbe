@@ -92,11 +92,22 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
         math::XYZTLorentzVector pSum = mu->p4() + tau->p4();
         if (pSum.mass() <= 40 || pSum.mass() >= 80) continue; // visible mass in (40, 80)
         if (deltaR(*tau, *mu) < 0.5) continue;
+
+        // max pt
+        // if (mu -> charge() / tau -> charge() > 0 ){
+        //     tausIdxPtVecSS.push_back(make_pair(tau -> pt(), itau));
+        // } else {
+        //     tausIdxPtVecOS.push_back(make_pair(tau -> pt(), itau));
+        // }
+
+        // min iso
+        float isoMVA = tau->tauID("byIsolationMVArun2v1DBoldDMwLTraw");
         if (mu -> charge() / tau -> charge() > 0 ){
-            tausIdxPtVecSS.push_back(make_pair(tau -> pt(), itau));
+            tausIdxPtVecSS.push_back(make_pair(isoMVA, itau));
         } else {
-            tausIdxPtVecOS.push_back(make_pair(tau -> pt(), itau));
+            tausIdxPtVecOS.push_back(make_pair(isoMVA, itau));
         }
+
     }
 
 
@@ -105,12 +116,14 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
     if (tausIdxPtVecOS.size() != 0)
     {
         if (tausIdxPtVecOS.size() > 1) sort (tausIdxPtVecOS.begin(), tausIdxPtVecOS.end()); // will be sorted by first idx i.e. highest pt
-        int tauIdx = tausIdxPtVecOS.back().second;
+        // int tauIdx = tausIdxPtVecOS.back().second; // max pt
+        int tauIdx = tausIdxPtVecOS.at(0).second; // min iso
         tau = (*tauHandle)[tauIdx];
     } else if (tausIdxPtVecSS.size() != 0 )
     {
         if (tausIdxPtVecSS.size() > 1) sort (tausIdxPtVecSS.begin(), tausIdxPtVecSS.end()); // will be sorted by first idx i.e. highest pt
-        int tauIdx = tausIdxPtVecSS.back().second;
+        // int tauIdx = tausIdxPtVecSS.back().second; // max pt
+        int tauIdx = tausIdxPtVecSS.at(0).second; // min iso
         tau = (*tauHandle)[tauIdx];
     } else return false;//They are both 0!
 
