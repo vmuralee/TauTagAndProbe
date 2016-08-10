@@ -5,7 +5,7 @@ from array import array
 
 gStyle.SetOptStat(111111)
 
-fIn = TFile.Open('NTuple_Merge_8Lug.root')
+fIn = TFile.Open('NTuple_Merge_22Lug.root')
 tree = fIn.Get('Ntuplizer/TagAndProbe')
 
 binning = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 45, 50, 60, 70, 80, 90, 100, 150]
@@ -122,8 +122,9 @@ for bitIndex in range(0, len(triggerNamesList)):
     turnOnList_HLT[bitIndex].SetMarkerStyle(8)
     turnOnList_HLT[bitIndex].SetMarkerSize(0.8)
     turnOnList_HLT[bitIndex].SetMarkerColor(kRed)
-    turnOnList_HLT[bitIndex].GetXaxis().SetTitle("p_t (GeV)");
-    turnOnList_HLT[bitIndex].GetYaxis().SetTitle("Efficiency");
+    turnOnList_HLT[bitIndex].GetXaxis().SetTitle("p_t (GeV)")
+    turnOnList_HLT[bitIndex].GetYaxis().SetRangeUser(0, 1.05)
+    turnOnList_HLT[bitIndex].GetYaxis().SetTitle("Efficiency")
     turnOnList_HLT[bitIndex].SetTitle(triggerNamesList[bitIndex] + " turn-on curve")
     turnOnList_HLT[bitIndex].Draw("AP")
     c1.Update()
@@ -135,8 +136,10 @@ for bitIndex in range(0, len(triggerNamesList)):
     hTotListHLT_OS[bitIndex].Write()
 
 for cutIndex in range(0, len(l1tCuts)):
+
     hPassListL1T_OS[cutIndex].Add(hPassListL1T_SS[cutIndex], -1)
     hTotListL1T_OS[cutIndex].Add(hTotListL1T_SS[cutIndex], -1)
+
     for binIndex in range(1, hPassListL1T_OS[cutIndex].GetNbinsX() - 1):
         if hPassListL1T_OS[cutIndex].GetBinContent(binIndex) > hTotListL1T_OS[cutIndex].GetBinContent(binIndex):
             hPassListL1T_OS[cutIndex].SetBinContent(binIndex, hTotListL1T_OS[cutIndex].GetBinContent(binIndex))
