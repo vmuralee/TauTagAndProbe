@@ -227,7 +227,7 @@ void Ntuplizer::beginJob()
     this -> _tree -> Branch("hasTriggerTauType", &_hasTriggerTauType, "hasTriggerTauType/O");
     this -> _tree -> Branch("isMatched", &_isMatched, "isMatched/O");
     this -> _tree -> Branch("isOS", &_isOS, "isOS/O");
-    this -> _tree -> Branch("foundJet", &_foundJet, "isOS/I");
+    this -> _tree -> Branch("foundJet", &_foundJet, "foundJet/I");
 
     return;
 }
