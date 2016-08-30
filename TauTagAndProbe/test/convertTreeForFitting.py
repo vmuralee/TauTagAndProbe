@@ -5,7 +5,7 @@ import numpy as n
 
 # the hadd of all the output ntuples
 fname = 'allICHEPIsoOrder.root'
-pt = [25, 35, 45]
+pt = [28, 30, 32]
 
 #######################################################
 fIn = TFile.Open(fname)
