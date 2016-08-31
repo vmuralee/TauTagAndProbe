@@ -22,7 +22,7 @@ class TurnOn:
 
 
 class TurnOnPlot:
-    def __init__(self):
+    def __init__(self, **args):
         self.name  = ""
         self.turnons = []
         self.plotDir = "plots/"
@@ -31,6 +31,7 @@ class TurnOnPlot:
         #self.legendPosition = (0.6,0.2,0.9,0.4)
         self.legendPosition = (0.4,0.2,0.9,0.6)
         self.setPlotStyle()
+        self.triggerName = args.get("TriggerName", "Turn-On")
 
     def addTurnOn(self, turnon):
         self.turnons.append(turnon)
@@ -43,10 +44,50 @@ class TurnOnPlot:
         hDummy.SetXTitle(self.xTitle)
         hDummy.SetYTitle("Efficiency")
         hDummy.Draw()
+
+
+        cmsTextFont     = 61  # font of the "CMS" label
+        cmsTextSize   = 0.05  # font size of the "CMS" label
+        extraTextFont   = 52     # for the "preliminary"
+        extraTextSize   = 0.76 * cmsTextSize # for the "preliminary"
+        xpos  = 0.177
+        ypos  = 0.89
+
+        CMSbox       = ROOT.TLatex  (xpos, ypos         , "CMS")
+        extraTextBox = ROOT.TLatex  (xpos, ypos - 0.05 , "#splitline{preliminary}{2016}")
+        CMSbox.SetNDC()
+        extraTextBox.SetNDC()
+        CMSbox.SetTextSize(cmsTextSize)
+        CMSbox.SetTextFont(cmsTextFont)
+        CMSbox.SetTextColor(ROOT.kBlack)
+        CMSbox.SetTextAlign(13)
+        extraTextBox.SetTextSize(extraTextSize)
+        extraTextBox.SetTextFont(extraTextFont)
+        extraTextBox.SetTextColor(ROOT.kBlack)
+        extraTextBox.SetTextAlign(13)
+
+        triggerNameBox = ROOT.TLatex(0.15, 0.95, self.triggerName)
+        triggerNameBox.SetNDC()
+        triggerNameBox.SetTextFont(42)
+        triggerNameBox.SetTextSize(extraTextSize)
+        triggerNameBox.SetTextColor(ROOT.kBlack)
+        triggerNameBox.SetTextAlign(11)
+
+        # lumi_num = float(cfg.readOption ("general::lumi"))
+        # lumi_num = lumi_num/1000. # from pb-1 to fb-1
+        # lumi = "%.1f fb^{-1} (13 TeV)" % lumi_num
+        lumi = "12.9 fb^{-1} (13 TeV)"
+        lumibox = ROOT.TLatex  (0.953, 0.95, lumi)
+        lumibox.SetNDC()
+        lumibox.SetTextAlign(31)
+        lumibox.SetTextSize(extraTextSize)
+        lumibox.SetTextFont(42)
+        lumibox.SetTextColor(ROOT.kBlack)
+        #Line legend
         legend = ROOT.TLegend(self.legendPosition[0],self.legendPosition[1],self.legendPosition[2],self.legendPosition[3])
         legend.SetTextFont(42)
         legend.SetFillColor(0)
-        legend1 = ROOT.TLegend(0.14, 0.80, 0.80, 1.02)
+        '''legend1 = ROOT.TLegend(0.14, 0.80, 0.80, 1.02)
         legend1.SetBorderSize(0)
         legend1.SetTextFont(62)
         legend1.SetTextSize(0.025)
@@ -56,8 +97,8 @@ class TurnOnPlot:
         legend1.SetFillColor(0)
         legend1.SetFillStyle(0)
         legend1.AddEntry("NULL","CMS Preliminary:                                              #sqrt{s}=13 TeV","h")
-        legend1.AddEntry("NULL","L1 Threshold : 28 GeV","h")
-        
+        legend1.AddEntry("NULL","L1 Threshold : 28 GeV","h")'''
+
         for turnon in self.turnons:
             histo = turnon.histo
             histo.SetMarkerStyle(turnon.markerStyle)
@@ -73,10 +114,13 @@ class TurnOnPlot:
             legend.AddEntry(histo, turnon.legend, "pe")
             legend.Draw()
             #if self.name=="turnon_Stage1_Stage2_EB":
-        # legend1.Draw()
+        triggerNameBox.Draw()
+        CMSbox.Draw()
+        extraTextBox.Draw()
+        lumibox.Draw()
         #print ("DEBUG: " + self.plotDir+"/"+self.name+".eps")
-        canvas.Print(self.plotDir+"/"+self.name+".pdf")
-        canvas.Print(self.plotDir+"/"+self.name+".png")
+        canvas.Print(self.plotDir+"/"+self.name+".pdf", "pdf")
+        canvas.Print(self.plotDir+"/"+self.name+".png", "png")
         return canvas
 
 

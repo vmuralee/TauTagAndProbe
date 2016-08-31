@@ -1,1 +1,5 @@
 *.pyc
+*.root
+*.so
+*.pdf
+*.zip

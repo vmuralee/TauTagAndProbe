@@ -1,15 +1,15 @@
 OutputFile: results/TestTurnOn/fitOutput.root
 NCPU: 4
 
-Turnon.N: 3
+Turnon.N: 18
 
 
 ## Stage-2 Barrel
-Turnon.1.Name: Stage2_Barrel_vs_Pt
-Turnon.1.File: /home/llr/cms/cadamuro/TauTagAndProbe/CMSSW_8_0_5/src/TauTagAndProbe/TauTagAndProbe/test/allICHEPIsoOrder_forFit.root
+Turnon.1.Name: Stage2_Barrel_vs_Pt_26Gev
+Turnon.1.File: /afs/cern.ch/user/s/sbologna/TauTagAndProbe/CMSSW_8_0_5/src/TauTagAndProbe/TauTagAndProbe/test/fitter/NTuple_Merge_10Ago_MaxIso_forFit.root
 Turnon.1.Tree: TagAndProbe
 Turnon.1.XVar: tauPt
-Turnon.1.Cut: hasL1_30
+Turnon.1.Cut: hasL1_26
 Turnon.1.SelectionVars: tauEta
 Turnon.1.Selection: abs(tauEta)<1.305
 Turnon.1.Binning: 4 8 10 12 14 16 18 19 20 21 22 23 24 26 28 30 32 35 40 45 50 60 70 90 110 140
@@ -20,15 +20,13 @@ Turnon.1.CB.N: 10. 1.001 100.
 Turnon.1.CB.Mean: 30. 0. 120.
 Turnon.1.CB.Sigma: 2. 0.01 10
 
-
-## Stage-2 Endcaps
-Turnon.2.Name: Stage2_Endcaps_vs_Pt
-Turnon.2.File: /home/llr/cms/cadamuro/TauTagAndProbe/CMSSW_8_0_5/src/TauTagAndProbe/TauTagAndProbe/test/allICHEPIsoOrder_forFit.root
+Turnon.2.Name: Stage2_Barrel_vs_Pt_26GeV_iso
+Turnon.2.File: /afs/cern.ch/user/s/sbologna/TauTagAndProbe/CMSSW_8_0_5/src/TauTagAndProbe/TauTagAndProbe/test/fitter/NTuple_Merge_10Ago_MaxIso_forFit.root
 Turnon.2.Tree: TagAndProbe
 Turnon.2.XVar: tauPt
-Turnon.2.Cut: hasL1_30
+Turnon.2.Cut: hasL1_26_iso
 Turnon.2.SelectionVars: tauEta
-Turnon.2.Selection: abs(tauEta)>1.479
+Turnon.2.Selection: abs(tauEta)<1.305
 Turnon.2.Binning: 4 8 10 12 14 16 18 19 20 21 22 23 24 26 28 30 32 35 40 45 50 60 70 90 110 140
 Turnon.2.FitRange: 0 140
 Turnon.2.CB.Max: 1. 0.9 1.
@@ -37,14 +35,13 @@ Turnon.2.CB.N: 10. 1.001 100.
 Turnon.2.CB.Mean: 30. 0. 120.
 Turnon.2.CB.Sigma: 2. 0.01 10
 
-
-
-## Stage-2 All
-Turnon.3.Name: Stage2_All_vs_Pt
-Turnon.3.File: /home/llr/cms/cadamuro/TauTagAndProbe/CMSSW_8_0_5/src/TauTagAndProbe/TauTagAndProbe/test/allICHEPIsoOrder_forFit.root
+Turnon.3.Name: Stage2_Barrel_vs_Pt_30GeV
+Turnon.3.File: /afs/cern.ch/user/s/sbologna/TauTagAndProbe/CMSSW_8_0_5/src/TauTagAndProbe/TauTagAndProbe/test/fitter/NTuple_Merge_10Ago_MaxIso_forFit.root
 Turnon.3.Tree: TagAndProbe
 Turnon.3.XVar: tauPt
 Turnon.3.Cut: hasL1_30
+Turnon.3.SelectionVars: tauEta
+Turnon.3.Selection: abs(tauEta)<1.305
 Turnon.3.Binning: 4 8 10 12 14 16 18 19 20 21 22 23 24 26 28 30 32 35 40 45 50 60 70 90 110 140
 Turnon.3.FitRange: 0 140
 Turnon.3.CB.Max: 1. 0.9 1.
@@ -52,3 +49,223 @@ Turnon.3.CB.Alpha: 3. 0.01 50.
 Turnon.3.CB.N: 10. 1.001 100.
 Turnon.3.CB.Mean: 30. 0. 120.
 Turnon.3.CB.Sigma: 2. 0.01 10
+
+Turnon.4.Name: Stage2_Barrel_vs_Pt_30GeV_iso
+Turnon.4.File: /afs/cern.ch/user/s/sbologna/TauTagAndProbe/CMSSW_8_0_5/src/TauTagAndProbe/TauTagAndProbe/test/fitter/NTuple_Merge_10Ago_MaxIso_forFit.root
+Turnon.4.Tree: TagAndProbe
+Turnon.4.XVar: tauPt
+Turnon.4.Cut: hasL1_30_iso
+Turnon.4.SelectionVars: tauEta
+Turnon.4.Selection: abs(tauEta)<1.305
+Turnon.4.Binning: 4 8 10 12 14 16 18 19 20 21 22 23 24 26 28 30 32 35 40 45 50 60 70 90 110 140
+Turnon.4.FitRange: 0 140
+Turnon.4.CB.Max: 1. 0.9 1.
+Turnon.4.CB.Alpha: 3. 0.01 50.
+Turnon.4.CB.N: 10. 1.001 100.
+Turnon.4.CB.Mean: 30. 0. 120.
+Turnon.4.CB.Sigma: 2. 0.01 10
+
+Turnon.5.Name: Stage2_Barrel_vs_Pt_34GeV
+Turnon.5.File: /afs/cern.ch/user/s/sbologna/TauTagAndProbe/CMSSW_8_0_5/src/TauTagAndProbe/TauTagAndProbe/test/fitter/NTuple_Merge_10Ago_MaxIso_forFit.root
+Turnon.5.Tree: TagAndProbe
+Turnon.5.XVar: tauPt
+Turnon.5.Cut: hasL1_34
+Turnon.5.SelectionVars: tauEta
+Turnon.5.Selection: abs(tauEta)<1.305
+Turnon.5.Binning: 4 8 10 12 14 16 18 19 20 21 22 23 24 26 28 30 32 35 40 45 50 60 70 90 110 140
+Turnon.5.FitRange: 0 140
+Turnon.5.CB.Max: 1. 0.9 1.
+Turnon.5.CB.Alpha: 3. 0.01 50.
+Turnon.5.CB.N: 10. 1.001 100.
+Turnon.5.CB.Mean: 30. 0. 120.
+Turnon.5.CB.Sigma: 2. 0.01 10
+
+Turnon.6.Name: Stage2_Barrel_vs_Pt_34GeV_iso
+Turnon.6.File: /afs/cern.ch/user/s/sbologna/TauTagAndProbe/CMSSW_8_0_5/src/TauTagAndProbe/TauTagAndProbe/test/fitter/NTuple_Merge_10Ago_MaxIso_forFit.root
+Turnon.6.Tree: TagAndProbe
+Turnon.6.XVar: tauPt
+Turnon.6.Cut: hasL1_34_iso
+Turnon.6.SelectionVars: tauEta
+Turnon.6.Selection: abs(tauEta)<1.305
+Turnon.6.Binning: 4 8 10 12 14 16 18 19 20 21 22 23 24 26 28 30 32 35 40 45 50 60 70 90 110 140
+Turnon.6.FitRange: 0 140
+Turnon.6.CB.Max: 1. 0.9 1.
+Turnon.6.CB.Alpha: 3. 0.01 50.
+Turnon.6.CB.N: 10. 1.001 100.
+Turnon.6.CB.Mean: 30. 0. 120.
+Turnon.6.CB.Sigma: 2. 0.01 10
+
+
+
+## Stage-2 Endcaps
+Turnon.7.Name: Stage2_Endcaps_vs_Pt_26GeV
+Turnon.7.File: /afs/cern.ch/user/s/sbologna/TauTagAndProbe/CMSSW_8_0_5/src/TauTagAndProbe/TauTagAndProbe/test/fitter/NTuple_Merge_10Ago_MaxIso_forFit.root
+Turnon.7.Tree: TagAndProbe
+Turnon.7.XVar: tauPt
+Turnon.7.Cut: hasL1_26
+Turnon.7.SelectionVars: tauEta
+Turnon.7.Selection: abs(tauEta)>1.479
+Turnon.7.Binning: 4 8 10 12 14 16 18 19 20 21 22 23 24 26 28 30 32 35 40 45 50 60 70 90 110 140
+Turnon.7.FitRange: 0 140
+Turnon.7.CB.Max: 1. 0.9 1.
+Turnon.7.CB.Alpha: 3. 0.01 50.
+Turnon.7.CB.N: 10. 1.001 100.
+Turnon.7.CB.Mean: 30. 0. 120.
+Turnon.7.CB.Sigma: 2. 0.01 10
+
+Turnon.8.Name: Stage2_Endcaps_vs_Pt_26GeV_iso
+Turnon.8.File: /afs/cern.ch/user/s/sbologna/TauTagAndProbe/CMSSW_8_0_5/src/TauTagAndProbe/TauTagAndProbe/test/fitter/NTuple_Merge_10Ago_MaxIso_forFit.root
+Turnon.8.Tree: TagAndProbe
+Turnon.8.XVar: tauPt
+Turnon.8.Cut: hasL1_26_iso
+Turnon.8.SelectionVars: tauEta
+Turnon.8.Selection: abs(tauEta)>1.479
+Turnon.8.Binning: 4 8 10 12 14 16 18 19 20 21 22 23 24 26 28 30 32 35 40 45 50 60 70 90 110 140
+Turnon.8.FitRange: 0 140
+Turnon.8.CB.Max: 1. 0.9 1.
+Turnon.8.CB.Alpha: 3. 0.01 50.
+Turnon.8.CB.N: 10. 1.001 100.
+Turnon.8.CB.Mean: 30. 0. 120.
+Turnon.8.CB.Sigma: 2. 0.01 10
+
+Turnon.9.Name: Stage2_Endcaps_vs_Pt_30GeV
+Turnon.9.File: /afs/cern.ch/user/s/sbologna/TauTagAndProbe/CMSSW_8_0_5/src/TauTagAndProbe/TauTagAndProbe/test/fitter/NTuple_Merge_10Ago_MaxIso_forFit.root
+Turnon.9.Tree: TagAndProbe
+Turnon.9.XVar: tauPt
+Turnon.9.Cut: hasL1_30
+Turnon.9.SelectionVars: tauEta
+Turnon.9.Selection: abs(tauEta)>1.479
+Turnon.9.Binning: 4 8 10 12 14 16 18 19 20 21 22 23 24 26 28 30 32 35 40 45 50 60 70 90 110 140
+Turnon.9.FitRange: 0 140
+Turnon.9.CB.Max: 1. 0.9 1.
+Turnon.9.CB.Alpha: 3. 0.01 50.
+Turnon.9.CB.N: 10. 1.001 100.
+Turnon.9.CB.Mean: 30. 0. 120.
+Turnon.9.CB.Sigma: 2. 0.01 10
+
+Turnon.10.Name: Stage2_Endcaps_vs_Pt_30GeV_iso
+Turnon.10.File: /afs/cern.ch/user/s/sbologna/TauTagAndProbe/CMSSW_8_0_5/src/TauTagAndProbe/TauTagAndProbe/test/fitter/NTuple_Merge_10Ago_MaxIso_forFit.root
+Turnon.10.Tree: TagAndProbe
+Turnon.10.XVar: tauPt
+Turnon.10.Cut: hasL1_30_iso
+Turnon.10.SelectionVars: tauEta
+Turnon.10.Selection: abs(tauEta)>1.479
+Turnon.10.Binning: 4 8 10 12 14 16 18 19 20 21 22 23 24 26 28 30 32 35 40 45 50 60 70 90 110 140
+Turnon.10.FitRange: 0 140
+Turnon.10.CB.Max: 1. 0.9 1.
+Turnon.10.CB.Alpha: 3. 0.01 50.
+Turnon.10.CB.N: 10. 1.001 100.
+Turnon.10.CB.Mean: 30. 0. 120.
+Turnon.10.CB.Sigma: 2. 0.01 10
+
+Turnon.11.Name: Stage2_Endcaps_vs_Pt_34GeV
+Turnon.11.File: /afs/cern.ch/user/s/sbologna/TauTagAndProbe/CMSSW_8_0_5/src/TauTagAndProbe/TauTagAndProbe/test/fitter/NTuple_Merge_10Ago_MaxIso_forFit.root
+Turnon.11.Tree: TagAndProbe
+Turnon.11.XVar: tauPt
+Turnon.11.Cut: hasL1_34
+Turnon.11.SelectionVars: tauEta
+Turnon.11.Selection: abs(tauEta)>1.479
+Turnon.11.Binning: 4 8 10 12 14 16 18 19 20 21 22 23 24 26 28 30 32 35 40 45 50 60 70 90 110 140
+Turnon.11.FitRange: 0 140
+Turnon.11.CB.Max: 1. 0.9 1.
+Turnon.11.CB.Alpha: 3. 0.01 50.
+Turnon.11.CB.N: 10. 1.001 100.
+Turnon.11.CB.Mean: 30. 0. 120.
+Turnon.11.CB.Sigma: 2. 0.01 10
+
+Turnon.12.Name: Stage2_Endcaps_vs_Pt_34GeV_iso
+Turnon.12.File: /afs/cern.ch/user/s/sbologna/TauTagAndProbe/CMSSW_8_0_5/src/TauTagAndProbe/TauTagAndProbe/test/fitter/NTuple_Merge_10Ago_MaxIso_forFit.root
+Turnon.12.Tree: TagAndProbe
+Turnon.12.XVar: tauPt
+Turnon.12.Cut: hasL1_34_iso
+Turnon.12.SelectionVars: tauEta
+Turnon.12.Selection: abs(tauEta)>1.479
+Turnon.12.Binning: 4 8 10 12 14 16 18 19 20 21 22 23 24 26 28 30 32 35 40 45 50 60 70 90 110 140
+Turnon.12.FitRange: 0 140
+Turnon.12.CB.Max: 1. 0.9 1.
+Turnon.12.CB.Alpha: 3. 0.01 50.
+Turnon.12.CB.N: 10. 1.001 100.
+Turnon.12.CB.Mean: 30. 0. 120.
+Turnon.12.CB.Sigma: 2. 0.01 10
+
+
+
+## Stage-2 All
+Turnon.13.Name: Stage2_All_vs_Pt_26GeV
+Turnon.13.File: /afs/cern.ch/user/s/sbologna/TauTagAndProbe/CMSSW_8_0_5/src/TauTagAndProbe/TauTagAndProbe/test/fitter/NTuple_Merge_10Ago_MaxIso_forFit.root
+Turnon.13.Tree: TagAndProbe
+Turnon.13.XVar: tauPt
+Turnon.13.Cut: hasL1_26
+Turnon.13.Binning: 4 8 10 12 14 16 18 19 20 21 22 23 24 26 28 30 32 35 40 45 50 60 70 90 110 140
+Turnon.13.FitRange: 0 140
+Turnon.13.CB.Max: 1. 0.9 1.
+Turnon.13.CB.Alpha: 3. 0.01 50.
+Turnon.13.CB.N: 10. 1.001 100.
+Turnon.13.CB.Mean: 30. 0. 120.
+Turnon.13.CB.Sigma: 2. 0.01 10
+
+Turnon.14.Name: Stage2_All_vs_Pt_26GeV_iso
+Turnon.14.File: /afs/cern.ch/user/s/sbologna/TauTagAndProbe/CMSSW_8_0_5/src/TauTagAndProbe/TauTagAndProbe/test/fitter/NTuple_Merge_10Ago_MaxIso_forFit.root
+Turnon.14.Tree: TagAndProbe
+Turnon.14.XVar: tauPt
+Turnon.14.Cut: hasL1_26_iso
+Turnon.14.Binning: 4 8 10 12 14 16 18 19 20 21 22 23 24 26 28 30 32 35 40 45 50 60 70 90 110 140
+Turnon.14.FitRange: 0 140
+Turnon.14.CB.Max: 1. 0.9 1.
+Turnon.14.CB.Alpha: 3. 0.01 50.
+Turnon.14.CB.N: 10. 1.001 100.
+Turnon.14.CB.Mean: 30. 0. 120.
+Turnon.14.CB.Sigma: 2. 0.01 10
+
+Turnon.15.Name: Stage2_All_vs_Pt_30GeV
+Turnon.15.File: /afs/cern.ch/user/s/sbologna/TauTagAndProbe/CMSSW_8_0_5/src/TauTagAndProbe/TauTagAndProbe/test/fitter/NTuple_Merge_10Ago_MaxIso_forFit.root
+Turnon.15.Tree: TagAndProbe
+Turnon.15.XVar: tauPt
+Turnon.15.Cut: hasL1_30
+Turnon.15.Binning: 4 8 10 12 14 16 18 19 20 21 22 23 24 26 28 30 32 35 40 45 50 60 70 90 110 140
+Turnon.15.FitRange: 0 140
+Turnon.15.CB.Max: 1. 0.9 1.
+Turnon.15.CB.Alpha: 3. 0.01 50.
+Turnon.15.CB.N: 10. 1.001 100.
+Turnon.15.CB.Mean: 30. 0. 120.
+Turnon.15.CB.Sigma: 2. 0.01 10
+
+Turnon.16.Name: Stage2_All_vs_Pt_30GeV_iso
+Turnon.16.File: /afs/cern.ch/user/s/sbologna/TauTagAndProbe/CMSSW_8_0_5/src/TauTagAndProbe/TauTagAndProbe/test/fitter/NTuple_Merge_10Ago_MaxIso_forFit.root
+Turnon.16.Tree: TagAndProbe
+Turnon.16.XVar: tauPt
+Turnon.16.Cut: hasL1_30_iso
+Turnon.16.Binning: 4 8 10 12 14 16 18 19 20 21 22 23 24 26 28 30 32 35 40 45 50 60 70 90 110 140
+Turnon.16.FitRange: 0 140
+Turnon.16.CB.Max: 1. 0.9 1.
+Turnon.16.CB.Alpha: 3. 0.01 50.
+Turnon.16.CB.N: 10. 1.001 100.
+Turnon.16.CB.Mean: 30. 0. 120.
+Turnon.16.CB.Sigma: 2. 0.01 10
+
+Turnon.17.Name: Stage2_All_vs_Pt_34GeV
+Turnon.17.File: /afs/cern.ch/user/s/sbologna/TauTagAndProbe/CMSSW_8_0_5/src/TauTagAndProbe/TauTagAndProbe/test/fitter/NTuple_Merge_10Ago_MaxIso_forFit.root
+Turnon.17.Tree: TagAndProbe
+Turnon.17.XVar: tauPt
+Turnon.17.Cut: hasL1_34
+Turnon.17.Binning: 4 8 10 12 14 16 18 19 20 21 22 23 24 26 28 30 32 35 40 45 50 60 70 90 110 140
+Turnon.17.FitRange: 0 140
+Turnon.17.CB.Max: 1. 0.9 1.
+Turnon.17.CB.Alpha: 3. 0.01 50.
+Turnon.17.CB.N: 10. 1.001 100.
+Turnon.17.CB.Mean: 30. 0. 120.
+Turnon.17.CB.Sigma: 2. 0.01 10
+
+Turnon.18.Name: Stage2_All_vs_Pt_34GeV_iso
+Turnon.18.File: /afs/cern.ch/user/s/sbologna/TauTagAndProbe/CMSSW_8_0_5/src/TauTagAndProbe/TauTagAndProbe/test/fitter/NTuple_Merge_10Ago_MaxIso_forFit.root
+Turnon.18.Tree: TagAndProbe
+Turnon.18.XVar: tauPt
+Turnon.18.Cut: hasL1_34_iso
+Turnon.18.Binning: 4 8 10 12 14 16 18 19 20 21 22 23 24 26 28 30 32 35 40 45 50 60 70 90 110 140
+Turnon.18.FitRange: 0 140
+Turnon.18.CB.Max: 1. 0.9 1.
+Turnon.18.CB.Alpha: 3. 0.01 50.
+Turnon.18.CB.N: 10. 1.001 100.
+Turnon.18.CB.Mean: 30. 0. 120.
+Turnon.18.CB.Sigma: 2. 0.01 10
+

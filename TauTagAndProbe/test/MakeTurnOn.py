@@ -6,7 +6,7 @@ from array import array
 gStyle.SetOptStat(111111)
 
 
-fIn = TFile.Open('NTuple_NewFilter.root')
+fIn = TFile.Open('NTuple_Merge_10Ago_MaxIso.root')
 
 tree = fIn.Get('Ntuplizer/TagAndProbe')
 
@@ -38,7 +38,7 @@ turnOnList_HLT = []
 turnOnList_L1T = []
 turnOnList_L1T_Iso = []
 
-for iTrig in range (0, 1):
+for iTrig in range (0, 6):
     triggerNamesTree.GetEntry(iTrig)
     triggerNamesList.append(triggerNamesTree.triggerNames.Data())
 
