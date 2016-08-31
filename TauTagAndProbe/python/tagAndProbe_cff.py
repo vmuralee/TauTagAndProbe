@@ -68,8 +68,8 @@ goodMuons = cms.EDFilter("PATMuonRefSelector",
         src = cms.InputTag("slimmedMuons"),
         cut = cms.string(
                 'pt > 24 && abs(eta) < 2.1 ' # kinematics
-                '&& ( (pfIsolationR03().sumChargedHadronPt + max(pfIsolationR03().sumNeutralHadronEt + pfIsolationR03().sumPhotonEt - 0.5 * pfIsolationR03().sumPUPt, 0.0)) / pt() ) < 0.1 ' # isolation
-                '&& isMediumMuon()' # quality -- medium muon
+                '&& ( (pfIsolationR04().sumChargedHadronPt + max(pfIsolationR04().sumNeutralHadronEt + pfIsolationR04().sumPhotonEt - 0.5 * pfIsolationR04().sumPUPt, 0.0)) / pt() ) < 0.1 ' # isolation
+                '&& isTightMuon()' # quality -- medium muon
         ),
         filter = cms.bool(True)
 )
@@ -92,7 +92,7 @@ goodTaus = cms.EDFilter("PATTauRefSelector",
 bjets = cms.EDFilter("PATJetRefSelector",
         src = cms.InputTag("slimmedJets"),
         cut = cms.string(
-                'pt > 30 && abs(eta) < 2.5 ' #kinematics
+                'pt > 20 && abs(eta) < 2.4 ' #kinematics
                 '&& bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") > 0.800' # b tag with medium WP
         ),
         filter = cms.bool(True)
