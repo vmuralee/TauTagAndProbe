@@ -15,6 +15,7 @@ tTriggerNames = fIn.Get("Ntuplizer/triggerNames")
 outname = fname.replace ('.root', '_forFit.root')
 fOut = TFile (outname, 'recreate')
 tOut = tIn.CloneTree(0)
+tOutNames = tTriggerNames.CloneTree(0)
 
 briso   = [n.zeros(1, dtype=int) for x in range (0, len(pt))]
 brnoiso = [n.zeros(1, dtype=int) for x in range (0, len(pt))]
@@ -62,5 +63,6 @@ for ev in range (0, nentries):
 
     tOut.Fill()
 
+tOutNames.Write()
 tOut.Write()
 fOut.Close()
