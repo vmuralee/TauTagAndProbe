@@ -4,8 +4,8 @@ import numpy as n
 ## FIXME: copy triggerNames structure for storing HLT info as well
 
 # the hadd of all the output ntuples
-fname = 'allICHEPIsoOrder.root'
-pt = [28, 30, 32]
+fname = 'NTuple_Merge_10Ago_MaxIso.root'
+pt = [26, 30, 34]
 
 #######################################################
 fIn = TFile.Open(fname)
