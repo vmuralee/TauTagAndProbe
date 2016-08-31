@@ -69,7 +69,7 @@ goodMuons = cms.EDFilter("PATMuonRefSelector",
         cut = cms.string(
                 'pt > 24 && abs(eta) < 2.1 ' # kinematics
                 '&& ( (pfIsolationR04().sumChargedHadronPt + max(pfIsolationR04().sumNeutralHadronEt + pfIsolationR04().sumPhotonEt - 0.5 * pfIsolationR04().sumPUPt, 0.0)) / pt() ) < 0.1 ' # isolation
-                '&& isTightMuon()' # quality -- medium muon
+                '&& isLooseMuon()' # quality -- medium muon
         ),
         filter = cms.bool(True)
 )
