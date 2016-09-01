@@ -1,8 +1,6 @@
 from ROOT import *
 import numpy as n
 
-## FIXME: copy triggerNames structure for storing HLT info as well
-
 # the hadd of all the output ntuples
 fname = 'NTuple_Merge_10Ago_MaxIso.root'
 pt = [26, 30, 34]
@@ -29,7 +27,7 @@ for i in range (0, len(pt)):
 
 for i in range (0, numberOfHLTTriggers):
     tTriggerNames.GetEntry(i)
-    name = ("hasHLTPath_" + tTriggerNames.triggerNames.Data())
+    name = ("hasHLTPath_" + str(i))
     tOut.Branch(name, hltPathTriggered_OS[i], name+"/I")
 
 nentries = tIn.GetEntries()
