@@ -78,7 +78,7 @@ goodMuons = cms.EDFilter("PATMuonRefSelector",
 goodTaus = cms.EDFilter("PATTauRefSelector",
         src = cms.InputTag("slimmedTaus"),
         cut = cms.string(
-                'pt > 20 && abs(eta) < 2.5 ' #kinematics
+                'pt > 20 && abs(eta) < 2.1 ' #kinematics
                 '&& abs(charge) > 0 && abs(charge) < 2 ' #sometimes 2 prongs have charge != 1
                 '&& tauID("decayModeFinding") > 0.5 ' # tau ID
                 '&& tauID("byTightIsolationMVArun2v1DBoldDMwLT") > 0.5 '
