@@ -6,18 +6,18 @@ from array import array
 gStyle.SetOptStat(111111)
 
 
-fIn = TFile.Open('NTuple_Merge_10Ago_MaxIso.root')
+fIn = TFile.Open('NTuple_10Ago_Riccardo.root')
 
 tree = fIn.Get('Ntuplizer/TagAndProbe')
 
-binning = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 45, 50, 60, 70, 80, 90, 100, 150]
+binning = [4, 8, 10, 12, 14, 16, 18, 19, 20, 21, 22, 23, 24, 26, 28, 30, 32, 35, 40, 45, 50, 60, 70, 90, 110, 140]
 bins = array('d', binning)
 
 triggerNamesTree = fIn.Get("Ntuplizer/triggerNames")
 
 triggerNamesList = []
 
-l1tCuts = [28, 35, 42]
+l1tCuts = [28, 34, 42]
 
 # hpass = TH1F ("hpass", "hpass", 75, 0, 150)
 # htot = TH1F ("htot", "htot", 75, 0, 150)
@@ -69,6 +69,10 @@ print "Populating histograms"
 #Populating the histograms
 for iEv in range (0, tree.GetEntries()):
     tree.GetEntry(iEv)
+
+    if abs(tree.tauEta) > 2.1:
+        continue
+
     pt = tree.tauPt
 
     #HLT Plots
@@ -86,7 +90,7 @@ for iEv in range (0, tree.GetEntries()):
     #L1 Plots
     l1tPt = tree.l1tPt
     for cutIndex in range (0, len(l1tCuts)):
-        if tree.isOS == True :
+        if tree.isOS == True:
             hTotListL1T_OS[cutIndex].Fill(pt)
             hTotListL1T_Iso_OS[cutIndex].Fill(pt)
             if l1tPt > l1tCuts[cutIndex] :

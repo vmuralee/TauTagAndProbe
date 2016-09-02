@@ -48,6 +48,13 @@ HLTLIST = cms.VPSet(
         path2 = cms.vstring ("hltPFTau32TrackPt1MediumIsolationL1HLTMatchedReg", "hltOverlapFilterIsoMu19MediumIsoPFTau32Reg"),
         leg1 = cms.int32(13),
         leg2 = cms.int32(15)
+    ),
+    cms.PSet (
+        HLT = cms.string("HLT_IsoMu21_eta2p1_MediumIsoPFTau32_Trk1_eta2p1_Reg_v"),
+        path1 = cms.vstring ("hltL3crIsoL1sMu20L1f0L2f10QL3f20QL3trkIsoFiltered0p09", "hltOverlapFilterIsoMu21MediumIsoPFTau32Reg"),
+        path2 = cms.vstring ("HLT_IsoMu21_eta2p1_MediumIsoPFTau32_Trk1_eta2p1_Reg_v*", "hltOverlapFilterIsoMu21MediumIsoPFTau32Reg"),
+        leg1 = cms.int32(13),
+        leg2 = cms.int32(15)
     )
 )
 
@@ -78,7 +85,7 @@ goodMuons = cms.EDFilter("PATMuonRefSelector",
 goodTaus = cms.EDFilter("PATTauRefSelector",
         src = cms.InputTag("slimmedTaus"),
         cut = cms.string(
-                'pt > 20 && abs(eta) < 2.5 ' #kinematics
+                'pt > 20 && abs(eta) < 2.1 ' #kinematics
                 '&& abs(charge) > 0 && abs(charge) < 2 ' #sometimes 2 prongs have charge != 1
                 '&& tauID("decayModeFinding") > 0.5 ' # tau ID
                 '&& tauID("byTightIsolationMVArun2v1DBoldDMwLT") > 0.5 '
