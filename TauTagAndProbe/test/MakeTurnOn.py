@@ -69,6 +69,10 @@ print "Populating histograms"
 #Populating the histograms
 for iEv in range (0, tree.GetEntries()):
     tree.GetEntry(iEv)
+
+    if abs(tree.tauEta) > 2.1:
+        continue
+
     pt = tree.tauPt
 
     #HLT Plots
