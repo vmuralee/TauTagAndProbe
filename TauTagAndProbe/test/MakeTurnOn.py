@@ -1,10 +1,23 @@
 #!/usr/bin/python
-
+#
+#
+# Epoch B: 273150 - 275376
+# Epoch C: 275420 - 276283
+# Epoch D: 276315 - 276811
+#
 from ROOT import *
 from array import array
 
 gStyle.SetOptStat(111111)
 
+epochBMinRunNumber = 273150
+epochBMaxRunNumber = 275376
+
+epochCMinRunNumber = 275420
+epochCMaxRunNumber = 276283
+
+epochDMinRunNumber = 276315
+epochDMaxRunNumber = 276811
 
 fIn = TFile.Open('NTuple_10Ago_Riccardo.root')
 
@@ -69,6 +82,9 @@ print "Populating histograms"
 #Populating the histograms
 for iEv in range (0, tree.GetEntries()):
     tree.GetEntry(iEv)
+
+    #if tree.RunNumber < epochDMinRunNumber and tree.RunNumber > epochDMaxRunNumber:
+    #    continue
 
     if abs(tree.tauEta) > 2.1:
         continue
