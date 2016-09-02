@@ -2,7 +2,7 @@ from ROOT import *
 import numpy as n
 
 # the hadd of all the output ntuples
-fname = 'NTuple_Merge_10Ago_MaxIso.root'
+fname = 'NTuple_Merge_10Ago_MaxIso_FixRiccardo.root'
 pt = [26, 30, 34]
 numberOfHLTTriggers = 6
 
@@ -34,6 +34,9 @@ nentries = tIn.GetEntries()
 for ev in range (0, nentries):
     tIn.GetEntry(ev)
     if (ev%10000 == 0) : print ev, "/", nentries
+
+    if abs(tIn.tauEta) > 2.1:
+        continue
 
     if tIn.isOS == True:
         for i in range (0, len(pt)):
