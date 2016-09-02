@@ -35,16 +35,16 @@ for ev in range (0, nentries):
     tIn.GetEntry(ev)
     if (ev%10000 == 0) : print ev, "/", nentries
 
-    for i in range (0, len(pt)):
-        briso[i][0] = 0
-        brnoiso[i][0] = 0
-
-    for i in range (0, numberOfHLTTriggers):
-        hltPathTriggered_OS[i][0] = 0
-
-    L1iso = True if tIn.l1tIso == 1 else False
-    L1pt = tIn.l1tPt
     if tIn.isOS == True:
+        for i in range (0, len(pt)):
+            briso[i][0] = 0
+            brnoiso[i][0] = 0
+
+        for i in range (0, numberOfHLTTriggers):
+            hltPathTriggered_OS[i][0] = 0
+
+        L1iso = True if tIn.l1tIso == 1 else False
+        L1pt = tIn.l1tPt
         for i in range(0, len(pt)):
             # print L1pt, pt[i]
             #
@@ -59,7 +59,7 @@ for ev in range (0, nentries):
                 if ((triggerBits >> bitIndex) & 1) == 1:
                     hltPathTriggered_OS[bitIndex][0] = 1
 
-    tOut.Fill()
+        tOut.Fill()
 
 tOutNames.Write()
 tOut.Write()
