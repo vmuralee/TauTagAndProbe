@@ -271,13 +271,13 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
     const pat::TauRef tau = (*tauHandle)[0] ;
     const pat::MuonRef muon = (*muonHandle)[0] ;
-    
+
     this -> _isOS = (muon -> charge() / tau -> charge() < 0) ? true : false;
 
     this -> _tauTriggerBitSet.reset();
 
-    
-    
+
+
     for (pat::TriggerObjectStandAlone  obj : *triggerObjects)
     {
         const float dR = deltaR (*tau, obj);
@@ -322,9 +322,9 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
 
     edm::Handle< BXVector<l1t::Tau> >  L1TauHandle;
     iEvent.getByToken(_L1TauTag, L1TauHandle);
-    
+
     float minDR = 0.5; //Uncomment for new match algo
-    
+
     for (l1t::TauBxCollection::const_iterator bx0TauIt = L1TauHandle->begin(0); bx0TauIt != L1TauHandle->end(0) ; bx0TauIt++)
     {
         const float dR = deltaR(*tau, *bx0TauIt);

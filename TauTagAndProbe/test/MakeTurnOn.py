@@ -65,6 +65,12 @@ for bitIndex in range(0, len(triggerNamesList)):
     hTotListHLT_SS.append(TH1F("hTotSS_"+triggerNamesList[bitIndex], "hTotSS_"+triggerNamesList[bitIndex], len(binning)-1, bins))
     turnOnList_HLT.append(TGraphAsymmErrors())
 
+hPassTest_OS = TH1F("hPassTestOS", "hPassTestOS", len(binning)-1, bins)
+hPassTest_SS = TH1F("hPassTestSS", "hPassTestSS", len(binning)-1, bins)
+hTotTest_OS = TH1F("hTotTestOS", "hTotTestOS", len(binning)-1, bins)
+hTotTest_SS = TH1F("hTotTestSS", "hTotTestSS", len(binning)-1, bins)
+hTurnOnTest = TGraphAsymmErrors()
+
 for cutIndex in range(0, len(l1tCuts)):
     hTotListL1T_OS.append(TH1F("hTotL1IOS_" + str(l1tCuts[cutIndex]), "hTotL1OS_"+str(l1tCuts[cutIndex]), len(binning)-1, bins))
     hPassListL1T_OS.append(TH1F("hPassL1OS_" + str(l1tCuts[cutIndex]), "hPassL1OS_"+str(l1tCuts[cutIndex]), len(binning)-1, bins))
@@ -121,6 +127,18 @@ for iEv in range (0, tree.GetEntries()):
                 if tree.l1tIso == 1:
                     hPassListL1T_Iso_SS[cutIndex].Fill(pt)
 
+    hltPt = tree.hltPt
+
+    if tree.isOS == True:
+        hTotTestOS.Fill(pt)
+        if ((triggerBits >> 5) & 1) == 1:
+            if (hltPt > 35) and (l1tPt > 27.5):
+                hPassTestOS.Fill(pt)
+    else:
+        hTotTestSS.Fill(pt)
+        if ((triggerBits >> 5) & 1) == 1:
+            if (hltPt > 35) and (l1tPt > 27.5):
+                hPassTestSS.Fill(pt)
 
 print "Calculating efficiencies"
 
@@ -197,5 +215,25 @@ for cutIndex in range(0, len(l1tCuts)):
     hTotListL1T_Iso_OS[cutIndex].Write()
     hPassListL1T_OS[cutIndex].Write()
     hTotListL1T_OS[cutIndex].Write()
+
+hPassTestOS.Add(hPassTestSS, -1)
+hTotTestOS.Add(hTotTestSS, -1)
+
+for binIndex in range(1, hPassTestOS.GetNbinsX() - 1):
+    if hPassTestOS.GetBinContent(binIndex) > hTotTestOS.GetBinContent(binIndex):
+        hPassTestOS.SetBinContent(binIndex, hTotTestOS.GetBinContent(binIndex))
+
+hTurnOnTest.Divide(hPassTestOS, hTotTestOS, "cl=0.683 b(1,1) mode")
+hTurnOnTest.SetMarkerStyle(8)
+hTurnOnTest.SetMarkerSize(0.8)
+hTurnOnTest.SetMarkerColor(kRed)
+hTurnOnTest.GetXaxis().SetTitle("p_t (GeV)")
+hTurnOnTest.GetYaxis().SetRangeUser(0, 1.05)
+hTurnOnTest.GetYaxis().SetTitle("Efficiency")
+hTurnOnTest.SetTitle("test turn-on curve")
+hTurnOnTest.Draw("AP")
+c1.Update()
+c1.Print("turnOnTest.png", "png")
+
 
 raw_input()

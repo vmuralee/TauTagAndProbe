@@ -3,21 +3,21 @@ import TurnOnPlot_DATA as TurnOnPlot
 
 
 plots = []
-plots.append(TurnOnPlot.TurnOnPlot(TriggerName="L1 Threshold: 28 GeV iso + non-iso"))
+plots.append(TurnOnPlot.TurnOnPlot(TriggerName="L1 Threshold: 30 GeV iso + non-iso"))
 plots[-1].name = "turnOn_Barrel_EndCap_30GeV"
 plots[-1].xRange = (10,109.9)
 #plots[-1].legendPosition = (0.6,0.2,0.9,0.4)
 plots[-1].legendPosition = (0.6,0.2,0.9,0.4)
 
 #EE
-plots.append(TurnOnPlot.TurnOnPlot(TriggerName="L1 Threshold: 28 GeV iso"))
+plots.append(TurnOnPlot.TurnOnPlot(TriggerName="L1 Threshold: 30 GeV iso"))
 plots[-1].name = "turnOn_Barrel_EndCap_30GeV_iso"
 plots[-1].xRange = (10,109.9)
 #plots[-1].legendPosition = (0.6,0.2,0.9,0.4)
 plots[-1].legendPosition = (0.6,0.2,0.9,0.4)
 
 #open turn on file
-inputFile = ROOT.TFile.Open("L1T_TurnOns.root")
+inputFile = ROOT.TFile.Open("FittedTurnOn.root")
 
 histo_EB = inputFile.Get("histo_Stage2_Barrel_vs_Pt_30GeV")
 histo_EB.__class__ = ROOT.RooHist
@@ -68,7 +68,5 @@ canvas = []
 for plot in plots:
     canvas.append(plot.plot())
 
-
-inputFile.Close()
 
 raw_input()
