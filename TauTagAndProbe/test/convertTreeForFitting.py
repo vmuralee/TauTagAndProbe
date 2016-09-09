@@ -2,7 +2,7 @@ from ROOT import *
 import numpy as n
 
 # the hadd of all the output ntuples
-fname = 'DY_MC_reHLT_7Set2016.root'
+fname = 'NTuple_MC_7Set.root'
 pt = [26, 30, 34]
 numberOfHLTTriggers = 6
 
@@ -45,7 +45,7 @@ for ev in range (0, nentries):
         continue
 
     if saveOnlyOS and not tIn.isOS:
-        continue 
+        continue
 
     for i in range (0, len(pt)):
         briso[i][0] = 0
