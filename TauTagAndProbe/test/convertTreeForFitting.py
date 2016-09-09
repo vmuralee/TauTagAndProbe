@@ -2,9 +2,11 @@ from ROOT import *
 import numpy as n
 
 # the hadd of all the output ntuples
-fname = 'NTuple_Merge_10Ago_MaxIso_FixRiccardo.root'
+fname = 'DY_MC_reHLT_7Set2016.root'
 pt = [26, 30, 34]
 numberOfHLTTriggers = 6
+
+saveOnlyOS = False # False; save only OS, True: savo both and store weight for bkg sub
 
 #######################################################
 fIn = TFile.Open(fname)
@@ -13,10 +15,12 @@ tTriggerNames = fIn.Get("Ntuplizer/triggerNames")
 outname = fname.replace ('.root', '_forFit.root')
 fOut = TFile (outname, 'recreate')
 tOut = tIn.CloneTree(0)
-tOutNames = tTriggerNames.CloneTree(0)
+tOutNames = tTriggerNames.CloneTree(-1) # copy all
 
 briso   = [n.zeros(1, dtype=int) for x in range (0, len(pt))]
 brnoiso = [n.zeros(1, dtype=int) for x in range (0, len(pt))]
+bkgSubW = n.zeros(1, dtype=float)
+
 hltPathTriggered_OS   = [n.zeros(1, dtype=int) for x in range (0, numberOfHLTTriggers)]
 
 for i in range (0, len(pt)):
@@ -30,6 +34,8 @@ for i in range (0, numberOfHLTTriggers):
     name = ("hasHLTPath_" + str(i))
     tOut.Branch(name, hltPathTriggered_OS[i], name+"/I")
 
+tOut.Branch("bkgSubW", bkgSubW, "bkgSubW/D")
+
 nentries = tIn.GetEntries()
 for ev in range (0, nentries):
     tIn.GetEntry(ev)
@@ -38,31 +44,35 @@ for ev in range (0, nentries):
     if abs(tIn.tauEta) > 2.1:
         continue
 
-    if tIn.isOS == True:
-        for i in range (0, len(pt)):
-            briso[i][0] = 0
-            brnoiso[i][0] = 0
+    if saveOnlyOS and not tIn.isOS:
+        continue 
 
-        for i in range (0, numberOfHLTTriggers):
-            hltPathTriggered_OS[i][0] = 0
+    for i in range (0, len(pt)):
+        briso[i][0] = 0
+        brnoiso[i][0] = 0
 
-        L1iso = True if tIn.l1tIso == 1 else False
-        L1pt = tIn.l1tPt
-        for i in range(0, len(pt)):
-            # print L1pt, pt[i]
-            #
-                if L1pt > pt[i]:
-                    brnoiso[i][0] = 1
-                    # print "SUCCESS!! ", brnoiso[i]
-                    if L1iso:
-                        briso[i][0] = 1
+    for i in range (0, numberOfHLTTriggers):
+        hltPathTriggered_OS[i][0] = 0
 
-        triggerBits = tIn.tauTriggerBits
-        for bitIndex in range(0, numberOfHLTTriggers):
-                if ((triggerBits >> bitIndex) & 1) == 1:
-                    hltPathTriggered_OS[bitIndex][0] = 1
+    L1iso = True if tIn.l1tIso == 1 else False
+    L1pt = tIn.l1tPt
+    for i in range(0, len(pt)):
+        # print L1pt, pt[i]
+        #
+            if L1pt > pt[i]:
+                brnoiso[i][0] = 1
+                # print "SUCCESS!! ", brnoiso[i]
+                if L1iso:
+                    briso[i][0] = 1
 
-        tOut.Fill()
+    triggerBits = tIn.tauTriggerBits
+    for bitIndex in range(0, numberOfHLTTriggers):
+            if ((triggerBits >> bitIndex) & 1) == 1:
+                hltPathTriggered_OS[bitIndex][0] = 1
+
+    bkgSubW[0] = 1. if tIn.isOS else -1.
+
+    tOut.Fill()
 
 tOutNames.Write()
 tOut.Write()

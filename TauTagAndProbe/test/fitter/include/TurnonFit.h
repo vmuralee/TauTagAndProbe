@@ -51,6 +51,7 @@ class TurnonFit
         void setCut(const std::string& cut) {m_cut = cut;}
         void setSelectionVars(const std::vector<std::string>& selectionVars) {m_selectionVars = selectionVars;}
         void setSelection(const std::string& selection) {m_selection = selection;}
+        void setWeightVar(const std::string& weightVar) {m_weightVar = weightVar;}
         void setBinning(const std::vector<double>& binning) {m_binning = binning;}
         void setCrystalBall(double max, double max0, double max1,
                 double alpha, double alpha0, double alpha1,
@@ -70,6 +71,7 @@ class TurnonFit
         std::string m_treeName;
         std::string m_cut;
         std::vector<std::string> m_selectionVars;
+        std::string m_weightVar;
         std::string m_selection;
         std::vector<double> m_binning;
         int m_nCPU;

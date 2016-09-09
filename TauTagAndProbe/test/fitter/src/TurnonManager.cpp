@@ -64,7 +64,7 @@ bool TurnonManager::readConfig(const std::string& config)
     int nTurnons = m_params.GetValue("Turnon.N", 1);
     for(int i=0; i<nTurnons; i++)
     {
-        stringstream sName, sFile, sTree, sXVar, sCut, sSelectionVars, sSelection, sBinning, sFitRange, sCBMax, sCBAlpha, sCBN, sCBMean, sCBSigma;
+        stringstream sName, sFile, sTree, sXVar, sCut, sSelectionVars, sSelection, sWeightVar, sBinning, sFitRange, sCBMax, sCBAlpha, sCBN, sCBMean, sCBSigma;
         sName         << "Turnon." << i+1 << ".Name";
         sFile         << "Turnon." << i+1 << ".File";
         sTree         << "Turnon." << i+1 << ".Tree";
@@ -72,6 +72,7 @@ bool TurnonManager::readConfig(const std::string& config)
         sCut          << "Turnon." << i+1 << ".Cut";
         sSelectionVars<< "Turnon." << i+1 << ".SelectionVars";
         sSelection    << "Turnon." << i+1 << ".Selection";
+        sWeightVar    << "Turnon." << i+1 << ".WeightVar";
         sBinning      << "Turnon." << i+1 << ".Binning";
         sFitRange     << "Turnon." << i+1 << ".FitRange";
         sCBMax        << "Turnon." << i+1 << ".CB.Max";
@@ -87,6 +88,7 @@ bool TurnonManager::readConfig(const std::string& config)
         string cut           = m_params.GetValue(sCut          .str().c_str(), "dummy");
         string selectionVars = m_params.GetValue(sSelectionVars.str().c_str(), "");
         string selection     = m_params.GetValue(sSelection    .str().c_str(), "");
+        string weightVar     = m_params.GetValue(sWeightVar    .str().c_str(), "");
         string binning       = m_params.GetValue(sBinning      .str().c_str(), "8 10 12 14 16 18 19 20 21 22 24 26 30 35 40 45 50 60 70 100");
         string fitRange      = m_params.GetValue(sFitRange     .str().c_str(), "0. 100.");
         string cbMax         = m_params.GetValue(sCBMax        .str().c_str(), "1. 0.9 1.");
@@ -117,6 +119,7 @@ bool TurnonManager::readConfig(const std::string& config)
         m_turnonFits.back()->setCut(cut);
         m_turnonFits.back()->setSelectionVars(selectionVarsList);
         m_turnonFits.back()->setSelection(selection);
+        m_turnonFits.back()->setWeightVar(weightVar);
         m_turnonFits.back()->setBinning(bins);
         m_turnonFits.back()->setCrystalBall(cbMaxValues[0],   cbMaxValues[1],   cbMaxValues[2],
                            cbAlphaValues[0], cbAlphaValues[1], cbAlphaValues[2],

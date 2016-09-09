@@ -115,7 +115,17 @@ void TurnonFit::fit()
     RooDataSet* dataSet;
     RooArgSet argSet(m_xVar,  cut);
     vector<RooRealVar> selectionVars;
-    if(m_selection=="") dataSet = new RooDataSet("data", "data", argSet, Import(*tree));
+    vector<RooRealVar> weightVars;
+    if(m_selection=="")
+    {
+        if (m_weightVar=="")dataSet = new RooDataSet("data", "data", argSet, Import(*tree));
+        else
+        {
+            weightVars.push_back(RooRealVar(m_weightVar.c_str(), m_weightVar.c_str(), 0.));
+            argSet.add(weightVars.back());
+            dataSet = new RooDataSet("data", "data", argSet, Import(*tree), WeightVar(m_weightVar.c_str()));   
+        }
+    }
     else 
     {
         for(unsigned i=0;i<m_selectionVars.size();i++)
@@ -123,7 +133,13 @@ void TurnonFit::fit()
             selectionVars.push_back( RooRealVar(m_selectionVars[i].c_str(), m_selectionVars[i].c_str(), 0.) );
             argSet.add(selectionVars.back());
         }
-        dataSet = new RooDataSet("data", "data", argSet, Import(*tree), Cut(m_selection.c_str()));
+        if (m_weightVar=="") dataSet = new RooDataSet("data", "data", argSet, Import(*tree), Cut(m_selection.c_str()));
+        else
+        {
+            weightVars.push_back(RooRealVar(m_weightVar.c_str(), m_weightVar.c_str(), 0.));
+            argSet.add(weightVars.back());
+            dataSet = new RooDataSet("data", "data", argSet, Import(*tree), WeightVar(m_weightVar.c_str()));               
+        }
     }
 
     // Create binned turn-on
@@ -140,7 +156,8 @@ void TurnonFit::fit()
     //if(!m_noFit) m_fitResult = eff.fitTo(*dataSet,ConditionalObservables(m_xVar),Minos(kTRUE),Warnings(kFALSE),NumCPU(m_nCPU),Save(kTRUE),Verbose(kFALSE));
     if(!m_noFit)
     {
-        m_fitResult = eff.fitTo(*dataSet,ConditionalObservables(m_xVar),Minos(kFALSE),Warnings(kFALSE),NumCPU(m_nCPU),Save(kTRUE),Verbose(kFALSE));
+        if (m_weightVar=="") m_fitResult = eff.fitTo(*dataSet,ConditionalObservables(m_xVar),Minos(kFALSE),Warnings(kFALSE),NumCPU(m_nCPU),Save(kTRUE),Verbose(kFALSE));
+        else                 m_fitResult = eff.fitTo(*dataSet,ConditionalObservables(m_xVar),Minos(kFALSE),Warnings(kFALSE),NumCPU(m_nCPU),Save(kTRUE),Verbose(kFALSE),SumW2Error(kTRUE));
         stringstream resultName;
         resultName << "fitResult_" << m_name;
         m_fitResult->SetName(resultName.str().c_str());
@@ -151,8 +168,20 @@ void TurnonFit::fit()
     m_plot->GetYaxis()->SetRangeUser(0,1.05);
     m_plot->GetXaxis()->SetRangeUser(m_xVar.getMin(),m_xVar.getMax());
 
-
     m_histo = (RooHist*)m_plot->getObject(0);
+
+    for (int ipt = 0; ipt < m_histo->GetN(); ++ipt)
+    {
+        double x,y;
+        m_histo->GetPoint(ipt,x,y);
+        if (y > 1)
+        {
+            m_histo->SetPoint(ipt,x,1.);
+            m_histo->SetPointEYhigh(ipt, 0.);
+            cout << "** WARNING: turnOn " << m_name << " , efficiency exceeds 1 in bin " << ipt << " forcign value to 1" << endl;
+        }   
+    }
+
     m_fit  = (RooCurve*)m_plot->getObject(1);
     stringstream histoName, fitName;
     histoName << "histo_" << m_name;
@@ -198,6 +227,7 @@ void TurnonFit::printParameters()
     cout<<"  XVar     : "<<m_xVar.GetName()<<"\n";
     cout<<"  Cut      : "<<m_cut<<"\n";
     cout<<"  Selection: "<<m_selection<<"\n";
+    cout<<"  WeightVar: "<<m_weightVar<<"\n";
     cout<<"  CB       :\n";
     cout<<"    Max  : "<<m_max.getVal()  <<" ["<<m_max.getMin()  <<", "<<m_max.getMax()<<"]\n";
     cout<<"    Alpha: "<<m_alpha.getVal()<<" ["<<m_alpha.getMin()<<", "<<m_alpha.getMax()<<"]\n";
