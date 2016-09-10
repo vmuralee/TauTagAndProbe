@@ -4,7 +4,7 @@ import TurnOnPlot_DATA as TurnOnPlot
 ### Edit here ###
 
 # TRIGGERS MUST BE DECLARED
-triggers = ["HLT_IsoMu19_eta2p1_MediumIsoPFTau32_Trk1_eta2p1_Reg_v", "HLT_IsoMu21_eta2p1_LooseIsoPFTau20_SingleL1_v"]
+triggers = ["HLT_IsoMu19_eta2p1_MediumIsoPFTau32_Trk1_eta2p1_Reg_v", "HLT_IsoMu21_eta2p1_LooseIsoPFTau20_SingleL1_v", "Pt_26GeV", "Pt_34GeV"]
 # PLOT TITLES
 #plotTitles = ["HLT MediumIsoPFTau32 Data - MC", "HLT MediumIsoPFTau20 Data - MC"]
 # ROOT FILE CONTAINING THE DATA
