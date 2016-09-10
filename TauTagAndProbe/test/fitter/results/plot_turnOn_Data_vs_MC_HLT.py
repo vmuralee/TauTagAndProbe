@@ -1,6 +1,8 @@
 import ROOT
 import TurnOnPlot_DATA as TurnOnPlot
 
+### Edit here ###
+
 # TRIGGERS MUST BE DECLARED
 triggers = ["HLT_IsoMu19_eta2p1_MediumIsoPFTau32_Trk1_eta2p1_Reg_v", "HLT_IsoMu21_eta2p1_LooseIsoPFTau20_SingleL1_v"]
 # PLOT TITLES
@@ -10,11 +12,7 @@ dataFileName = "FittedTurnOn_Final_Data.root"
 # ROOT FILE CONTAINING THE MC
 mcFileName = "FittedTurnOn_Final_MC.root"
 
-# PLOTS MUST BE INSTANTIATED FIRST
-
-plots = []
-
-
+### Do not edit from here ###
 
 #open turn on file
 inputFile_Data = ROOT.TFile.Open(dataFileName)
@@ -26,6 +24,7 @@ fit_Data = []
 fit_MC = []
 turnon_Data = []
 turnon_MC = []
+plots = []
 
 for trigger in triggers:
     histo_Data.append(inputFile_Data.Get("histo_Stage2_All_vs_" + trigger))
