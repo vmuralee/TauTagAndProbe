@@ -2,11 +2,11 @@ from ROOT import *
 import numpy as n
 
 # the hadd of all the output ntuples
-fname = 'NTuple_MC_7Set.root'
+fname = 'NTuple_Merge_10Ago_MaxIso_FixRiccardo.root'
 pt = [26, 30, 34]
 numberOfHLTTriggers = 6
 
-saveOnlyOS = False # False; save only OS, True: savo both and store weight for bkg sub
+saveOnlyOS = False # False; save only OS, True: save both and store weight for bkg sub
 
 #######################################################
 fIn = TFile.Open(fname)
