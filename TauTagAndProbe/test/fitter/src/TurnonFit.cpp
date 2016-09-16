@@ -138,7 +138,7 @@ void TurnonFit::fit()
         {
             weightVars.push_back(RooRealVar(m_weightVar.c_str(), m_weightVar.c_str(), 0.));
             argSet.add(weightVars.back());
-            dataSet = new RooDataSet("data", "data", argSet, Import(*tree), WeightVar(m_weightVar.c_str()));               
+            dataSet = new RooDataSet("data", "data", argSet, Import(*tree), Cut(m_selection.c_str()), WeightVar(m_weightVar.c_str()));               
         }
     }
 
