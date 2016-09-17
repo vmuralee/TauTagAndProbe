@@ -1,7 +1,6 @@
 import ROOT
 import TurnOnPlot_DATA as TurnOnPlot
 
-ROOT.gROOT.SetBatch(True)
 ### Edit here ###
 
 # TRIGGERS MUST BE DECLARED
