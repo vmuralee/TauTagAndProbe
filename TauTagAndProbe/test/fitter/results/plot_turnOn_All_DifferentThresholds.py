@@ -17,7 +17,7 @@ plots[-1].xRange = (10,109.9)
 plots[-1].legendPosition = (0.6,0.2,0.9,0.4)
 
 #open turn on file
-inputFile = ROOT.TFile.Open("FittedTurnOn.root")
+inputFile = ROOT.TFile.Open("FittedTurnOn_Final_MC.root")
 
 histo_26GeV = inputFile.Get("histo_Stage2_All_vs_Pt_26GeV")
 histo_26GeV.__class__ = ROOT.RooHist

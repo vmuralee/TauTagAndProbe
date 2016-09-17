@@ -8,9 +8,9 @@ triggers = ["HLT_IsoMu19_eta2p1_MediumIsoPFTau32_Trk1_eta2p1_Reg_v", "HLT_IsoMu2
 # PLOT TITLES
 #plotTitles = ["HLT MediumIsoPFTau32 Data - MC", "HLT MediumIsoPFTau20 Data - MC"]
 # ROOT FILE CONTAINING THE DATA
-dataFileName = "FittedTurnOn_Final_Data.root"
+dataFileName = "FittedTurnOn_Final_Data_0_500GeV.root"
 # ROOT FILE CONTAINING THE MC
-mcFileName = "FittedTurnOn_Final_MC.root"
+mcFileName = "FittedTurnOn_Final_MC_0_500GeV.root"
 
 ### Do not edit from here ###
 
@@ -43,7 +43,7 @@ for trigger in triggers:
                                    Legend="Simulation"))
     plots.append(TurnOnPlot.TurnOnPlot(TriggerName = trigger + "Data - MC"))
     plots[-1].name = "turnOn_Data_MC_" + trigger
-    plots[-1].xRange = (10,109.9)
+    plots[-1].xRange = (10,500)
     #plots[-1].legendPosition = (0.6,0.2,0.9,0.4)
     plots[-1].legendPosition = (0.6,0.2,0.9,0.4)
     plots[-1].addTurnOn(turnon_Data[-1])

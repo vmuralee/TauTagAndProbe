@@ -1,15 +1,16 @@
 import ROOT
 import TurnOnPlot_DATA as TurnOnPlot
 
+ROOT.gROOT.SetBatch(True)
 ### Edit here ###
 
 # TRIGGERS MUST BE DECLARED
-#triggers = ["HLT_IsoMu19_eta2p1_MediumIsoPFTau32_Trk1_eta2p1_Reg_v", "HLT_IsoMu21_eta2p1_LooseIsoPFTau20_SingleL1_v", "Pt_26GeV", "Pt_34GeV"]
-triggers = ["Pt_30GeV"]
+triggers = ["HLT_IsoMu19_eta2p1_MediumIsoPFTau32_Trk1_eta2p1_Reg_v", "HLT_IsoMu21_eta2p1_LooseIsoPFTau20_SingleL1_v", "Pt_26GeV", "Pt_34GeV"]
+#triggers = ["Pt_30GeV"]
 # PLOT TITLES
 #plotTitles = ["HLT MediumIsoPFTau32 Barrel - Endcaps", "HLT MediumIsoPFTau20 Barrel - Endcaps"]
 # ROOT FILE CONTAINING THE Barrel
-fileName = "FittedTurnOn_Final_Data.root"
+fileName = "FittedTurnOn_Final_MC.root"
 
 ### Do not edit from here ###
 
