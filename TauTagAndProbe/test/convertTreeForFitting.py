@@ -3,7 +3,7 @@ import numpy as n
 
 # the hadd of all the output ntuples
 fname = 'NTuple_Merge_10Ago_MaxIso_FixRiccardo.root'
-pt = [26, 30, 34]
+pt = [20, 26, 30, 34]
 numberOfHLTTriggers = 6
 
 saveOnlyOS = False # False; save only OS, True: save both and store weight for bkg sub
