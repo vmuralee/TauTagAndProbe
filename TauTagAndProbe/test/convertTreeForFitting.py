@@ -21,7 +21,7 @@ briso   = [n.zeros(1, dtype=int) for x in range (0, len(pt))]
 brnoiso = [n.zeros(1, dtype=int) for x in range (0, len(pt))]
 bkgSubW = n.zeros(1, dtype=float)
 
-hltPathTriggered_OS   = [n.zeros(1, dtype=int) for x in range (0, numberOfHLTTriggers)]
+hltPathTriggered_OS   = [n.zeros(1, dtype=int) for x in range (0, numberOfHLTTriggers+1)]
 
 for i in range (0, len(pt)):
     name = ("hasL1_" + str(pt[i]))
@@ -33,6 +33,8 @@ for i in range (0, numberOfHLTTriggers):
     tTriggerNames.GetEntry(i)
     name = ("hasHLTPath_" + str(i))
     tOut.Branch(name, hltPathTriggered_OS[i], name+"/I")
+
+tOut.Branch("isoHLT", hltPathTriggered_OS[6], name+"/I")
 
 tOut.Branch("bkgSubW", bkgSubW, "bkgSubW/D")
 
@@ -59,18 +61,24 @@ for ev in range (0, nentries):
     for i in range(0, len(pt)):
         # print L1pt, pt[i]
         #
-            if L1pt > pt[i]:
-                brnoiso[i][0] = 1
-                # print "SUCCESS!! ", brnoiso[i]
-                if L1iso:
-                    briso[i][0] = 1
+        if L1pt > pt[i]:
+            brnoiso[i][0] = 1
+            # print "SUCCESS!! ", brnoiso[i]
+            if L1iso:
+                briso[i][0] = 1
 
     triggerBits = tIn.tauTriggerBits
+    HLTpt = tIn.hltPt
     for bitIndex in range(0, numberOfHLTTriggers):
-            if ((triggerBits >> bitIndex) & 1) == 1:
-                hltPathTriggered_OS[bitIndex][0] = 1
+        if ((triggerBits >> bitIndex) & 1) == 1:
+            hltPathTriggered_OS[bitIndex][0] = 1
 
     bkgSubW[0] = 1. if tIn.isOS else -1.
+
+    if (L1pt > 26) and (L1iso) and (HLTpt > 32) and (((triggerBits >> 2) & 1) == 1):
+        hltPathTriggered_OS[6][0] = 1
+    else:
+        hltPathTriggered_OS[6][0] = 0
 
     tOut.Fill()
 
