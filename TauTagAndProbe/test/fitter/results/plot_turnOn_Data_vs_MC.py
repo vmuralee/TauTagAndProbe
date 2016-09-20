@@ -43,7 +43,7 @@ for trigger in triggers:
                                    Legend="Simulation"))
     plots.append(TurnOnPlot.TurnOnPlot(TriggerName = trigger + "Data - MC"))
     plots[-1].name = "turnOn_Data_MC_" + trigger
-    plots[-1].xRange = (10,500)
+    plots[-1].xRange = (10,120)
     #plots[-1].legendPosition = (0.6,0.2,0.9,0.4)
     plots[-1].legendPosition = (0.6,0.2,0.9,0.4)
     plots[-1].addTurnOn(turnon_Data[-1])
