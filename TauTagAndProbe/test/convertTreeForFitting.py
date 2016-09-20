@@ -2,7 +2,7 @@ from ROOT import *
 import numpy as n
 
 # the hadd of all the output ntuples
-fname = 'NTuple_Merge_10Ago_MaxIso_FixRiccardo.root'
+fname = 'NTuple_10Ago_Riccardo.root'
 pt = [20, 26, 30, 34]
 numberOfHLTTriggers = 6
 
