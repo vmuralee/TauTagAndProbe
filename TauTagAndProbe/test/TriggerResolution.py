@@ -3,36 +3,45 @@
 from ROOT import *
 from array import array
 
-gStyle.SetOptStat(111111)
+gStyle.SetOptStat(1111)
 
 fIn = TFile.Open('NTuple_10Ago_Riccardo.root')
 tree = fIn.Get('Ntuplizer/TagAndProbe')
 
-l1tResolution = TH1I("L1TriggerReso1", "L1T resolution for offline pt between 20 and 40 GeV", 100, -100, 100)
-hltResolution = TH1I("HLTriggerReso1", "HLT resolution for offline pt between 20 and 40 GeV", 100, -100, 100)
+l1tResolution = TH1I("L1TriggerReso1", "L1T resolution", 200, -1, 1)
+hltResolution = TH1I("HLTriggerReso1", "HLT resolution", 200, -1, 1)
 
 for iEv in range (0, tree.GetEntries()):
     tree.GetEntry(iEv)
-    ptOffline = tree.tauPt
-    ptL1T = tree.l1tPt
-    ptHLT = tree.hltPt
+    if tree.foundJet != 1: continue
+    ptOffline = tree.tauPhi
+    ptL1T = tree.l1tPhi
+    ptHLT = tree.hltPhi
     if ptHLT > 0:
-        deltaPtHLT = ptOffline - ptHLT
+        deltaPtHLT = (ptHLT - ptOffline)/ptOffline
         hltResolution.Fill(deltaPtHLT)
     if ptL1T > 0:
-        deltaPtL1T = ptOffline - ptL1T
+        deltaPtL1T = (ptL1T - ptOffline)/ptOffline
         l1tResolution.Fill(deltaPtL1T)
 
 l1tCanvas = TCanvas("l1tCanvas")
-l1tResolution.GetXaxis().SetTitle("ptOffline - ptL1T")
+l1tResolution.GetXaxis().SetTitle("\\frac{ptL1T - ptOffline}{ptOffline}")
+l1tResolution.GetYaxis().SetTitle("Events")
 l1tResolution.Draw()
 l1tCanvas.Update()
 l1tCanvas.Print("l1tResolution.pdf", "pdf")
 
 hltCanvas = TCanvas("hltCanvas")
-hltResolution.GetXaxis().SetTitle("ptOffline - ptHLT")
+hltResolution.GetXaxis().SetTitle("\\frac{ptHLT - ptOffline}{ptOffline}")
+hltResolution.GetYaxis().SetTitle("Events")
 hltResolution.Draw()
 hltCanvas.Update()
 hltCanvas.Print("hltResolution.pdf", "pdf")
+
+hlt_l1t_Canvas = TCanvas("hlt_l1t_Canvas")
+hltResolution.Draw()
+l1tResolution.Draw("SAME")
+hlt_l1t_Canvas.Update()
+hlt_l1t_Canvas.Print("hlt_l1t_Resolution.pdf", "pdf")
 
 raw_input()
