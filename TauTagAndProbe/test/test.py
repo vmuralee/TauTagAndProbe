@@ -26,14 +26,14 @@ options.inputFiles = []
 options.maxEvents  = -999
 options.parseArguments()
 
-
 if not isMC: # will use 80X
     from Configuration.AlCa.autoCond import autoCond
     process.GlobalTag.globaltag = '80X_dataRun2_Prompt_v8'
     process.load('TauTagAndProbe.TauTagAndProbe.tagAndProbe_cff')
     process.source = cms.Source("PoolSource",
         fileNames = cms.untracked.vstring(
-            '/store/data/Run2016B/SingleMuon/MINIAOD/PromptReco-v2/000/274/199/00000/082EC2A0-4C28-E611-BC61-02163E014412.root',
+           #'/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1/40000/00200284-F15C-E611-AA9B-002590574776.root',
+            # '/store/data/Run2016B/SingleMuon/MINIAOD/PromptReco-v2/000/274/199/00000/082EC2A0-4C28-E611-BC61-02163E014412.root',
             # '/store/data/Run2016B/SingleMuon/MINIAOD/PromptReco-v2/000/274/199/00000/1014078C-4C28-E611-85FB-02163E0141C1.root',
             # '/store/data/Run2016B/SingleMuon/MINIAOD/PromptReco-v2/000/274/199/00000/203E5176-4C28-E611-B4F8-02163E014743.root',
             # '/store/data/Run2016B/SingleMuon/MINIAOD/PromptReco-v2/000/274/199/00000/32508866-4C28-E611-A38D-02163E011BAF.root',
@@ -65,10 +65,6 @@ else:
         )
     )
 
-process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(200000)
-)
-
 if options.JSONfile:
     print "Using JSON: " , options.JSONfile
     process.source.lumisToProcess = LumiList.LumiList(filename = options.JSONfile).getVLuminosityBlockRange()
@@ -85,9 +81,13 @@ if options.maxEvents >= -1:
 if options.skipEvents >= 0:
     process.source.skipEvents = cms.untracked.uint32(options.skipEvents)
 
+process.options = cms.untracked.PSet(
+    wantSummary = cms.untracked.bool(True)
+)
 
 process.p = cms.Path(
-    process.TAndPseq
+    process.TAndPseq +
+    process.NtupleSeq
 )
 
 # Silence output
