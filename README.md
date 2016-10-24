@@ -29,3 +29,4 @@ git cms-addpkg L1Trigger/L1TCalorimeter # only if you want to edit smt in the em
 git clone https://github.com/l-cadamuro/TauTagAndProbe
 scram b -j4
 ```
+and use reEmulL1.py
