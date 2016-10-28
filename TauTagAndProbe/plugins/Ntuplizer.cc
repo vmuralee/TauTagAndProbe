@@ -83,6 +83,18 @@ class Ntuplizer : public edm::EDAnalyzer {
         float _l1tEta;
         float _l1tPhi;
         int _l1tIso;
+        int _l1tEmuQual;
+        float _l1tEmuPt;
+        float _l1tEmuEta;
+        float _l1tEmuPhi;
+        int _l1tEmuIso;
+        int _l1tEmuNTT;
+        int _l1tEmuHasEM;
+        int _l1tEmuIsMerged;
+        int _l1tEmuTowerIEta;
+        int _l1tEmuTowerIPhi;
+        int _l1tEmuRawEt;
+        int _l1tEmuIsoEt;
         Bool_t _hasTriggerMuonType;
         Bool_t _hasTriggerTauType;
         Bool_t _isMatched;
@@ -98,6 +110,7 @@ class Ntuplizer : public edm::EDAnalyzer {
         edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> _triggerObjects;
         edm::EDGetTokenT<edm::TriggerResults> _triggerBits;
         edm::EDGetTokenT<l1t::TauBxCollection> _L1TauTag  ;
+        edm::EDGetTokenT<l1t::TauBxCollection> _L1EmuTauTag  ;
         edm::EDGetTokenT<std::vector<reco::Vertex>> _VtxTag;
 
         //!Contains the parameters
@@ -129,6 +142,7 @@ _tauTag         (consumes<pat::TauRefVector>                      (iConfig.getPa
 _triggerObjects (consumes<pat::TriggerObjectStandAloneCollection> (iConfig.getParameter<edm::InputTag>("triggerSet"))),
 _triggerBits    (consumes<edm::TriggerResults>                    (iConfig.getParameter<edm::InputTag>("triggerResultsLabel"))),
 _L1TauTag       (consumes<l1t::TauBxCollection>                   (iConfig.getParameter<edm::InputTag>("L1Tau"))),
+_L1EmuTauTag    (consumes<l1t::TauBxCollection>                   (iConfig.getParameter<edm::InputTag>("L1EmuTau"))),
 _VtxTag         (consumes<std::vector<reco::Vertex>>              (iConfig.getParameter<edm::InputTag>("Vertexes")))
 {
     this -> _treeName = iConfig.getParameter<std::string>("treeName");
@@ -196,6 +210,11 @@ void Ntuplizer::Initialize() {
     this -> _runNumber = 0;
     this -> _lumi = 0;
     this -> _tauPt = -1.;
+    this -> _tauEta = -1.;
+    this -> _tauPhi = -1.;
+    this -> _muonPt = -1.;
+    this -> _muonEta = -1.;
+    this -> _muonPhi = -1.;
     this -> _isMatched = false;
     this -> _hltPt = -1;
     this -> _hltEta = 666;
@@ -205,6 +224,18 @@ void Ntuplizer::Initialize() {
     this -> _l1tPhi = 666;
     this -> _l1tQual = -1;
     this -> _l1tIso = -1;
+    this -> _l1tEmuPt = -1;
+    this -> _l1tEmuEta = 666;
+    this -> _l1tEmuPhi = 666;
+    this -> _l1tEmuQual = -1;
+    this -> _l1tEmuIso = -1;
+    this -> _l1tEmuNTT = -1;
+    this -> _l1tEmuHasEM = -1;
+    this -> _l1tEmuIsMerged = -1;
+    this -> _l1tEmuTowerIEta = -1;
+    this -> _l1tEmuTowerIPhi = -1;
+    this -> _l1tEmuRawEt = -1;
+    this -> _l1tEmuIsoEt = -1;
     this -> _foundJet = 0;
 }
 
@@ -233,6 +264,19 @@ void Ntuplizer::beginJob()
     this -> _tree -> Branch("l1tPhi", &_l1tPhi, "l1tPhi/F");
     this -> _tree -> Branch("l1tQual", &_l1tQual, "l1tQual/I");
     this -> _tree -> Branch("l1tIso", &_l1tIso, "l1tIso/I");
+    this -> _tree -> Branch("l1tEmuPt",  &_l1tEmuPt,  "l1tEmuPt/F");
+    this -> _tree -> Branch("l1tEmuEta", &_l1tEmuEta, "l1tEmuEta/F");
+    this -> _tree -> Branch("l1tEmuPhi", &_l1tEmuPhi, "l1tEmuPhi/F");
+    this -> _tree -> Branch("l1tEmuQual", &_l1tEmuQual, "l1tEmuQual/I");
+    this -> _tree -> Branch("l1tEmuIso", &_l1tEmuIso, "l1tEmuIso/I");
+    this -> _tree -> Branch("l1tEmuNTT", &_l1tEmuNTT, "l1tEmuNTT/I");
+    this -> _tree -> Branch("l1tEmuIsMerged", &_l1tEmuIsMerged, "l1tEmuIsMerged/I");
+    this -> _tree -> Branch("l1tEmuTowerIEta", &_l1tEmuTowerIEta, "l1tEmuTowerIEta/I");
+    this -> _tree -> Branch("l1tEmuTowerIPhi", &_l1tEmuTowerIPhi, "l1tEmuTowerIPhi/I");
+    this -> _tree -> Branch("l1tEmuRawEt", &_l1tEmuRawEt, "l1tEmuRawEt/I");
+    this -> _tree -> Branch("l1tEmuIsoEt", &_l1tEmuIsoEt, "l1tEmuIsoEt/I");
+
+
     this -> _tree -> Branch("hasTriggerMuonType", &_hasTriggerMuonType, "hasTriggerMuonType/O");
     this -> _tree -> Branch("hasTriggerTauType", &_hasTriggerTauType, "hasTriggerTauType/O");
     this -> _tree -> Branch("isMatched", &_isMatched, "isMatched/O");
@@ -338,14 +382,19 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
 
     float minDR = 0.5; //Uncomment for new match algo
 
+    //cout<<"ill try this: "<<endl;
+
     for (l1t::TauBxCollection::const_iterator bx0TauIt = L1TauHandle->begin(0); bx0TauIt != L1TauHandle->end(0) ; bx0TauIt++)
     {
         const float dR = deltaR(*tau, *bx0TauIt);
+	const l1t::Tau& l1tTau = *bx0TauIt;
+
+	cout<<"FW Tau, pT = "<<l1tTau.pt()<<", eta = "<<l1tTau.eta()<<", phi = "<<l1tTau.phi()<<endl;
+
         if (dR < minDR) //Uncomment for new match algo
         //if (dR < 0.5) //Uncomment for old match algo
         {
             minDR = dR; //Uncomment for new match algo
-            const l1t::Tau& l1tTau = *bx0TauIt;
             this -> _l1tPt = l1tTau.pt();
             this -> _l1tEta = l1tTau.eta();
             this -> _l1tPhi = l1tTau.phi();
@@ -353,6 +402,39 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
             this -> _l1tQual = l1tTau.hwQual();
         }
     }
+
+    edm::Handle< BXVector<l1t::Tau> >  L1EmuTauHandle;
+    try {iEvent.getByToken(_L1EmuTauTag, L1EmuTauHandle);} catch (...) {;}
+
+    if (L1EmuTauHandle.isValid())
+      {
+	minDR = 0.5;
+	
+	for (l1t::TauBxCollection::const_iterator bx0EmuTauIt = L1EmuTauHandle->begin(0); bx0EmuTauIt != L1EmuTauHandle->end(0) ; bx0EmuTauIt++)
+	  {
+	    const float dR = deltaR(*tau, *bx0EmuTauIt);
+	    const l1t::Tau& l1tEmuTau = *bx0EmuTauIt;
+	    
+	    cout<<"Emul Tau, pT = "<<l1tEmuTau.pt()<<", eta = "<<l1tEmuTau.eta()<<", phi = "<<l1tEmuTau.phi()<<endl;
+	    
+	    if (dR < minDR) //Uncomment for new match algo
+	      {
+		minDR = dR; //Uncomment for new match algo
+		this -> _l1tEmuPt        = l1tEmuTau.pt();
+		this -> _l1tEmuEta       = l1tEmuTau.eta();
+		this -> _l1tEmuPhi       = l1tEmuTau.phi();
+		this -> _l1tEmuIso       = l1tEmuTau.hwIso();
+		this -> _l1tEmuNTT       = l1tEmuTau.nTT();
+		this -> _l1tEmuQual      = l1tEmuTau.hwQual();
+		this -> _l1tEmuIsMerged  = l1tEmuTau.isMerged();
+		this -> _l1tEmuTowerIEta = l1tEmuTau.towerIEta();
+		this -> _l1tEmuTowerIPhi = l1tEmuTau.towerIPhi();
+		this -> _l1tEmuRawEt     = l1tEmuTau.rawEt();
+		this -> _l1tEmuIsoEt     = l1tEmuTau.isoEt();
+		
+	      }
+	  }
+      }
 
     this -> _tauPt = tau -> pt();
     this -> _tauEta = tau -> eta();

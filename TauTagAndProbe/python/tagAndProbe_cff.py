@@ -88,6 +88,7 @@ muonNumberFilter = cms.EDFilter ("muonNumberFilter",
 goodMuons = cms.EDFilter("PATMuonRefSelector",
         src = cms.InputTag("slimmedMuons"),
         cut = cms.string(
+         #       'pt > 5 && abs(eta) < 2.1 ' # kinematics
                 'pt > 24 && abs(eta) < 2.1 ' # kinematics
                 '&& ( (pfIsolationR04().sumChargedHadronPt + max(pfIsolationR04().sumNeutralHadronEt + pfIsolationR04().sumPhotonEt - 0.5 * pfIsolationR04().sumPUPt, 0.0)) / pt() ) < 0.1 ' # isolation
                 '&& isLooseMuon()' # quality -- medium muon
@@ -99,6 +100,7 @@ goodMuons = cms.EDFilter("PATMuonRefSelector",
 goodTaus = cms.EDFilter("PATTauRefSelector",
         src = cms.InputTag("slimmedTaus"),
         cut = cms.string(
+        #        'pt > 5 && abs(eta) < 2.1 ' #kinematics
                 'pt > 20 && abs(eta) < 2.1 ' #kinematics
                 '&& abs(charge) > 0 && abs(charge) < 2 ' #sometimes 2 prongs have charge != 1
                 '&& tauID("decayModeFinding") > 0.5 ' # tau ID
@@ -133,6 +135,8 @@ Ntuplizer = cms.EDAnalyzer("Ntuplizer",
     triggerSet = cms.InputTag("selectedPatTrigger"),
     triggerResultsLabel = cms.InputTag("TriggerResults", "", "HLT"),
     L1Tau = cms.InputTag("caloStage2Digis", "Tau", "RECO"),
+    #L1EmuTau = cms.InputTag("simCaloStage2Digis"),
+    L1EmuTau = cms.InputTag("simCaloStage2Digis", "MP"),
     Vertexes = cms.InputTag("offlineSlimmedPrimaryVertices")
 )
 
