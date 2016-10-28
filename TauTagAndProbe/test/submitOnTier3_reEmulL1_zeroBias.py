@@ -30,7 +30,7 @@ njobs = 200
 filelist = open("fileList_ZeroBias.txt")
 #filelist = open("Data_SingleMu_2016RunB_PromptRecov2_1Luglio.txt")
 
-folder = "Test_ZeroBias"
+folder = "ZeroBias_6x9"
 #folder = "testSubmitT3TAndP2Luglio"
 
 JSONfile = "/home/llr/cms/davignon/json_DCSONLY.txt"
@@ -78,4 +78,4 @@ for idx, block in enumerate(fileblocks):
     command = ('/opt/exp_soft/cms/t3/t3submit_new -long \'' + outJobName +"\'")
 #    command = ('/opt/exp_soft/cms/t3/t3submit_new -short -q cms \'' + outJobName +"\'")
     print command
-    #os.system (command)
+    os.system (command)

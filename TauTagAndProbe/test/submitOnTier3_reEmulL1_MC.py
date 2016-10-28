@@ -111,4 +111,4 @@ for idx, block in enumerate(fileblocks):
     command = ('/opt/exp_soft/cms/t3/t3submit_new -long \'' + outJobName +"\'")
 #    command = ('/opt/exp_soft/cms/t3/t3submit_new -short -q cms \'' + outJobName +"\'")
     print command
-    #os.system (command)
+    os.system (command)
