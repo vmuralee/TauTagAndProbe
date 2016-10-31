@@ -3,7 +3,7 @@ import FWCore.PythonUtilities.LumiList as LumiList
 import FWCore.ParameterSet.Config as cms
 from Configuration.StandardSequences.Eras import eras
 
-isMC = False
+isMC = True
 
 process = cms.Process("ZeroBias",eras.Run2_2016)
 #process = cms.Process("ZeroBias",eras.Run2_2016)

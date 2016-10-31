@@ -1,5 +1,7 @@
 import os
 
+isMC = True
+
 def chunks(l, n):
     """Yield successive n-sized chunks from l."""
     for i in range(0, len(l), n):
@@ -25,8 +27,8 @@ def splitInBlocks (l, n):
 ###########
 
 njobs = 200
-filelist = open("Data_SingleMu_2016RunB_PromptRecov2_1Luglio.txt")
-folder = "testSubmitT3TAndP2Luglio"
+filelist = open("fileList_MC_RECO.txt")
+folder = "MC_RECO_6x9"
 JSONfile = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/Cert_271036-275125_13TeV_PromptReco_Collisions16_JSON.txt"
 ###########
 
@@ -50,7 +52,11 @@ for idx, block in enumerate(fileblocks):
     for f in block: jobfilelist.write(f+"\n")
     jobfilelist.close()
 
-    cmsRun = "cmsRun test.py maxEvents=-1 inputFiles_load="+outListName + " outputFile="+outRootName + " JSONfile="+JSONfile + " >& " + outLogName
+    if not isMC:
+        cmsRun = "cmsRun test.py maxEvents=-1 inputFiles_load="+outListName + " outputFile="+outRootName + " JSONfile="+JSONfile + " >& " + outLogName
+    else:
+        cmsRun = "cmsRun test.py maxEvents=-1 inputFiles_load="+outListName + " outputFile="+outRootName + " >& " + outLogName        
+
     skimjob = open (outJobName, 'w')
     skimjob.write ('#!/bin/bash\n')
     skimjob.write ('export X509_USER_PROXY=~/.t3/proxy.cert\n')
@@ -63,6 +69,6 @@ for idx, block in enumerate(fileblocks):
     skimjob.close ()
 
     os.system ('chmod u+rwx ' + outJobName)
-    command = ('/opt/exp_soft/cms/t3/t3submit -q cms \'' + outJobName +"\'")
+    command = ('/opt/exp_soft/cms/t3/t3submit_new -long \'' + outJobName +"\'")
     # print command
     os.system (command)
