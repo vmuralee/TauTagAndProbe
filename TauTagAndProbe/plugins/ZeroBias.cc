@@ -167,6 +167,7 @@ void ZeroBias::beginJob()
     this -> _tree -> Branch("l1tEmuQual", &_l1tEmuQual);
     this -> _tree -> Branch("l1tEmuIso", &_l1tEmuIso);
     this -> _tree -> Branch("l1tEmuNTT", &_l1tEmuNTT);
+    this -> _tree -> Branch("l1tEmuHasEM", &_l1tEmuHasEM);
     this -> _tree -> Branch("l1tEmuIsMerged", &_l1tEmuIsMerged);
     this -> _tree -> Branch("l1tEmuTowerIEta", &_l1tEmuTowerIEta);
     this -> _tree -> Branch("l1tEmuTowerIPhi", &_l1tEmuTowerIPhi);
@@ -234,6 +235,7 @@ void ZeroBias::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
 	    this -> _l1tEmuIso      .push_back(l1tEmuTau.hwIso());
 	    this -> _l1tEmuNTT      .push_back(l1tEmuTau.nTT());
 	    this -> _l1tEmuQual     .push_back(l1tEmuTau.hwQual());
+	    this -> _l1tEmuHasEM    .push_back(l1tEmuTau.hasEM());
 	    this -> _l1tEmuIsMerged .push_back(l1tEmuTau.isMerged());
 	    this -> _l1tEmuTowerIEta.push_back(l1tEmuTau.towerIEta());
 	    this -> _l1tEmuTowerIPhi.push_back(l1tEmuTau.towerIPhi());

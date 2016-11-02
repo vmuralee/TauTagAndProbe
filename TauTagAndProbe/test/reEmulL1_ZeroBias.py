@@ -3,7 +3,7 @@ import FWCore.PythonUtilities.LumiList as LumiList
 import FWCore.ParameterSet.Config as cms
 from Configuration.StandardSequences.Eras import eras
 
-isMC = True
+isMC = False
 
 process = cms.Process("ZeroBias",eras.Run2_2016)
 #process = cms.Process("ZeroBias",eras.Run2_2016)
@@ -58,7 +58,8 @@ if not isMC: # will use 80X
     process.source = cms.Source("PoolSource",
         fileNames = cms.untracked.vstring(
             #'file:BCB1EC0B-5E26-E611-8240-02163E0145B8.root'
-            '/store/data/Run2016E/ZeroBias/RAW/v2/000/276/831/00000/04145A1E-A54B-E611-A0C6-FA163E6A5A26.root'
+            '/store/data/Run2016E/ZeroBias/RAW/v2/000/277/420/00000/02E63363-A052-E611-8FD7-FA163E249562.root'
+            #'/store/data/Run2016E/ZeroBias/RAW/v2/000/276/831/00000/04145A1E-A54B-E611-A0C6-FA163E6A5A26.root'
             #'/store/data/Run2016B/SingleMuon/RAW/v2/000/274/199/00000/BCB1EC0B-5E26-E611-8240-02163E0145B8.root'
             #'/store/data/Run2016B/SingleMuon/MINIAOD/PromptReco-v2/000/274/199/00000/7005DB70-4C28-E611-8628-02163E0144DD.root',
         ),

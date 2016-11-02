@@ -2,7 +2,7 @@ import os
 import json
 from subprocess import Popen, PIPE
 
-isMC = False
+isMC = True
 
 def chunks(l, n):
     """Yield successive n-sized chunks from l."""
@@ -29,12 +29,12 @@ def splitInBlocks (l, n):
 ###########
 
 njobs = 200
-#filelist = open("fileList_MC_RAW.txt")
-filelist = open("fileList_ZeroBias.txt")
+filelist = open("fileList_MC_RAW.txt")
+#filelist = open("fileList_ZeroBias.txt")
 #filelist = open("Data_SingleMu_2016RunB_PromptRecov2_1Luglio.txt")
 
-folder = "Data_ZeroBias_Run277420_6x9"
-#folder = "MC_RAW_6x9"
+#folder = "Data_ZeroBias_Run277420_9x9"
+folder = "MC_RAW_9x9"
 #folder = "testSubmitT3TAndP2Luglio"
 
 JSONfile = "/home/llr/cms/davignon/json_DCSONLY.txt"
@@ -69,7 +69,7 @@ for idx, block in enumerate(fileblocks):
     if not isMC:
         cmsRun = "cmsRun reEmulL1_ZeroBias.py maxEvents=-1 inputFiles_load="+outListName + " outputFile="+outRootName + " JSONfile="+JSONfile + " >& " + outLogName
     else:
-        cmsRun = "cmsRun reEmulL1_ZeroBias.py maxEvents=-1 inputFiles_load="+outListName + " outputFile="+outRootName + " >& " + outLogName
+        cmsRun = "cmsRun reEmulL1_MC_L1Only.py maxEvents=-1 inputFiles_load="+outListName + " outputFile="+outRootName + " >& " + outLogName
 
     skimjob = open (outJobName, 'w')
     skimjob.write ('#!/bin/bash\n')
@@ -86,4 +86,4 @@ for idx, block in enumerate(fileblocks):
     command = ('/opt/exp_soft/cms/t3/t3submit_new -long \'' + outJobName +"\'")
 #    command = ('/opt/exp_soft/cms/t3/t3submit_new -short -q cms \'' + outJobName +"\'")
     print command
-    #os.system (command)
+    os.system (command)

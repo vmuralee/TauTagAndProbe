@@ -28,7 +28,7 @@ def splitInBlocks (l, n):
 
 njobs = 200
 filelist = open("fileList_MC_RECO.txt")
-folder = "MC_RECO_6x9"
+folder = "MC_RECO_9x9"
 JSONfile = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/Cert_271036-275125_13TeV_PromptReco_Collisions16_JSON.txt"
 ###########
 

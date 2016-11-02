@@ -270,6 +270,7 @@ void Ntuplizer::beginJob()
     this -> _tree -> Branch("l1tEmuQual", &_l1tEmuQual, "l1tEmuQual/I");
     this -> _tree -> Branch("l1tEmuIso", &_l1tEmuIso, "l1tEmuIso/I");
     this -> _tree -> Branch("l1tEmuNTT", &_l1tEmuNTT, "l1tEmuNTT/I");
+    this -> _tree -> Branch("l1tEmuHasEM", &_l1tEmuHasEM, "l1tEmuHasEM/I");
     this -> _tree -> Branch("l1tEmuIsMerged", &_l1tEmuIsMerged, "l1tEmuIsMerged/I");
     this -> _tree -> Branch("l1tEmuTowerIEta", &_l1tEmuTowerIEta, "l1tEmuTowerIEta/I");
     this -> _tree -> Branch("l1tEmuTowerIPhi", &_l1tEmuTowerIPhi, "l1tEmuTowerIPhi/I");
@@ -426,6 +427,7 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
 		this -> _l1tEmuIso       = l1tEmuTau.hwIso();
 		this -> _l1tEmuNTT       = l1tEmuTau.nTT();
 		this -> _l1tEmuQual      = l1tEmuTau.hwQual();
+		this -> _l1tEmuHasEM     = l1tEmuTau.hasEM();
 		this -> _l1tEmuIsMerged  = l1tEmuTau.isMerged();
 		this -> _l1tEmuTowerIEta = l1tEmuTau.towerIEta();
 		this -> _l1tEmuTowerIPhi = l1tEmuTau.towerIPhi();
