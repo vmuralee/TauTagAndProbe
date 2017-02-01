@@ -1,5 +1,5 @@
-#ifndef NTUPLIZER_H
-#define NTUPLIZER_H
+#ifndef NTUPLIZER_NOTAGANDPROBE_H
+#define NTUPLIZER_NOTAGANDPROBE_H
 
 #include <cmath>
 #include <vector>
@@ -46,12 +46,12 @@
 ██████  ███████  ██████ ███████ ██   ██ ██   ██ ██   ██    ██    ██  ██████  ██   ████
 */
 
-class Ntuplizer : public edm::EDAnalyzer {
+class Ntuplizer_noTagAndProbe : public edm::EDAnalyzer {
     public:
         /// Constructor
-        explicit Ntuplizer(const edm::ParameterSet&);
+        explicit Ntuplizer_noTagAndProbe(const edm::ParameterSet&);
         /// Destructor
-        virtual ~Ntuplizer();
+        virtual ~Ntuplizer_noTagAndProbe();
 
     private:
         //----edm control---
@@ -75,6 +75,8 @@ class Ntuplizer : public edm::EDAnalyzer {
         float _tauPt;
         float _tauEta;
         float _tauPhi;
+        int   _tauCharge;
+        int   _tauDecayMode;
         float _hltPt;
         float _hltEta;
         float _hltPhi;
@@ -100,12 +102,8 @@ class Ntuplizer : public edm::EDAnalyzer {
         Bool_t _isMatched;
         Bool_t _isOS;
         int _foundJet;
-        float _muonPt;
-        float _muonEta;
-        float _muonPhi;
         int _Nvtx;
 
-        edm::EDGetTokenT<pat::MuonRefVector>  _muonsTag;
         edm::EDGetTokenT<pat::TauRefVector>   _tauTag;
         edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> _triggerObjects;
         edm::EDGetTokenT<edm::TriggerResults> _triggerBits;
@@ -136,8 +134,7 @@ class Ntuplizer : public edm::EDAnalyzer {
 */
 
 // ----Constructor and Destructor -----
-Ntuplizer::Ntuplizer(const edm::ParameterSet& iConfig) :
-_muonsTag       (consumes<pat::MuonRefVector>                     (iConfig.getParameter<edm::InputTag>("muons"))),
+Ntuplizer_noTagAndProbe::Ntuplizer_noTagAndProbe(const edm::ParameterSet& iConfig) :
 _tauTag         (consumes<pat::TauRefVector>                      (iConfig.getParameter<edm::InputTag>("taus"))),
 _triggerObjects (consumes<pat::TriggerObjectStandAloneCollection> (iConfig.getParameter<edm::InputTag>("triggerSet"))),
 _triggerBits    (consumes<edm::TriggerResults>                    (iConfig.getParameter<edm::InputTag>("triggerResultsLabel"))),
@@ -173,10 +170,10 @@ _VtxTag         (consumes<std::vector<reco::Vertex>>              (iConfig.getPa
     return;
 }
 
-Ntuplizer::~Ntuplizer()
+Ntuplizer_noTagAndProbe::~Ntuplizer_noTagAndProbe()
 {}
 
-void Ntuplizer::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
+void Ntuplizer_noTagAndProbe::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
 {
     Bool_t changedConfig = false;
 
@@ -205,16 +202,15 @@ void Ntuplizer::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
 
 }
 
-void Ntuplizer::Initialize() {
+void Ntuplizer_noTagAndProbe::Initialize() {
     this -> _indexevents = 0;
     this -> _runNumber = 0;
     this -> _lumi = 0;
     this -> _tauPt = -1.;
     this -> _tauEta = -1.;
     this -> _tauPhi = -1.;
-    this -> _muonPt = -1.;
-    this -> _muonEta = -1.;
-    this -> _muonPhi = -1.;
+    this -> _tauCharge = -1;
+    this -> _tauDecayMode = -1;
     this -> _isMatched = false;
     this -> _hltPt = -1;
     this -> _hltEta = 666;
@@ -240,7 +236,7 @@ void Ntuplizer::Initialize() {
 }
 
 
-void Ntuplizer::beginJob()
+void Ntuplizer_noTagAndProbe::beginJob()
 {
     edm::Service<TFileService> fs;
     this -> _tree = fs -> make<TTree>(this -> _treeName.c_str(), this -> _treeName.c_str());
@@ -253,9 +249,8 @@ void Ntuplizer::beginJob()
     this -> _tree -> Branch("tauPt",  &_tauPt,  "tauPt/F");
     this -> _tree -> Branch("tauEta", &_tauEta, "tauEta/F");
     this -> _tree -> Branch("tauPhi", &_tauPhi, "tauPhi/F");
-    this -> _tree -> Branch("muonPt",  &_muonPt,  "muonPt/F");
-    this -> _tree -> Branch("muonEta", &_muonEta, "muonEta/F");
-    this -> _tree -> Branch("muonPhi", &_muonPhi, "muonPhi/F");
+    this -> _tree -> Branch("tauCharge",  &_tauCharge,  "tauCharge/I");
+    this -> _tree -> Branch("tauDecayMode",  &_tauDecayMode,  "tauDecayMode/I");
     this -> _tree -> Branch("hltPt",  &_hltPt,  "hltPt/F");
     this -> _tree -> Branch("hltEta", &_hltEta, "hltEta/F");
     this -> _tree -> Branch("hltPhi", &_hltPhi, "hltPhi/F");
@@ -289,19 +284,19 @@ void Ntuplizer::beginJob()
 }
 
 
-void Ntuplizer::endJob()
+void Ntuplizer_noTagAndProbe::endJob()
 {
     return;
 }
 
 
-void Ntuplizer::endRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
+void Ntuplizer_noTagAndProbe::endRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
 {
     return;
 }
 
 
-void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
+void Ntuplizer_noTagAndProbe::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
 {
     this -> Initialize();
 
@@ -309,18 +304,16 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     _runNumber = iEvent.id().run();
     _lumi = iEvent.luminosityBlock();
 
-    cout<<"EventNumber = "<<_indexevents<<endl;
+    //cout<<"EventNumber = "<<_indexevents<<endl;
 
     // std::auto_ptr<pat::MuonRefVector> resultMuon(new pat::MuonRefVector);
 
     // search for the tag in the event
-    edm::Handle<pat::MuonRefVector> muonHandle;
     edm::Handle<pat::TauRefVector>  tauHandle;
     edm::Handle<pat::TriggerObjectStandAloneCollection> triggerObjects;
     edm::Handle<edm::TriggerResults> triggerBits;
     edm::Handle<std::vector<reco::Vertex> >  vertexes;
 
-    iEvent.getByToken(this -> _muonsTag, muonHandle);
     iEvent.getByToken(this -> _tauTag,   tauHandle);
     iEvent.getByToken(this -> _triggerObjects, triggerObjects);
     iEvent.getByToken(this -> _triggerBits, triggerBits);
@@ -329,10 +322,6 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
 //! TagAndProbe on HLT taus
     const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
     const pat::TauRef tau = (*tauHandle)[0] ;
-    const pat::MuonRef muon = (*muonHandle)[0] ;
-
-    if(muonHandle.isValid()) this -> _isOS = (muon -> charge() / tau -> charge() < 0) ? true : false;
-
 
     this -> _tauTriggerBitSet.reset();
 
@@ -392,7 +381,8 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
         const float dR = deltaR(*tau, *bx0TauIt);
 	const l1t::Tau& l1tTau = *bx0TauIt;
 
-	cout<<"FW Tau, pT = "<<l1tTau.pt()<<", eta = "<<l1tTau.eta()<<", phi = "<<l1tTau.phi()<<endl;
+	//dump check
+	//cout<<"FW Tau, pT = "<<l1tTau.pt()<<", eta = "<<l1tTau.eta()<<", phi = "<<l1tTau.phi()<<endl;
 
         if (dR < minDR) //Uncomment for new match algo
         //if (dR < 0.5) //Uncomment for old match algo
@@ -443,10 +433,8 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     this -> _tauPt = tau -> pt();
     this -> _tauEta = tau -> eta();
     this -> _tauPhi = tau -> phi();
-
-    if(muonHandle.isValid()) this -> _muonPt=muon->pt();
-    if(muonHandle.isValid()) this -> _muonEta=muon->eta();
-    if(muonHandle.isValid()) this -> _muonPhi=muon->phi();
+    this -> _tauCharge = tau -> charge();
+    this -> _tauDecayMode = tau -> decayMode();
 
     this -> _Nvtx = vertexes->size();
 
@@ -459,7 +447,7 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
 
 }
 
-bool Ntuplizer::hasFilters(const pat::TriggerObjectStandAlone&  obj , const std::vector<std::string>& filtersToLookFor) {
+bool Ntuplizer_noTagAndProbe::hasFilters(const pat::TriggerObjectStandAlone&  obj , const std::vector<std::string>& filtersToLookFor) {
 
     const std::vector<std::string>& eventLabels = obj.filterLabels();
     for (const std::string& filter : filtersToLookFor)
@@ -484,6 +472,6 @@ bool Ntuplizer::hasFilters(const pat::TriggerObjectStandAlone&  obj , const std:
 
 
 #include <FWCore/Framework/interface/MakerMacros.h>
-DEFINE_FWK_MODULE(Ntuplizer);
+DEFINE_FWK_MODULE(Ntuplizer_noTagAndProbe);
 
-#endif //NTUPLIZER_H
+#endif //NTUPLIZER_NOTAGANDPROBE_H

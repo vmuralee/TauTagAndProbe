@@ -22,7 +22,7 @@
 
 using namespace std;
 
-void CreateFileList(string Dataset = "/ZeroBias/Run2016E-v2/RAW", string Outfile = "fileList.txt", string SpaceSeparatedListOfRuns = "277305 277420")
+void CreateFileList(string Dataset = "/SingleMuon/Run2016H-PromptReco-v2/MINIAOD", string Outfile = "fileList.txt", string SpaceSeparatedListOfRuns = "277305 277420")
 {
   std::vector<string> vectOfRuns;
 
@@ -43,6 +43,13 @@ void CreateFileList(string Dataset = "/ZeroBias/Run2016E-v2/RAW", string Outfile
 
   TString RmCommand = "rm "+Outfile;
   gSystem->Exec(RmCommand.Data());
+
+  TString ExecQueryRuns = "python ./das_client.py --query=\"run dataset="+Dataset;
+  ExecQueryRuns += "\" --limit=0 ";
+  cout<<"ExecQueryRuns = "<<ExecQueryRuns<<endl;
+
+  TString Runs = gSystem->GetFromPipe(ExecQueryRuns.Data());
+  cout<<"Runs = "<<Runs<<endl;
 
   // for (int j=0; j< vectOfRuns.size(); j++) std::cout << vectOfRuns.at(j)<<std::endl;
       

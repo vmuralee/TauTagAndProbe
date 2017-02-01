@@ -52,7 +52,10 @@ class TurnonFit
         void setSelectionVars(const std::vector<std::string>& selectionVars) {m_selectionVars = selectionVars;}
         void setSelection(const std::string& selection) {m_selection = selection;}
         void setWeightVar(const std::string& weightVar) {m_weightVar = weightVar;}
-        void setBinning(const std::vector<double>& binning) {m_binning = binning;}
+        void setBinning(const std::vector<double>& binning) {m_binning = binning;
+	  std::cout<<"in include:"<<std::endl;
+	  for(UInt_t iBin = 0 ; iBin < m_binning.size() ; ++iBin) std::cout<<m_binning[iBin]<<std::endl;
+	}
         void setCrystalBall(double max, double max0, double max1,
                 double alpha, double alpha0, double alpha1,
                 double n, double n0, double n1,

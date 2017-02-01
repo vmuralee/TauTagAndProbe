@@ -145,7 +145,7 @@ TAndPseq = cms.Sequence(
     muonNumberFilter +
     goodMuons        +
     goodTaus         +
-    ~bjets           +
+    #~bjets           +
     TagAndProbe
 )
 

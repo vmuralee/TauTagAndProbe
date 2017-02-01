@@ -2,7 +2,11 @@ from ROOT import *
 import numpy as n
 
 # the hadd of all the output ntuples
-fname = 'NTuple_10Ago_Riccardo.root'
+#fname = 'NTuple_10Ago_Riccardo.root'
+#fname = 'Ntuple_FullH.root'
+fname = "Ntuples_141116/Option22/Ntuple_Option22_2016.root"
+#fname = "Ntuples_141116/Option21/Ntuple_Option21_2016.root"
+#pt = [20, 26, 30, 34]
 pt = [20, 26, 30, 34]
 numberOfHLTTriggers = 6
 

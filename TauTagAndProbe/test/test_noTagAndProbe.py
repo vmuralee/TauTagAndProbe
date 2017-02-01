@@ -57,7 +57,7 @@ if not isMC: # will use 80X
 else:
     process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_miniAODv2' #MC 25 ns miniAODv2
     # process.GlobalTag.globaltag = '76X_dataRun2_16Dec2015_v0'
-    process.load('TauTagAndProbe.TauTagAndProbe.MCanalysis_cff')
+    process.load('TauTagAndProbe.TauTagAndProbe.MCanalysis_noTagAndProbe_cff')
     process.source = cms.Source("PoolSource",
         fileNames = cms.untracked.vstring(
             

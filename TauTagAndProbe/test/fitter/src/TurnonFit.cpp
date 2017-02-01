@@ -19,8 +19,10 @@
 #include "TurnonFit.h"
 
 #include <sstream>
+#include <fstream>      // std::filebuf
 
 #include "TCanvas.h"
+#include "TH1.h"
 #include "TAxis.h"
 #include "TROOT.h"
 
@@ -116,6 +118,7 @@ void TurnonFit::fit()
     RooArgSet argSet(m_xVar,  cut);
     vector<RooRealVar> selectionVars;
     vector<RooRealVar> weightVars;
+    //m_selection = "tauPt>250";
     if(m_selection=="")
     {
         if (m_weightVar=="")dataSet = new RooDataSet("data", "data", argSet, Import(*tree));
@@ -141,32 +144,41 @@ void TurnonFit::fit()
             dataSet = new RooDataSet("data", "data", argSet, Import(*tree), Cut(m_selection.c_str()), WeightVar(m_weightVar.c_str()));               
         }
     }
+    std::filebuf fb;
+    fb.open ("test.txt",std::ios::out);
+    std::ostream os(&fb);
+    dataSet->printValue(os);
 
     // Create binned turn-on
     int nbins = m_binning.size()-1;
+    for(UInt_t iBin = 0 ; iBin < m_binning.size() ; ++iBin) cout<<m_binning[iBin]<<endl;
+    cout<<"binning = "<<m_binning[0]<<endl;
     RooBinning binning = RooBinning(nbins, &m_binning[0], "binning");
     gROOT->cd(); // change current directory. Otherwise, m_plot is associated to "file", and file->Close() destroys m_plot
     m_plot = m_xVar.frame(Bins(18000),Title("")) ;
     stringstream plotName;
     plotName << "plot_" << m_name;
     m_plot->SetName(plotName.str().c_str());
-    dataSet->plotOn(m_plot, Binning(binning), Efficiency(cut), MarkerColor(kBlack), LineColor(kBlack), MarkerStyle(20));
+    dataSet->plotOn(m_plot, DataError(RooAbsData::Poisson), Binning(binning), Efficiency(cut), MarkerColor(kBlack), LineColor(kBlack), MarkerStyle(20));
 
     // fit functional form to unbinned dataset
     //if(!m_noFit) m_fitResult = eff.fitTo(*dataSet,ConditionalObservables(m_xVar),Minos(kTRUE),Warnings(kFALSE),NumCPU(m_nCPU),Save(kTRUE),Verbose(kFALSE));
     if(!m_noFit)
     {
-        if (m_weightVar=="") m_fitResult = eff.fitTo(*dataSet,ConditionalObservables(m_xVar),Minos(kFALSE),Warnings(kFALSE),NumCPU(m_nCPU),Save(kTRUE),Verbose(kFALSE));
+        if (m_weightVar=="") m_fitResult = eff.fitTo(*dataSet,ConditionalObservables(m_xVar),Minos(kFALSE),Warnings(kFALSE),NumCPU(m_nCPU),Save(kTRUE),Verbose(kFALSE),SumW2Error(kTRUE));
+        // if (m_weightVar=="") m_fitResult = eff.fitTo(*dataSet,ConditionalObservables(m_xVar),Minos(kFALSE),Warnings(kFALSE),NumCPU(m_nCPU),Save(kTRUE),Verbose(kFALSE));
         else                 m_fitResult = eff.fitTo(*dataSet,ConditionalObservables(m_xVar),Minos(kFALSE),Warnings(kFALSE),NumCPU(m_nCPU),Save(kTRUE),Verbose(kFALSE),SumW2Error(kTRUE));
         stringstream resultName;
         resultName << "fitResult_" << m_name;
         m_fitResult->SetName(resultName.str().c_str());
     }
 
+    // m_function->plotOn(m_plot,VisualizeError(*m_fitResult,1),FillColor(kOrange),LineColor(kRed),LineWidth(2));
     m_function->plotOn(m_plot,LineColor(kRed),LineWidth(2));
 
     m_plot->GetYaxis()->SetRangeUser(0,1.05);
     m_plot->GetXaxis()->SetRangeUser(m_xVar.getMin(),m_xVar.getMax());
+    //cout<<"m_xVar.getMax() = "<<m_xVar.getMax()<<endl;
 
     m_histo = (RooHist*)m_plot->getObject(0);
 
@@ -174,6 +186,7 @@ void TurnonFit::fit()
     {
         double x,y;
         m_histo->GetPoint(ipt,x,y);
+	cout<<"x = "<<x<<", y = "<<y<<", error = "<<m_histo->GetErrorYlow(ipt)<<endl;
         if (y > 1)
         {
             m_histo->SetPoint(ipt,x,1.);
@@ -207,7 +220,17 @@ void TurnonFit::save(TFile* outputFile)
     cName << "canvas_" << m_name;
     TCanvas* canvas = new TCanvas(cName.str().c_str(), cName.str().c_str(), 800, 800);
     canvas->SetGrid();
-    m_plot->Draw();
+    TH1F* dummy = new TH1F("test","test",300,0.,300.);
+    dummy->GetXaxis()->SetRangeUser(0.,300.);
+    dummy->GetXaxis()->SetTitle("p_{T}^{offl.} [GeV]");
+    dummy->GetXaxis()->SetTitleOffset(1.3);
+    dummy->GetYaxis()->SetTitle("L1 Efficiency");
+    dummy->GetYaxis()->SetTitleOffset(1.3);
+    dummy->SetTitle("");
+    dummy->SetStats(0);
+    dummy->Draw();
+    m_plot->Draw("same");
+    // m_plot->Draw();
     canvas->Write();
     m_histo->Write();
     m_fit->Write();

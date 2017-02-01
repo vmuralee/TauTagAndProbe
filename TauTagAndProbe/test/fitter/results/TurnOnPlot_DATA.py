@@ -9,6 +9,7 @@ ROOT.gSystem.Load('libRooFit')
 class TurnOn:
     def __init__(self, **args):
         self.name        = args.get("Name", "turnon")
+        #self.legend      = args.get("Legend","")
         self.legend      = args.get("Legend","Turn-on")
         self.histo       = args.get("Histo", None)
         self.fit         = args.get("Fit", None)
@@ -31,7 +32,8 @@ class TurnOnPlot:
         #self.legendPosition = (0.6,0.2,0.9,0.4)
         self.legendPosition = (0.4,0.2,0.9,0.6)
         self.setPlotStyle()
-        self.triggerName = args.get("TriggerName", "Turn-On")
+        #self.triggerName = args.get("TriggerName", "Turn-On")
+        self.triggerName = args.get("TriggerName", "")
 
     def addTurnOn(self, turnon):
         self.turnons.append(turnon)
@@ -39,9 +41,11 @@ class TurnOnPlot:
     def plot(self):
         canvas = ROOT.TCanvas("c_"+self.name, self.name, 800, 800)
         canvas.SetGrid()
+        canvas.SetLogx()
         hDummy = ROOT.TH1F("hDummy_"+self.name, self.name, 1, self.xRange[0], self.xRange[1])
         hDummy.SetAxisRange(0, 1.05, "Y")
         hDummy.SetXTitle(self.xTitle)
+        #hDummy.SetYTitle("Test")
         hDummy.SetYTitle("Efficiency")
         hDummy.Draw()
 
@@ -76,7 +80,7 @@ class TurnOnPlot:
         # lumi_num = float(cfg.readOption ("general::lumi"))
         # lumi_num = lumi_num/1000. # from pb-1 to fb-1
         # lumi = "%.1f fb^{-1} (13 TeV)" % lumi_num
-        lumi = "12.9 fb^{-1} (13 TeV)"
+        lumi = "36.XX fb^{-1} (13 TeV)"
         lumibox = ROOT.TLatex  (0.953, 0.95, lumi)
         lumibox.SetNDC()
         lumibox.SetTextAlign(31)

@@ -3,6 +3,7 @@ import json
 from subprocess import Popen, PIPE
 
 isMC = True
+#isMC = False
 
 def chunks(l, n):
     """Yield successive n-sized chunks from l."""
@@ -29,12 +30,16 @@ def splitInBlocks (l, n):
 ###########
 
 njobs = 200
-filelist = open("fileList_MC_RAW.txt")
+#filelist = open("fileList_MC_RAW.txt")
+filelist = open("VBFHToTauTau_M125_13TeV_powheg_pythia8_FlatPU28to62HcalNZSRAW_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1.txt")
+
 #filelist = open("fileList_ZeroBias.txt")
 #filelist = open("Data_SingleMu_2016RunB_PromptRecov2_1Luglio.txt")
 
-#folder = "Data_ZeroBias_Run277420_9x9"
-folder = "MC_RAW_9x9"
+folder = "MC_L1_31_01_17"
+#folder = "Data_ZeroBias_Run277420_12x12"
+#folder = "MC_RAW_12x12"
+#folder = "MC_RAW_9x9"
 #folder = "testSubmitT3TAndP2Luglio"
 
 JSONfile = "/home/llr/cms/davignon/json_DCSONLY.txt"
@@ -86,4 +91,4 @@ for idx, block in enumerate(fileblocks):
     command = ('/opt/exp_soft/cms/t3/t3submit_new -long \'' + outJobName +"\'")
 #    command = ('/opt/exp_soft/cms/t3/t3submit_new -short -q cms \'' + outJobName +"\'")
     print command
-    os.system (command)
+    #os.system (command)

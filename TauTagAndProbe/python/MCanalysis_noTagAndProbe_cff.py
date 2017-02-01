@@ -38,17 +38,6 @@ hltFilter = hlt.hltHighLevel.clone(
     throw = cms.bool(True) #if True: throws exception if a trigger path is invalid
 )
 
-## good muons for T&P
-goodMuons = cms.EDFilter("PATMuonRefSelector",
-        src = cms.InputTag("slimmedMuons"),
-        cut = cms.string(
-                'pt > 10 && abs(eta) < 2.1 ' # kinematics
-                '&& ( (pfIsolationR03().sumChargedHadronPt + max(pfIsolationR03().sumNeutralHadronEt + pfIsolationR03().sumPhotonEt - 0.5 * pfIsolationR03().sumPUPt, 0.0)) / pt() ) < 0.1 ' # isolation
-                '&& isMediumMuon()' # quality -- medium muon
-        ),
-        filter = cms.bool(True)
-)
-
 ## good taus - apply analysis selection
 goodTaus = cms.EDFilter("PATTauRefSelector",
         src = cms.InputTag("slimmedTaus"),
@@ -71,9 +60,8 @@ genMatchedTaus = cms.EDFilter("genMatchTauFilter",
     )
 
 # Ntuplizer.taus = cms.InputTag("genMatchedTaus")
-Ntuplizer = cms.EDAnalyzer("Ntuplizer",
+Ntuplizer_noTagAndProbe = cms.EDAnalyzer("Ntuplizer_noTagAndProbe",
     treeName = cms.string("TagAndProbe"),
-    muons = cms.InputTag("goodMuons"),
     taus  = cms.InputTag("genMatchedTaus"),
     triggerSet = cms.InputTag("selectedPatTrigger"),
     triggerResultsLabel = cms.InputTag("TriggerResults", "", "HLT"),
@@ -91,11 +79,11 @@ Ntuplizer = cms.EDAnalyzer("Ntuplizer",
 
 TAndPseq = cms.Sequence(
     #hltFilter      +
-    goodMuons      +
+    #goodMuons      +
     goodTaus       +
     genMatchedTaus 
 )
 
 NtupleSeq = cms.Sequence(
-    Ntuplizer
+    Ntuplizer_noTagAndProbe
 )

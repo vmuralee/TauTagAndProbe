@@ -1,6 +1,7 @@
 import os
 
 isMC = True
+#isMC = False
 
 def chunks(l, n):
     """Yield successive n-sized chunks from l."""
@@ -27,9 +28,41 @@ def splitInBlocks (l, n):
 ###########
 
 njobs = 200
-filelist = open("fileList_MC_RECO.txt")
-folder = "MC_RECO_9x9"
-JSONfile = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/Cert_271036-275125_13TeV_PromptReco_Collisions16_JSON.txt"
+#filelist = open("fileListCertification_20Oct16.txt")
+#filelist = open("fileListCertification_27Oct16.txt")
+#filelist = open("fileListCertification_3Nov16.txt")
+#filelist = open("fileList_Run2016B-23Sep2016-v3_141116.txt")
+#filelist = open("fileList_Run2016C-23Sep2016-v1_141116.txt")
+#filelist = open("fileList_Run2016D-23Sep2016-v1_141116.txt")
+#filelist = open("fileList_Run2016E-23Sep2016-v1_141116.txt")
+#filelist = open("fileList_Run2016E-23Sep2016-v1_141116.txt")
+#filelist = open("fileList_Run2016F-23Sep2016-v1_141116.txt")
+#filelist = open("fileList_Run2016G-23Sep2016-v1_141116.txt")
+#filelist = open("fileList_Run2016H-PromptReco-v2_141116.txt")
+#filelist = open("fileList_Run2016H-PromptReco-v3_141116.txt")
+#filelist = open("fileList_Run2016H-PromptReco-v2_141116_Run282092.txt")
+filelist = open("VBFHToTauTau_M125_13TeV_powheg_pythia8_RunIISummer16MiniAODv2-FlatPU28to62HcalNZSRAW_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1.txt")
+
+#filelist = open("fileList_MC_RECO.txt")
+#folder = "MC_RECO_9x9"
+#folder = "MC_RECO_12x12"
+#folder = "Certification_20Oct16"
+#folder = "Certification_27Oct16"
+
+folder = "MC_MiniAOD_31_01_17"
+#folder = "Run2016H-PromptReco-v2_141116_282092_noBtagVeto"
+#folder = "Run2016H-PromptReco-v3_141116"
+#folder = "Run2016H-PromptReco-v2_141116"
+#folder = "Run2016G-23Sep2016-v1_141116"
+#folder = "Run2016F-23Sep2016-v1_141116"
+#folder = "Run2016E-23Sep2016-v1_141116"
+#folder = "Run2016D-23Sep2016-v1_141116"
+#folder = "Run2016C-23Sep2016-v1_141116"
+#folder = "Run2016B-23Sep2016-v3_141116"
+JSONfile = "/home/llr/cms/davignon/json_NoL1T.txt"
+#JSONfile = "/home/llr/cms/davignon/json_DCSONLY.txt"
+#/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/Cert_271036-275125_13TeV_PromptReco_Collisions16_JSON.txt
+
 ###########
 
 os.system ('source /opt/exp_soft/cms/t3/t3setup')
@@ -55,7 +88,7 @@ for idx, block in enumerate(fileblocks):
     if not isMC:
         cmsRun = "cmsRun test.py maxEvents=-1 inputFiles_load="+outListName + " outputFile="+outRootName + " JSONfile="+JSONfile + " >& " + outLogName
     else:
-        cmsRun = "cmsRun test.py maxEvents=-1 inputFiles_load="+outListName + " outputFile="+outRootName + " >& " + outLogName        
+        cmsRun = "cmsRun test_noTagAndProbe.py maxEvents=-1 inputFiles_load="+outListName + " outputFile="+outRootName + " >& " + outLogName        
 
     skimjob = open (outJobName, 'w')
     skimjob.write ('#!/bin/bash\n')
