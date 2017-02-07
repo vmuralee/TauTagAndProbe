@@ -36,7 +36,7 @@ filelist = open("VBFHToTauTau_M125_13TeV_powheg_pythia8_FlatPU28to62HcalNZSRAW_8
 #filelist = open("fileList_ZeroBias.txt")
 #filelist = open("Data_SingleMu_2016RunB_PromptRecov2_1Luglio.txt")
 
-folder = "MC_L1_31_01_17"
+folder = "MC_L1_With2017Layer1_07_02_17"
 #folder = "Data_ZeroBias_Run277420_12x12"
 #folder = "MC_RAW_12x12"
 #folder = "MC_RAW_9x9"

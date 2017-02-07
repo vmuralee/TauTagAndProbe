@@ -58,8 +58,10 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
 
     cout<<"EventNumber = "<<_indexevents<<endl;
 
-    auto_ptr<pat::MuonRefVector> resultMuon ( new pat::MuonRefVector );
-    auto_ptr<pat::TauRefVector>  resultTau  ( new pat::TauRefVector  );
+    std::unique_ptr<pat::MuonRefVector> resultMuon ( new pat::MuonRefVector );
+    std::unique_ptr<pat::TauRefVector>  resultTau  ( new pat::TauRefVector  );
+    // auto_ptr<pat::MuonRefVector> resultMuon ( new pat::MuonRefVector );
+    // auto_ptr<pat::TauRefVector>  resultTau  ( new pat::TauRefVector  );
 
     // ---------------------   search for the tag in the event --------------------
     Handle<pat::MuonRefVector> muonHandle;
@@ -157,8 +159,10 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
 
     resultTau->push_back (tau);
     resultMuon->push_back (mu);
-    iEvent.put(resultMuon);
-    iEvent.put(resultTau);
+    iEvent.put(std::move(resultMuon));
+    iEvent.put(std::move(resultTau));
+    // iEvent.put(resultMuon);
+    // iEvent.put(resultTau);
 
     return true;
 }
