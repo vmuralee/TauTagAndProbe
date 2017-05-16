@@ -6,6 +6,8 @@ ZeroBias = cms.EDAnalyzer("ZeroBias",
     treeName = cms.string("ZeroBias"),
     L1Tau = cms.InputTag("caloStage2Digis", "Tau"),
     L1EmuTau = cms.InputTag("simCaloStage2Digis", "MP"),
+    l1tJetCollection = cms.InputTag("caloStage2Digis","Jet"),
+    l1tEmuJetCollection = cms.InputTag("simCaloStage2Digis","MP")
 )
 
 NtupleZeroBiasSeq = cms.Sequence(

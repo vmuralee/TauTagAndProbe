@@ -27,6 +27,7 @@
 #include "DataFormats/L1Trigger/interface/Tau.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 
+#include "DataFormats/Common/interface/TriggerResults.h"
 
 #include "tParameterSet.h"
 

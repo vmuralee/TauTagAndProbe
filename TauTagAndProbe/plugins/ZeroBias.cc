@@ -25,6 +25,7 @@
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 #include "DataFormats/L1Trigger/interface/Tau.h"
+#include "DataFormats/L1Trigger/interface/Jet.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 
 
@@ -39,78 +40,100 @@
 
 
 /*
-██████  ███████  ██████ ██       █████  ██████   █████  ████████ ██  ██████  ███    ██
-██   ██ ██      ██      ██      ██   ██ ██   ██ ██   ██    ██    ██ ██    ██ ████   ██
-██   ██ █████   ██      ██      ███████ ██████  ███████    ██    ██ ██    ██ ██ ██  ██
-██   ██ ██      ██      ██      ██   ██ ██   ██ ██   ██    ██    ██ ██    ██ ██  ██ ██
-██████  ███████  ██████ ███████ ██   ██ ██   ██ ██   ██    ██    ██  ██████  ██   ████
+  ██████  ███████  ██████ ██       █████  ██████   █████  ████████ ██  ██████  ███    ██
+  ██   ██ ██      ██      ██      ██   ██ ██   ██ ██   ██    ██    ██ ██    ██ ████   ██
+  ██   ██ █████   ██      ██      ███████ ██████  ███████    ██    ██ ██    ██ ██ ██  ██
+  ██   ██ ██      ██      ██      ██   ██ ██   ██ ██   ██    ██    ██ ██    ██ ██  ██ ██
+  ██████  ███████  ██████ ███████ ██   ██ ██   ██ ██   ██    ██    ██  ██████  ██   ████
 */
 
 class ZeroBias : public edm::EDAnalyzer {
-    public:
-        /// Constructor
-        explicit ZeroBias(const edm::ParameterSet&);
-        /// Destructor
-        virtual ~ZeroBias();
+public:
+  /// Constructor
+  explicit ZeroBias(const edm::ParameterSet&);
+  /// Destructor
+  virtual ~ZeroBias();
 
-    private:
-        //----edm control---
-        virtual void beginJob() ;
-        virtual void beginRun(edm::Run const&, edm::EventSetup const&);
-        virtual void analyze(const edm::Event&, const edm::EventSetup&);
-        virtual void endJob();
-        virtual void endRun(edm::Run const&, edm::EventSetup const&);
-        void Initialize();
+private:
+  //----edm control---
+  virtual void beginJob() ;
+  virtual void beginRun(edm::Run const&, edm::EventSetup const&);
+  virtual void analyze(const edm::Event&, const edm::EventSetup&);
+  virtual void endJob();
+  virtual void endRun(edm::Run const&, edm::EventSetup const&);
+  void Initialize();
 
-        TTree *_tree;
-        std::string _treeName;
-        // -------------------------------------
-        // variables to be filled in output tree
-        ULong64_t       _indexevents;
-        Int_t           _runNumber;
-        Int_t           _lumi;
+  TTree *_tree;
+  std::string _treeName;
+  // -------------------------------------
+  // variables to be filled in output tree
+  ULong64_t       _indexevents;
+  Int_t           _runNumber;
+  Int_t           _lumi;
 
-        std::vector<int> _l1tQual;
-        std::vector<float> _l1tPt;
-        std::vector<float> _l1tEta;
-        std::vector<float> _l1tPhi;
-        std::vector<int> _l1tIso;
-        std::vector<int> _l1tEmuQual;
-        std::vector<float> _l1tEmuPt;
-        std::vector<float> _l1tEmuEta;
-        std::vector<float> _l1tEmuPhi;
-        std::vector<int> _l1tEmuIso;
-        std::vector<int> _l1tEmuNTT;
-        std::vector<int> _l1tEmuHasEM;
-        std::vector<int> _l1tEmuIsMerged;
-        std::vector<int> _l1tEmuTowerIEta;
-        std::vector<int> _l1tEmuTowerIPhi;
-        std::vector<int> _l1tEmuRawEt;
-        std::vector<int> _l1tEmuIsoEt;
+  std::vector<int> _l1tQual;
+  std::vector<float> _l1tPt;
+  std::vector<float> _l1tEta;
+  std::vector<float> _l1tPhi;
+  std::vector<int> _l1tIso;
+  std::vector<int> _l1tEmuQual;
+  std::vector<float> _l1tEmuPt;
+  std::vector<float> _l1tEmuEta;
+  std::vector<float> _l1tEmuPhi;
+  std::vector<int> _l1tEmuIso;
+  std::vector<int> _l1tEmuNTT;
+  std::vector<int> _l1tEmuHasEM;
+  std::vector<int> _l1tEmuIsMerged;
+  std::vector<int> _l1tEmuTowerIEta;
+  std::vector<int> _l1tEmuTowerIPhi;
+  std::vector<int> _l1tEmuRawEt;
+  std::vector<int> _l1tEmuIsoEt;
+        
+  std::vector<int> _l1tQualJet;
+  std::vector<float> _l1tPtJet;
+  std::vector<float> _l1tEtaJet;
+  std::vector<float> _l1tPhiJet;
+  std::vector<int> _l1tIsoJet;
+  std::vector<int> _l1tTowerIEtaJet;
+  std::vector<int> _l1tTowerIPhiJet;
+  std::vector<int> _l1tRawEtJet;  
+        
+  std::vector<int> _l1tEmuQualJet;
+  std::vector<float> _l1tEmuPtJet;
+  std::vector<float> _l1tEmuEtaJet;
+  std::vector<float> _l1tEmuPhiJet;
+  std::vector<int> _l1tEmuIsoJet;
+  std::vector<int> _l1tEmuTowerIEtaJet;
+  std::vector<int> _l1tEmuTowerIPhiJet;
+  std::vector<int> _l1tEmuRawEtJet; 
 
-        edm::EDGetTokenT<l1t::TauBxCollection> _L1TauTag  ;
-        edm::EDGetTokenT<l1t::TauBxCollection> _L1EmuTauTag  ;
+  edm::EDGetTokenT<l1t::TauBxCollection> _L1TauTag  ;
+  edm::EDGetTokenT<l1t::TauBxCollection> _L1EmuTauTag  ;
+  edm::EDGetTokenT<BXVector<l1t::Jet>> _l1tJetTag;
+  edm::EDGetTokenT<BXVector<l1t::Jet>> _l1tEmuJetTag;
 
 
 };
 
 /*
-██ ███    ███ ██████  ██      ███████ ███    ███ ███████ ███    ██ ████████  █████  ████████ ██  ██████  ███    ██
-██ ████  ████ ██   ██ ██      ██      ████  ████ ██      ████   ██    ██    ██   ██    ██    ██ ██    ██ ████   ██
-██ ██ ████ ██ ██████  ██      █████   ██ ████ ██ █████   ██ ██  ██    ██    ███████    ██    ██ ██    ██ ██ ██  ██
-██ ██  ██  ██ ██      ██      ██      ██  ██  ██ ██      ██  ██ ██    ██    ██   ██    ██    ██ ██    ██ ██  ██ ██
-██ ██      ██ ██      ███████ ███████ ██      ██ ███████ ██   ████    ██    ██   ██    ██    ██  ██████  ██   ████
+  ██ ███    ███ ██████  ██      ███████ ███    ███ ███████ ███    ██ ████████  █████  ████████ ██  ██████  ███    ██
+  ██ ████  ████ ██   ██ ██      ██      ████  ████ ██      ████   ██    ██    ██   ██    ██    ██ ██    ██ ████   ██
+  ██ ██ ████ ██ ██████  ██      █████   ██ ████ ██ █████   ██ ██  ██    ██    ███████    ██    ██ ██    ██ ██ ██  ██
+  ██ ██  ██  ██ ██      ██      ██      ██  ██  ██ ██      ██  ██ ██    ██    ██   ██    ██    ██ ██    ██ ██  ██ ██
+  ██ ██      ██ ██      ███████ ███████ ██      ██ ███████ ██   ████    ██    ██   ██    ██    ██  ██████  ██   ████
 */
 
 // ----Constructor and Destructor -----
 ZeroBias::ZeroBias(const edm::ParameterSet& iConfig) :
-_L1TauTag       (consumes<l1t::TauBxCollection>                   (iConfig.getParameter<edm::InputTag>("L1Tau"))),
-_L1EmuTauTag    (consumes<l1t::TauBxCollection>                   (iConfig.getParameter<edm::InputTag>("L1EmuTau")))
+  _L1TauTag       (consumes<l1t::TauBxCollection>                   (iConfig.getParameter<edm::InputTag>("L1Tau"))),
+  _L1EmuTauTag    (consumes<l1t::TauBxCollection>                   (iConfig.getParameter<edm::InputTag>("L1EmuTau"))),
+  _l1tJetTag      (consumes<BXVector<l1t::Jet>>                     (iConfig.getParameter<edm::InputTag>("l1tJetCollection"))),
+  _l1tEmuJetTag      (consumes<BXVector<l1t::Jet>>                  (iConfig.getParameter<edm::InputTag>("l1tEmuJetCollection")))
 {
-    this -> _treeName = iConfig.getParameter<std::string>("treeName");
+  this -> _treeName = iConfig.getParameter<std::string>("treeName");
     
-    this -> Initialize();
-    return;
+  this -> Initialize();
+  return;
 }
 
 ZeroBias::~ZeroBias()
@@ -122,130 +145,195 @@ void ZeroBias::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
 }
 
 void ZeroBias::Initialize() {
-    this -> _indexevents = 0;
-    this -> _runNumber = 0;
-    this -> _lumi = 0;
+  this -> _indexevents = 0;
+  this -> _runNumber = 0;
+  this -> _lumi = 0;
 
-    this -> _l1tPt .clear();
-    this -> _l1tEta .clear();
-    this -> _l1tPhi .clear();
-    this -> _l1tQual .clear();
-    this -> _l1tIso .clear();
-    this -> _l1tEmuPt .clear();
-    this -> _l1tEmuEta .clear();
-    this -> _l1tEmuPhi .clear();
-    this -> _l1tEmuQual .clear();
-    this -> _l1tEmuIso .clear();
-    this -> _l1tEmuNTT .clear();
-    this -> _l1tEmuHasEM .clear();
-    this -> _l1tEmuIsMerged .clear();
-    this -> _l1tEmuTowerIEta .clear();
-    this -> _l1tEmuTowerIPhi .clear();
-    this -> _l1tEmuRawEt .clear();
-    this -> _l1tEmuIsoEt .clear();
+  this -> _l1tPt .clear();
+  this -> _l1tEta .clear();
+  this -> _l1tPhi .clear();
+  this -> _l1tQual .clear();
+  this -> _l1tIso .clear();
+  this -> _l1tEmuPt .clear();
+  this -> _l1tEmuEta .clear();
+  this -> _l1tEmuPhi .clear();
+  this -> _l1tEmuQual .clear();
+  this -> _l1tEmuIso .clear();
+  this -> _l1tEmuNTT .clear();
+  this -> _l1tEmuHasEM .clear();
+  this -> _l1tEmuIsMerged .clear();
+  this -> _l1tEmuTowerIEta .clear();
+  this -> _l1tEmuTowerIPhi .clear();
+  this -> _l1tEmuRawEt .clear();
+  this -> _l1tEmuIsoEt .clear();
+
+  this -> _l1tPtJet        .clear();
+  this -> _l1tEtaJet       .clear();
+  this -> _l1tPhiJet       .clear();
+  this -> _l1tIsoJet       .clear();
+  this -> _l1tQualJet      .clear();
+  this -> _l1tTowerIEtaJet .clear();
+  this -> _l1tTowerIPhiJet .clear();
+  this -> _l1tRawEtJet     .clear();
+
+  this -> _l1tEmuPtJet        .clear();
+  this -> _l1tEmuEtaJet       .clear();
+  this -> _l1tEmuPhiJet       .clear();
+  this -> _l1tEmuIsoJet       .clear();
+  this -> _l1tEmuQualJet      .clear();
+  this -> _l1tEmuTowerIEtaJet .clear();
+  this -> _l1tEmuTowerIPhiJet .clear();
+  this -> _l1tEmuRawEtJet     .clear();
 
 }
 
 
 void ZeroBias::beginJob()
 {
-    edm::Service<TFileService> fs;
-    this -> _tree = fs -> make<TTree>(this -> _treeName.c_str(), this -> _treeName.c_str());
+  edm::Service<TFileService> fs;
+  this -> _tree = fs -> make<TTree>(this -> _treeName.c_str(), this -> _treeName.c_str());
 
-    //Branches
-    this -> _tree -> Branch("EventNumber",  &_indexevents);
-    this -> _tree -> Branch("RunNumber",  &_runNumber);
-    this -> _tree -> Branch("lumi",  &_lumi);
-    this -> _tree -> Branch("l1tPt",  &_l1tPt);
-    this -> _tree -> Branch("l1tEta", &_l1tEta);
-    this -> _tree -> Branch("l1tPhi", &_l1tPhi);
-    this -> _tree -> Branch("l1tQual", &_l1tQual);
-    this -> _tree -> Branch("l1tIso", &_l1tIso);
-    this -> _tree -> Branch("l1tEmuPt",  &_l1tEmuPt);
-    this -> _tree -> Branch("l1tEmuEta", &_l1tEmuEta);
-    this -> _tree -> Branch("l1tEmuPhi", &_l1tEmuPhi);
-    this -> _tree -> Branch("l1tEmuQual", &_l1tEmuQual);
-    this -> _tree -> Branch("l1tEmuIso", &_l1tEmuIso);
-    this -> _tree -> Branch("l1tEmuNTT", &_l1tEmuNTT);
-    this -> _tree -> Branch("l1tEmuHasEM", &_l1tEmuHasEM);
-    this -> _tree -> Branch("l1tEmuIsMerged", &_l1tEmuIsMerged);
-    this -> _tree -> Branch("l1tEmuTowerIEta", &_l1tEmuTowerIEta);
-    this -> _tree -> Branch("l1tEmuTowerIPhi", &_l1tEmuTowerIPhi);
-    this -> _tree -> Branch("l1tEmuRawEt", &_l1tEmuRawEt);
-    this -> _tree -> Branch("l1tEmuIsoEt", &_l1tEmuIsoEt);
+  //Branches
+  this -> _tree -> Branch("EventNumber",  &_indexevents);
+  this -> _tree -> Branch("RunNumber",  &_runNumber);
+  this -> _tree -> Branch("lumi",  &_lumi);
+  this -> _tree -> Branch("l1tPt",  &_l1tPt);
+  this -> _tree -> Branch("l1tEta", &_l1tEta);
+  this -> _tree -> Branch("l1tPhi", &_l1tPhi);
+  this -> _tree -> Branch("l1tQual", &_l1tQual);
+  this -> _tree -> Branch("l1tIso", &_l1tIso);
+  this -> _tree -> Branch("l1tEmuPt",  &_l1tEmuPt);
+  this -> _tree -> Branch("l1tEmuEta", &_l1tEmuEta);
+  this -> _tree -> Branch("l1tEmuPhi", &_l1tEmuPhi);
+  this -> _tree -> Branch("l1tEmuQual", &_l1tEmuQual);
+  this -> _tree -> Branch("l1tEmuIso", &_l1tEmuIso);
+  this -> _tree -> Branch("l1tEmuNTT", &_l1tEmuNTT);
+  this -> _tree -> Branch("l1tEmuHasEM", &_l1tEmuHasEM);
+  this -> _tree -> Branch("l1tEmuIsMerged", &_l1tEmuIsMerged);
+  this -> _tree -> Branch("l1tEmuTowerIEta", &_l1tEmuTowerIEta);
+  this -> _tree -> Branch("l1tEmuTowerIPhi", &_l1tEmuTowerIPhi);
+  this -> _tree -> Branch("l1tEmuRawEt", &_l1tEmuRawEt);
+  this -> _tree -> Branch("l1tEmuIsoEt", &_l1tEmuIsoEt);
 
-    return;
+  this -> _tree -> Branch("l1tPtJet",  &_l1tPtJet);
+  this -> _tree -> Branch("l1tEtaJet", &_l1tEtaJet);
+  this -> _tree -> Branch("l1tPhiJet", &_l1tPhiJet);
+  this -> _tree -> Branch("l1tQualJet", &_l1tQualJet);
+  this -> _tree -> Branch("l1tIsoJet", &_l1tIsoJet);
+  this -> _tree -> Branch("l1tTowerIEtaJet", &_l1tTowerIEtaJet);
+  this -> _tree -> Branch("l1tTowerIPhiJet", &_l1tTowerIPhiJet);
+  this -> _tree -> Branch("l1tRawEtJet", &_l1tRawEtJet);
+
+  this -> _tree -> Branch("l1tEmuPtJet",  &_l1tEmuPtJet);
+  this -> _tree -> Branch("l1tEmuEtaJet", &_l1tEmuEtaJet);
+  this -> _tree -> Branch("l1tEmuPhiJet", &_l1tEmuPhiJet);
+  this -> _tree -> Branch("l1tEmuQualJet", &_l1tEmuQualJet);
+  this -> _tree -> Branch("l1tEmuIsoJet", &_l1tEmuIsoJet);
+  this -> _tree -> Branch("l1tEmuTowerIEtaJet", &_l1tEmuTowerIEtaJet);
+  this -> _tree -> Branch("l1tEmuTowerIPhiJet", &_l1tEmuTowerIPhiJet);
+  this -> _tree -> Branch("l1tEmuRawEtJet", &_l1tEmuRawEtJet);
+
+  return;
 }
 
 
 void ZeroBias::endJob()
 {
-    return;
+  return;
 }
 
 
 void ZeroBias::endRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
 {
-    return;
+  return;
 }
 
 
 void ZeroBias::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
 {
-    this -> Initialize();
+  this -> Initialize();
 
-    _indexevents = iEvent.id().event();
-    _runNumber = iEvent.id().run();
-    _lumi = iEvent.luminosityBlock();
+  _indexevents = iEvent.id().event();
+  _runNumber = iEvent.id().run();
+  _lumi = iEvent.luminosityBlock();
 
-    edm::Handle< BXVector<l1t::Tau> >  L1TauHandle;
-    iEvent.getByToken(_L1TauTag, L1TauHandle);
+  edm::Handle< BXVector<l1t::Tau> >  L1TauHandle;
+  iEvent.getByToken(_L1TauTag, L1TauHandle);
 
-
-    //cout<<"ill try this: "<<endl;
-
-    for (l1t::TauBxCollection::const_iterator bx0TauIt = L1TauHandle->begin(0); bx0TauIt != L1TauHandle->end(0) ; bx0TauIt++)
+  for (l1t::TauBxCollection::const_iterator bx0TauIt = L1TauHandle->begin(0); bx0TauIt != L1TauHandle->end(0) ; bx0TauIt++)
     {
-	const l1t::Tau& l1tTau = *bx0TauIt;
+      const l1t::Tau& l1tTau = *bx0TauIt;
 
-	cout<<"FW Tau, pT = "<<l1tTau.pt()<<", eta = "<<l1tTau.eta()<<", phi = "<<l1tTau.phi()<<endl;
+      cout<<"FW Tau, pT = "<<l1tTau.pt()<<", eta = "<<l1tTau.eta()<<", phi = "<<l1tTau.phi()<<endl;
 
-	this -> _l1tPt.push_back(l1tTau.pt());
-	this -> _l1tEta.push_back(l1tTau.eta());
-	this -> _l1tPhi.push_back(l1tTau.phi());
-	this -> _l1tIso.push_back(l1tTau.hwIso());
-	this -> _l1tQual.push_back(l1tTau.hwQual());
+      this -> _l1tPt.push_back(l1tTau.pt());
+      this -> _l1tEta.push_back(l1tTau.eta());
+      this -> _l1tPhi.push_back(l1tTau.phi());
+      this -> _l1tIso.push_back(l1tTau.hwIso());
+      this -> _l1tQual.push_back(l1tTau.hwQual());
 
     }
 
-    edm::Handle< BXVector<l1t::Tau> >  L1EmuTauHandle;
-    try {iEvent.getByToken(_L1EmuTauTag, L1EmuTauHandle);} catch (...) {;}
+  edm::Handle< BXVector<l1t::Tau> >  L1EmuTauHandle;
+  try {iEvent.getByToken(_L1EmuTauTag, L1EmuTauHandle);} catch (...) {;}
 
-    if (L1EmuTauHandle.isValid())
-      {	
-	for (l1t::TauBxCollection::const_iterator bx0EmuTauIt = L1EmuTauHandle->begin(0); bx0EmuTauIt != L1EmuTauHandle->end(0) ; bx0EmuTauIt++)
-	  {
-	    const l1t::Tau& l1tEmuTau = *bx0EmuTauIt;
+  if (L1EmuTauHandle.isValid())
+    {	
+      for (l1t::TauBxCollection::const_iterator bx0EmuTauIt = L1EmuTauHandle->begin(0); bx0EmuTauIt != L1EmuTauHandle->end(0) ; bx0EmuTauIt++)
+	{
+	  const l1t::Tau& l1tEmuTau = *bx0EmuTauIt;
 	    
-	    cout<<"Emul Tau, pT = "<<l1tEmuTau.pt()<<", eta = "<<l1tEmuTau.eta()<<", phi = "<<l1tEmuTau.phi()<<endl;
+	  cout<<"Emul Tau, pT = "<<l1tEmuTau.pt()<<", eta = "<<l1tEmuTau.eta()<<", phi = "<<l1tEmuTau.phi()<<endl;
 	    
-	    this -> _l1tEmuPt       .push_back(l1tEmuTau.pt());
-	    this -> _l1tEmuEta      .push_back(l1tEmuTau.eta());
-	    this -> _l1tEmuPhi      .push_back(l1tEmuTau.phi());
-	    this -> _l1tEmuIso      .push_back(l1tEmuTau.hwIso());
-	    this -> _l1tEmuNTT      .push_back(l1tEmuTau.nTT());
-	    this -> _l1tEmuQual     .push_back(l1tEmuTau.hwQual());
-	    this -> _l1tEmuHasEM    .push_back(l1tEmuTau.hasEM());
-	    this -> _l1tEmuIsMerged .push_back(l1tEmuTau.isMerged());
-	    this -> _l1tEmuTowerIEta.push_back(l1tEmuTau.towerIEta());
-	    this -> _l1tEmuTowerIPhi.push_back(l1tEmuTau.towerIPhi());
-	    this -> _l1tEmuRawEt    .push_back(l1tEmuTau.rawEt());
-	    this -> _l1tEmuIsoEt    .push_back(l1tEmuTau.isoEt());
+	  this -> _l1tEmuPt       .push_back(l1tEmuTau.pt());
+	  this -> _l1tEmuEta      .push_back(l1tEmuTau.eta());
+	  this -> _l1tEmuPhi      .push_back(l1tEmuTau.phi());
+	  this -> _l1tEmuIso      .push_back(l1tEmuTau.hwIso());
+	  this -> _l1tEmuNTT      .push_back(l1tEmuTau.nTT());
+	  this -> _l1tEmuQual     .push_back(l1tEmuTau.hwQual());
+	  this -> _l1tEmuHasEM    .push_back(l1tEmuTau.hasEM());
+	  this -> _l1tEmuIsMerged .push_back(l1tEmuTau.isMerged());
+	  this -> _l1tEmuTowerIEta.push_back(l1tEmuTau.towerIEta());
+	  this -> _l1tEmuTowerIPhi.push_back(l1tEmuTau.towerIPhi());
+	  this -> _l1tEmuRawEt    .push_back(l1tEmuTau.rawEt());
+	  this -> _l1tEmuIsoEt    .push_back(l1tEmuTau.isoEt());
 
-	  }
-      }
+	}
+    }
 
-    this -> _tree -> Fill();
+  edm::Handle<BXVector<l1t::Jet>> l1tJetHandle;
+  
+  iEvent.getByToken(this -> _l1tJetTag, l1tJetHandle);
+  for(BXVector<l1t::Jet>::const_iterator jet = l1tJetHandle -> begin(0); jet != l1tJetHandle -> end(0) ; jet++)
+    {
+	
+      this -> _l1tPtJet        . push_back(jet -> pt());
+      this -> _l1tEtaJet       . push_back(jet -> eta());
+      this -> _l1tPhiJet       . push_back(jet -> phi());
+      this -> _l1tIsoJet       . push_back(jet -> hwIso());
+      this -> _l1tQualJet      . push_back(jet -> hwQual());
+      this -> _l1tTowerIEtaJet . push_back(jet -> towerIEta());
+      this -> _l1tTowerIPhiJet . push_back(jet -> towerIPhi());
+      this -> _l1tRawEtJet     . push_back(jet -> rawEt());
+    }
+
+  edm::Handle<BXVector<l1t::Jet>> l1tEmuJetHandle;  
+  iEvent.getByToken(this -> _l1tEmuJetTag, l1tEmuJetHandle);
+  for(BXVector<l1t::Jet>::const_iterator jet = l1tEmuJetHandle -> begin(0); jet != l1tEmuJetHandle -> end(0) ; jet++)
+    {
+	
+      this -> _l1tEmuPtJet        . push_back(jet -> pt());
+      this -> _l1tEmuEtaJet       . push_back(jet -> eta());
+      this -> _l1tEmuPhiJet       . push_back(jet -> phi());
+      this -> _l1tEmuIsoJet       . push_back(jet -> hwIso());
+      this -> _l1tEmuQualJet      . push_back(jet -> hwQual());
+      this -> _l1tEmuTowerIEtaJet . push_back(jet -> towerIEta());
+      this -> _l1tEmuTowerIPhiJet . push_back(jet -> towerIPhi());
+      this -> _l1tEmuRawEtJet     . push_back(jet -> rawEt());
+    }
+  
+
+  this -> _tree -> Fill();
 
 }
 

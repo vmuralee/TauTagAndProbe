@@ -32,11 +32,13 @@ def splitInBlocks (l, n):
 njobs = 200
 #filelist = open("fileList_MC_RAW.txt")
 filelist = open("VBFHToTauTau_M125_13TeV_powheg_pythia8_FlatPU28to62HcalNZSRAW_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1.txt")
+#filelist = open("ZeroBias1-5_Run283171.txt")
 
 #filelist = open("fileList_ZeroBias.txt")
 #filelist = open("Data_SingleMu_2016RunB_PromptRecov2_1Luglio.txt")
 
-folder = "MC_L1_With2017Layer1_07_02_17"
+#folder = "ZeroBias1-5_Run283171_WithMarch2017Layer1_ShapeVeto_04_05_17"
+folder = "MC_L1_May2017Layer1_04_05_17"
 #folder = "Data_ZeroBias_Run277420_12x12"
 #folder = "MC_RAW_12x12"
 #folder = "MC_RAW_9x9"
@@ -72,7 +74,8 @@ for idx, block in enumerate(fileblocks):
     jobfilelist.close()
 
     if not isMC:
-        cmsRun = "cmsRun reEmulL1_ZeroBias.py maxEvents=-1 inputFiles_load="+outListName + " outputFile="+outRootName + " JSONfile="+JSONfile + " >& " + outLogName
+        cmsRun = "cmsRun reEmulL1_ZeroBias.py maxEvents=-1 inputFiles_load="+outListName + " outputFile="+outRootName + " >& " + outLogName
+        #cmsRun = "cmsRun reEmulL1_ZeroBias.py maxEvents=-1 inputFiles_load="+outListName + " outputFile="+outRootName + " JSONfile="+JSONfile + " >& " + outLogName
     else:
         cmsRun = "cmsRun reEmulL1_MC_L1Only.py maxEvents=-1 inputFiles_load="+outListName + " outputFile="+outRootName + " >& " + outLogName
 
@@ -91,4 +94,4 @@ for idx, block in enumerate(fileblocks):
     command = ('/opt/exp_soft/cms/t3/t3submit_new -long \'' + outJobName +"\'")
 #    command = ('/opt/exp_soft/cms/t3/t3submit_new -short -q cms \'' + outJobName +"\'")
     print command
-    #os.system (command)
+    os.system (command)

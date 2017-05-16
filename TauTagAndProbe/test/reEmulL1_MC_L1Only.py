@@ -67,7 +67,8 @@ if not isMC: # will use 80X
 else: # will use 80X
     from Configuration.AlCa.autoCond import autoCond
     #process.GlobalTag.globaltag = 'auto:run2_mc'
-    process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_TrancheIV_v6'
+    process.GlobalTag.globaltag = '90X_mcRun2_asymptotic_v0'
+    #process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_TrancheIV_v6'
     #process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_v14'
     #process.GlobalTag.globaltag = 'auto:run2_mc'
     #process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_v6' #MC 25 ns miniAODv2
@@ -97,7 +98,8 @@ else:
     from L1Trigger.Configuration.customiseUtils import L1TTurnOffUnpackStage2GtGmtAndCalo 
     process = L1TTurnOffUnpackStage2GtGmtAndCalo(process)
 
-process.load("L1Trigger.L1TCalorimeter.caloStage2Params_2017_v1_0_inconsistent_cfi")
+process.load("L1Trigger.L1TCalorimeter.caloStage2Params_2017_v1_4_cfi")
+#process.load("L1Trigger.L1TCalorimeter.caloStage2Params_2017_v1_0_inconsistent_cfi")
 #process.load("L1Trigger.L1TCalorimeter.caloStage2Params_2016_v3_2_cfi")
 
 #### handling of cms line options for tier3 submission

@@ -49,7 +49,7 @@ filelist = open("VBFHToTauTau_M125_13TeV_powheg_pythia8_RunIISummer16MiniAODv2-F
 #folder = "Certification_20Oct16"
 #folder = "Certification_27Oct16"
 
-folder = "MC_MiniAOD_31_01_17"
+folder = "MC_MiniAOD_11_05_17"
 #folder = "Run2016H-PromptReco-v2_141116_282092_noBtagVeto"
 #folder = "Run2016H-PromptReco-v3_141116"
 #folder = "Run2016H-PromptReco-v2_141116"

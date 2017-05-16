@@ -73,6 +73,8 @@ Ntuplizer_noTagAndProbe = cms.EDAnalyzer("Ntuplizer_noTagAndProbe",
     #L1Tau = cms.InputTag("caloStage2Digis", "Tau", "HLT2"),
     L1Tau = cms.InputTag("caloStage2Digis", "Tau", "RECO"),
     L1EmuTau = cms.InputTag("simCaloStage2Digis", "MP"),
+    jetCollection = cms.InputTag("slimmedJets"),
+    l1tJetCollection = cms.InputTag("caloStage2Digis","Jet"),
     Vertexes = cms.InputTag("offlineSlimmedPrimaryVertices"),
     triggerList = HLTLIST
 )

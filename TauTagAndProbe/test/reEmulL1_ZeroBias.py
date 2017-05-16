@@ -53,7 +53,8 @@ import FWCore.Utilities.FileUtils as FileUtils
 
 if not isMC: # will use 80X
     from Configuration.AlCa.autoCond import autoCond
-    process.GlobalTag.globaltag = '80X_dataRun2_Prompt_v8'
+    process.GlobalTag.globaltag = '90X_dataRun2_v0'
+    #process.GlobalTag.globaltag = '80X_dataRun2_Prompt_v8'
     process.load('TauTagAndProbe.TauTagAndProbe.zeroBias_cff')
     process.source = cms.Source("PoolSource",
         fileNames = cms.untracked.vstring(
@@ -96,7 +97,8 @@ else:
     from L1Trigger.Configuration.customiseUtils import L1TTurnOffUnpackStage2GtGmtAndCalo 
     process = L1TTurnOffUnpackStage2GtGmtAndCalo(process)
 
-process.load("L1Trigger.L1TCalorimeter.caloStage2Params_2016_v3_2_cfi")
+process.load("L1Trigger.L1TCalorimeter.caloStage2Params_2017_v1_4_cfi")
+#process.load("L1Trigger.L1TCalorimeter.caloStage2Params_2016_v3_2_cfi")
 
 #### handling of cms line options for tier3 submission
 #### the following are dummy defaults, so that one can normally use the config changing file list by hand etc.
