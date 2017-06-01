@@ -78,7 +78,8 @@ else: # will use 80X
     process.source = cms.Source("PoolSource",
         fileNames = cms.untracked.vstring(
             #'file:BCB1EC0B-5E26-E611-8240-02163E0145B8.root'
-            'file:0A3E7062-D365-E611-BCF4-001EC9AF0377.root'
+            'file:0240C947-0CA4-E611-A94C-ECF4BBE1CEB0.root'
+            #'file:0A3E7062-D365-E611-BCF4-001EC9AF0377.root'
             #'/store/mc/RunIISpring16DR80/GluGluHToTauTau_M125_13TeV_powheg_pythia8/GEN-SIM-RAW/FlatPU20to70HcalNZSRAW_withHLT_80X_mcRun2_asymptotic_v14-v1/50000/0A3E7062-D365-E611-BCF4-001EC9AF0377.root'
             #'/store/data/Run2016B/SingleMuon/RAW/v2/000/274/199/00000/BCB1EC0B-5E26-E611-8240-02163E0145B8.root'
             #'/store/data/Run2016B/SingleMuon/MINIAOD/PromptReco-v2/000/274/199/00000/7005DB70-4C28-E611-8628-02163E0144DD.root',
@@ -93,10 +94,13 @@ if not isMC:
     from L1Trigger.Configuration.customiseReEmul import L1TReEmulFromRAW 
     process = L1TReEmulFromRAW(process)
 else:
-    from L1Trigger.Configuration.customiseReEmul import L1TReEmulMCFromRAW
-    process = L1TReEmulMCFromRAW(process) 
+    #from L1Trigger.Configuration.customiseReEmul import L1TReEmulMCFromRAW
+    #process = L1TReEmulMCFromRAW(process)
+    from L1Trigger.Configuration.customiseReEmul import L1TReEmulFromRAWsimTP
+    process = L1TReEmulFromRAWsimTP(process)
     from L1Trigger.Configuration.customiseUtils import L1TTurnOffUnpackStage2GtGmtAndCalo 
     process = L1TTurnOffUnpackStage2GtGmtAndCalo(process)
+
 
 process.load("L1Trigger.L1TCalorimeter.caloStage2Params_2017_v1_4_cfi")
 #process.load("L1Trigger.L1TCalorimeter.caloStage2Params_2017_v1_0_inconsistent_cfi")

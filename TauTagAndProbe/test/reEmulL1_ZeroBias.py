@@ -68,7 +68,8 @@ if not isMC: # will use 80X
 
 else: # will use 80X
     from Configuration.AlCa.autoCond import autoCond
-    process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_v14'
+    process.GlobalTag.globaltag = '90X_upgrade2017_TSG_Hcal_V3'#for VBF Hinv
+    #process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_v14'#for VBF HTT
     #process.GlobalTag.globaltag = 'auto:run2_mc'
     #process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_v6' #MC 25 ns miniAODv2
     #process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_v3' #MC 25 ns miniAODv2
@@ -96,6 +97,8 @@ else:
     process = L1TReEmulMCFromRAW(process) 
     from L1Trigger.Configuration.customiseUtils import L1TTurnOffUnpackStage2GtGmtAndCalo 
     process = L1TTurnOffUnpackStage2GtGmtAndCalo(process)
+    #from L1Trigger.Configuration.customiseReEmul import L1TReEmulFromRAWsimTP
+    #process = L1TReEmulFromRAWsimTP(process)
 
 process.load("L1Trigger.L1TCalorimeter.caloStage2Params_2017_v1_4_cfi")
 #process.load("L1Trigger.L1TCalorimeter.caloStage2Params_2016_v3_2_cfi")
