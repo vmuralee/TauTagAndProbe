@@ -187,18 +187,18 @@ void Ntuplizer::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
     }
 
     const edm::TriggerNames::Strings& triggerNames = this -> _hltConfig.triggerNames();
-    //std::cout << " ===== LOOKING FOR THE PATH INDEXES =====" << std::endl;
+    std::cout << " ===== LOOKING FOR THE PATH INDEXES =====" << std::endl;
     for (tParameterSet& parameter : this -> _parameters){
         const std::string& hltPath = parameter.hltPath;
         bool found = false;
         for(unsigned int j=0; j < triggerNames.size(); j++)
         {
-            //std::cout << triggerNames[j] << std::endl;
+	  std::cout << triggerNames[j] << std::endl;
             if (triggerNames[j].find(hltPath) != std::string::npos) {
                 found = true;
                 parameter.hltPathIndex = j;
 
-                //std::cout << "### FOUND AT INDEX #" << j << " --> " << triggerNames[j] << std::endl;
+                std::cout << "### FOUND AT INDEX #" << j << " --> " << triggerNames[j] << std::endl;
             }
         }
         if (!found) parameter.hltPathIndex = -1;
@@ -310,7 +310,7 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     _runNumber = iEvent.id().run();
     _lumi = iEvent.luminosityBlock();
 
-    cout<<"EventNumber = "<<_indexevents<<endl;
+    //cout<<"EventNumber = "<<_indexevents<<endl;
 
     // std::auto_ptr<pat::MuonRefVector> resultMuon(new pat::MuonRefVector);
 
@@ -364,7 +364,7 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
                     const std::vector<std::string>& filters = (parameter.leg1 == 15)? (parameter.hltFilters1):(parameter.hltFilters2);
                     if (this -> hasFilters(obj, filters))
                     {
-                        //std::cout << "#### FOUND TAU WITH HLT PATH " << x << " ####" << std::endl;
+		      //std::cout << "#### FOUND TAU WITH HLT PATH " << x << " ####" << std::endl;
                         this -> _hltPt = obj.pt();
                         this -> _hltEta = obj.eta();
                         this -> _hltPhi = obj.phi();
@@ -393,7 +393,7 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
         const float dR = deltaR(*tau, *bx0TauIt);
 	const l1t::Tau& l1tTau = *bx0TauIt;
 
-	cout<<"FW Tau, pT = "<<l1tTau.pt()<<", eta = "<<l1tTau.eta()<<", phi = "<<l1tTau.phi()<<endl;
+	//cout<<"FW Tau, pT = "<<l1tTau.pt()<<", eta = "<<l1tTau.eta()<<", phi = "<<l1tTau.phi()<<endl;
 
         if (dR < minDR) //Uncomment for new match algo
         //if (dR < 0.5) //Uncomment for old match algo
@@ -419,7 +419,7 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
 	    const float dR = deltaR(*tau, *bx0EmuTauIt);
 	    const l1t::Tau& l1tEmuTau = *bx0EmuTauIt;
 	    
-	    cout<<"Emul Tau, pT = "<<l1tEmuTau.pt()<<", eta = "<<l1tEmuTau.eta()<<", phi = "<<l1tEmuTau.phi()<<endl;
+	    //cout<<"Emul Tau, pT = "<<l1tEmuTau.pt()<<", eta = "<<l1tEmuTau.eta()<<", phi = "<<l1tEmuTau.phi()<<endl;
 	    
 	    if (dR < minDR) //Uncomment for new match algo
 	      {

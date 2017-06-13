@@ -4,20 +4,27 @@ print "Running on MC"
 
 
 HLTLIST = cms.VPSet(
-    #cms.PSet (
-    #    HLT = cms.string("HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v"),
-    #    path1 = cms.vstring ("hltL3crIsoL1sMu16erTauJet20erL1f0L2f10QL3f17QL3trkIsoFiltered0p09", "hltOverlapFilterIsoMu17LooseIsoPFTau20"),
-    #    path2 = cms.vstring ("hltPFTau20TrackLooseIsoAgainstMuon", "hltOverlapFilterIsoMu17LooseIsoPFTau20"),
-    #    leg1 = cms.int32(13),
-    #    leg2 = cms.int32(15)
-    #)
+    cms.PSet (
+        HLT = cms.string("HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v"),
+        path1 = cms.vstring ("hltL3crIsoL1sMu16erTauJet20erL1f0L2f10QL3f17QL3trkIsoFiltered0p09", "hltOverlapFilterIsoMu17LooseIsoPFTau20"),
+        path2 = cms.vstring ("hltPFTau20TrackLooseIsoAgainstMuon", "hltOverlapFilterIsoMu17LooseIsoPFTau20"),
+        leg1 = cms.int32(13),
+        leg2 = cms.int32(15)
+        ),
     cms.PSet (
         HLT = cms.string("HLT_IsoMu17_eta2p1_LooseIsoPFTau20_SingleL1_v"),
         path1 = cms.vstring ("hltL3crIsoL1sSingleMu16erL1f0L2f10QL3f17QL3trkIsoFiltered0p09", "hltOverlapFilterSingleIsoMu17LooseIsoPFTau20"),
         path2 = cms.vstring ("hltPFTau20TrackLooseIsoAgainstMuon", "hltOverlapFilterSingleIsoMu17LooseIsoPFTau20"),
         leg1 = cms.int32(13),
         leg2 = cms.int32(15)
-    )
+        ),
+    cms.PSet (
+        HLT = cms.string("HLT_IsoMu21_eta2p1_MediumIsoPFTau32_Trk1_eta2p1_Reg_v"),
+        path1 = cms.vstring ("hltL3crIsoL1sMu20erIsoTau26erL1f0L2f10QL3f21QL3trkIsoFiltered0p09", "hltOverlapFilterIsoMu21MediumIsoPFTau32Reg"),
+        path2 = cms.vstring ("hltPFTau32TrackPt1MediumIsolationL1HLTMatchedReg", "hltOverlapFilterIsoMu21MediumIsoPFTau32Reg"),
+        leg1 = cms.int32(13),
+        leg2 = cms.int32(15)
+        ),
 )
 
 
@@ -30,7 +37,7 @@ hltFilter = hlt.hltHighLevel.clone(
     #TriggerResultsTag = cms.InputTag("TriggerResults","","RECO"),
     #TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),
     #TriggerResultsTag = cms.InputTag("TriggerResults","","HLT2"),
-    HLTPaths = ['HLT_IsoMu18_v5'],
+    HLTPaths = ['HLT_IsoMu22_eta2p1_v2'],
     #HLTPaths = ['HLT_Mu7p5_L2Mu2_Jpsi_v4'],
     #HLTPaths = ['HLT_IsoMu18_v3'],
     #HLTPaths = ['HLT_IsoMu18_v3'],
@@ -57,7 +64,7 @@ goodTaus = cms.EDFilter("PATTauRefSelector",
                 #'pt > 20 && abs(eta) < 2.5 ' #kinematics
                 '&& abs(charge) > 0 && abs(charge) < 2 ' #sometimes 2 prongs have charge != 1
                 '&& tauID("decayModeFinding") > 0.5 ' # tau ID
-                '&& tauID("byCombinedIsolationDeltaBetaCorrRaw3Hits") < 2.5 ' # tau iso - NOTE: can as well use boolean discriminators with WP
+                '&& tauID("byTightIsolationMVArun2v1DBoldDMwLT") > 0.5 ' # tau iso - NOTE: can as well use boolean discriminators with WP
                 #'&& tauID("byCombinedIsolationDeltaBetaCorrRaw3Hits") < 2.5 ' # tau iso - NOTE: can as well use boolean discriminators with WP
                 #'&& tauID("byCombinedIsolationDeltaBetaCorrRaw3Hits") < 1.0 ' # tau iso - NOTE: can as well use boolean discriminators with WP
                 '&& tauID("againstMuonTight3") > 0.5 ' # anti Muon tight
@@ -90,7 +97,7 @@ Ntuplizer = cms.EDAnalyzer("Ntuplizer",
 )
 
 TAndPseq = cms.Sequence(
-    #hltFilter      +
+    hltFilter      +
     goodMuons      +
     goodTaus       +
     genMatchedTaus 

@@ -56,7 +56,7 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
     // int _runNumber = iEvent.id().run();
     // int _lumi = iEvent.luminosityBlock();
 
-    cout<<"EventNumber = "<<_indexevents<<endl;
+    //cout<<"EventNumber = "<<_indexevents<<endl;
 
     std::unique_ptr<pat::MuonRefVector> resultMuon ( new pat::MuonRefVector );
     std::unique_ptr<pat::TauRefVector>  resultTau  ( new pat::TauRefVector  );
@@ -71,7 +71,7 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
     // or without mu (should not happen in SingleMu dataset)
     if (muonHandle->size() != 1) return false;
 
-    cout<<"pass muonHandle"<<endl;
+    //cout<<"pass muonHandle"<<endl;
 
     // for loop is now dummy, leaving it for debug
     // for (size_t imu = 0; imu < muonHandle->size(); ++imu )
@@ -86,17 +86,17 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
     Handle<pat::METCollection> metHandle;
     iEvent.getByToken (_metTag, metHandle);
     const pat::MET& met = (*metHandle)[0];
-    cout<<"met.pt() = "<<met.pt()<<endl;
+    /*cout<<"met.pt() = "<<met.pt()<<endl;
     cout<<"met.uncorPt() = "<<met.uncorPt()<<endl;
-    cout<<"met.uncorPhi() = "<<met.uncorPhi()<<endl;
+    cout<<"met.uncorPhi() = "<<met.uncorPhi()<<endl;*/
 
     float mt = ComputeMT (mu->p4(), met);
 
-    cout<<"mt = "<<mt<<endl;
+    //cout<<"mt = "<<mt<<endl;
 
     if (mt >= 30) return false; // reject W+jets
 
-    cout<<"pass mT"<<endl;
+    //cout<<"pass mT"<<endl;
 
     Handle<pat::TauRefVector> tauHandle;
     iEvent.getByToken (_tausTag, tauHandle);
@@ -170,7 +170,7 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
 float TauTagAndProbeFilter::ComputeMT (math::XYZTLorentzVector visP4, const pat::MET& met)
 {
   math::XYZTLorentzVector METP4 (met.uncorPt()*TMath::Cos(met.uncorPhi()), met.uncorPt()*TMath::Sin(met.uncorPhi()), 0, met.uncorPt());
-  cout<<"MET Px = "<<met.uncorPt()*TMath::Cos(met.uncorPhi())<<endl;
+  //cout<<"MET Px = "<<met.uncorPt()*TMath::Cos(met.uncorPhi())<<endl;
     float scalSum = met.uncorPt() + visP4.pt();
 
     // math::XYZTLorentzVector METP4 (met.px(), met.py(), 0, met.pt());

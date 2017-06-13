@@ -74,7 +74,7 @@ HLTLIST = cms.VPSet(
 
 hltFilter = hlt.hltHighLevel.clone(
     TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),
-    HLTPaths = ['HLT_IsoMu22_v*'],
+    HLTPaths = ['HLT_IsoMu22_eta2p1_v*'],
     andOr = cms.bool(True), # how to deal with multiple triggers: True (OR) accept if ANY is true, False (AND) accept if ALL are true
     throw = cms.bool(True) #if True: throws exception if a trigger path is invalid
 )

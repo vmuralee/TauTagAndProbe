@@ -50,18 +50,18 @@ bool muonNumberFilter::filter(edm::Event & iEvent, edm::EventSetup const& iSetup
         const pat::Muon& mu = muonHandle->at(imu);
         float pt = mu.pt();
         float iso = (mu.pfIsolationR04().sumChargedHadronPt + max(mu.pfIsolationR04().sumNeutralHadronEt + mu.pfIsolationR04().sumPhotonEt - 0.5 * mu.pfIsolationR04().sumPUPt, 0.0)) / pt;
-	cout<<"muon pt = "<<pt<<", eta = "<<mu.eta()<<", iso = "<<iso<<", isLoose = "<<mu.isLooseMuon()<<endl;
+	//cout<<"muon pt = "<<pt<<", eta = "<<mu.eta()<<", iso = "<<iso<<", isLoose = "<<mu.isLooseMuon()<<endl;
         if (mu.isLooseMuon() && pt > 10 && fabs(mu.eta()) < 2.4 and iso < 0.3)
             nmu += 1;
     }
 
     if (nmu > 1)
       {
-	cout<<"does not pass muon veto"<<endl;
+	//cout<<"does not pass muon veto"<<endl;
 	return false;
       }
 
-    cout<<"does pass muon veto"<<endl;
+    //cout<<"does pass muon veto"<<endl;
 
     return true;
 

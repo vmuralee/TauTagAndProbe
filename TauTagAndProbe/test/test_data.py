@@ -3,8 +3,8 @@ import FWCore.PythonUtilities.LumiList as LumiList
 import FWCore.ParameterSet.Config as cms
 process = cms.Process("TagAndProbe")
 
-isMC = True
-#isMC = False
+#isMC = True
+isMC = False
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 
@@ -22,7 +22,7 @@ options.register ('JSONfile',
                   VarParsing.VarParsing.multiplicity.singleton, # singleton or list
                   VarParsing.VarParsing.varType.string,          # string, int, or float
                   "JSON file (empty for no JSON)")
-options.outputFile = 'NTuple_MC.root'
+options.outputFile = 'NTuple_data.root'
 options.inputFiles = []
 options.maxEvents  = -999
 options.parseArguments()
