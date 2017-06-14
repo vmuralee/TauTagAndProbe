@@ -47,6 +47,33 @@ else:
         )
     )
 
+
+
+HLTLIST = cms.VPSet(
+    cms.PSet (
+        HLT = cms.string("HLT_IsoMu24_eta2p1_MediumChargedIsoPFTau35_Trk1_eta2p1_Reg_CrossL1_v"),
+        path1 = cms.vstring ("hltL3crIsoL1sBigOrMuXXerIsoTauYYerL1f0L2f10QL3f20QL3trkIsoFiltered0p0", "hltOverlapFilterIsoMu24MediumChargedIsoPFTau35MonitoringReg"),
+        path2 = cms.vstring ("hltSelectedPFTau35TrackPt1MediumChargedIsolationL1HLTMatchedReg", "hltOverlapFilterIsoMu24MediumChargedIsoPFTau35MonitoringReg"),
+        leg1 = cms.int32(13),
+        leg2 = cms.int32(15)
+        ),
+    cms.PSet (
+        HLT = cms.string("HLT_IsoMu26_eta2p1_MediumChargedIsoPFTau35_Trk1_eta2p1_Reg_CrossL1_v"),
+        path1 = cms.vstring ("hltL3crIsoL1sBigOrMuXXerIsoTauYYerL1f0L2f10QL3f20QL3trkIsoFiltered0p0", "hltOverlapFilterIsoMu26MediumChargedIsoPFTau35MonitoringReg"),
+        path2 = cms.vstring ("hltSelectedPFTau35TrackPt1MediumChargedIsolationL1HLTMatchedReg", "hltOverlapFilterIsoMu26MediumChargedIsoPFTau35MonitoringReg"),
+        leg1 = cms.int32(13),
+        leg2 = cms.int32(15)
+        ),
+)
+
+
+
+
+process.Ntuplizer.triggerSet = cms.InputTag("selectedPatTriggerCustom","","MYHLT")
+process.Ntuplizer.triggerResultsLabel = cms.InputTag("TriggerResults", "", "MYHLT")
+process.Ntuplizer.triggerList = HLTLIST
+
+
 if options.JSONfile:
     print "Using JSON: " , options.JSONfile
     process.source.lumisToProcess = LumiList.LumiList(filename = options.JSONfile).getVLuminosityBlockRange()
