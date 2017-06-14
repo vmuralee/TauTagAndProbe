@@ -345,7 +345,7 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
         if ( dR < 0.5)
         {
             this -> _isMatched = true;
-            this -> _hasTriggerTauType = obj.hasTriggerObjectType(trigger::TriggerTau);
+            this -> _hasTriggerTauType = obj.hasTriggerObjectType(trigger::TriggerTau);	   
             this -> _hasTriggerMuonType = obj.hasTriggerObjectType(trigger::TriggerMuon);
 
             obj.unpackPathNames(names);
@@ -357,12 +357,17 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
             {
                 if ((parameter.hltPathIndex >= 0)&&(obj.hasPathName(triggerNames[parameter.hltPathIndex], true, false)))
                 {
+
                     foundTrigger = true;
                     //Path found, now looking for the label 1, if present in the parameter set
                     //std::cout << "==== FOUND PATH " << triggerNames[parameter.hltPathIndex] << " ====" << std::endl;
+
                     //Retrieving filter list for the event
-                    const std::vector<std::string>& filters = (parameter.leg1 == 15)? (parameter.hltFilters1):(parameter.hltFilters2);
-                    if (this -> hasFilters(obj, filters))
+		    
+		    //Filters are bugged for now
+                    //const std::vector<std::string>& filters = (parameter.leg1 == 15)? (parameter.hltFilters1):(parameter.hltFilters2);
+                    //if (this -> hasFilters(obj, filters))
+		    if(this -> _hasTriggerTauType)
                     {
 		      //std::cout << "#### FOUND TAU WITH HLT PATH " << x << " ####" << std::endl;
                         this -> _hltPt = obj.pt();
@@ -469,6 +474,8 @@ bool Ntuplizer::hasFilters(const pat::TriggerObjectStandAlone&  obj , const std:
         bool found = false;
         for (const std::string& label : eventLabels)
         {
+
+	  //cout<<"label="<<label<<endl;
             //if (label == std::string("hltOverlapFilterIsoMu17MediumIsoPFTau40Reg"))
             if (label == filter)
             {

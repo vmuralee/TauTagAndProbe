@@ -21,7 +21,7 @@ options.register ('JSONfile',
                   VarParsing.VarParsing.multiplicity.singleton, # singleton or list
                   VarParsing.VarParsing.varType.string,          # string, int, or float
                   "JSON file (empty for no JSON)")
-options.outputFile = 'NTuple_ZB296174.root'
+options.outputFile = 'NTuple_SingleMu296174.root'
 options.inputFiles = []
 options.maxEvents  = -999
 options.parseArguments()
@@ -32,7 +32,16 @@ if not isMC:
     process.load('TauTagAndProbe.TauTagAndProbe.tagAndProbe_nosel_cff')
     process.source = cms.Source("PoolSource",
         fileNames = cms.untracked.vstring(
-            '/store/data/Run2017A/ZeroBias/MINIAOD/PromptReco-v2/000/296/174/00000/D4E0A4C9-794C-E711-A499-02163E01A32A.root'
+            '/store/data/Run2017A/SingleMuon/MINIAOD/PromptReco-v2/000/296/172/00000/66D29210-674C-E711-AFD2-02163E01A270.root',
+            '/store/data/Run2017A/SingleMuon/MINIAOD/PromptReco-v2/000/296/173/00000/4C85F093-654C-E711-99AA-02163E01A203.root',
+            '/store/data/Run2017A/SingleMuon/MINIAOD/PromptReco-v2/000/296/173/00000/92ED5B44-6E4C-E711-A6FF-02163E011AC8.root',
+            '/store/data/Run2017A/SingleMuon/MINIAOD/PromptReco-v2/000/296/173/00000/A04BCF64-734C-E711-9DD7-02163E019D14.root',
+            '/store/data/Run2017A/SingleMuon/MINIAOD/PromptReco-v2/000/296/173/00000/A4DDC7F2-794C-E711-9AE1-02163E01A20B.root',
+            '/store/data/Run2017A/SingleMuon/MINIAOD/PromptReco-v2/000/296/173/00000/BE9B75D5-614C-E711-BD09-02163E01A4D3.root',
+            '/store/data/Run2017A/SingleMuon/MINIAOD/PromptReco-v2/000/296/173/00000/C426AE34-894C-E711-9319-02163E019B6A.root',
+            '/store/data/Run2017A/SingleMuon/MINIAOD/PromptReco-v2/000/296/173/00000/E4A6AF0C-7E4C-E711-903C-02163E0143F9.root',
+            '/store/data/Run2017A/SingleMuon/MINIAOD/PromptReco-v2/000/296/173/00000/F4E4645B-6D4C-E711-87D1-02163E019DCC.root',
+            '/store/data/Run2017A/SingleMuon/MINIAOD/PromptReco-v2/000/296/174/00000/F89D7E25-7C4C-E711-B14D-02163E01A270.root'
         ),
     )
 
@@ -56,7 +65,7 @@ if options.inputFiles:
     process.source.fileNames = cms.untracked.vstring(options.inputFiles)
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(100)
+    input = cms.untracked.int32(-1)
 )
 
 if options.maxEvents >= -1:

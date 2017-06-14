@@ -8,7 +8,7 @@ import HLTrigger.HLTfilters.hltHighLevel_cfi as hlt
 
 HLTLIST = cms.VPSet(
     cms.PSet (
-        HLT = cms.string("HLT_IsoMu24_eta2p1_LooseChargedIsoPFTau20_SingleL1_v1 "),
+        HLT = cms.string("HLT_IsoMu24_eta2p1_LooseChargedIsoPFTau20_SingleL1_v1"),
         path1 = cms.vstring ("hltL3crIsoL1sSingleMu22erL1f0L2f10QL3f24QL3trkIsoFiltered0p07", "hltOverlapFilterIsoMu24LooseChargedIsoPFTau20"),
         path2 = cms.vstring ("hltPFTau20TrackLooseChargedIsoAgainstMuon", "hltOverlapFilterIsoMu24LooseChargedIsoPFTau20"),
         leg1 = cms.int32(13),
@@ -22,7 +22,7 @@ HLTLIST = cms.VPSet(
         leg2 = cms.int32(15)
     ),
     cms.PSet (
-        HLT = cms.string("HLT_IsoMu24_eta2p1_MediumChargedIsoPFTau20_SingleL1_v1 "),
+        HLT = cms.string("HLT_IsoMu24_eta2p1_MediumChargedIsoPFTau20_SingleL1_v1"),
         path1 = cms.vstring ("hltL3crIsoL1sSingleMu22erL1f0L2f10QL3f24QL3trkIsoFiltered0p07", "hltOverlapFilterIsoMu24MediumChargedIsoPFTau20"),
         path2 = cms.vstring ("hltPFTau20TrackMediumChargedIsoAgainstMuon", "hltOverlapFilterIsoMu24MediumChargedIsoPFTau20"),
         leg1 = cms.int32(13),
@@ -36,7 +36,7 @@ HLTLIST = cms.VPSet(
         leg2 = cms.int32(15)
     ),
     cms.PSet (
-        HLT = cms.string("HLT_IsoMu24_eta2p1_TightChargedIsoPFTau20_SingleL1_v1 "),
+        HLT = cms.string("HLT_IsoMu24_eta2p1_TightChargedIsoPFTau20_SingleL1_v1"),
         path1 = cms.vstring ("hltL3crIsoL1sSingleMu22erL1f0L2f10QL3f24QL3trkIsoFiltered0p07", "hltOverlapFilterIsoMu24TightChargedIsoPFTau20"),
         path2 = cms.vstring ("hltPFTau20TrackTightChargedIsoAgainstMuon", "hltOverlapFilterIsoMu24TightChargedIsoPFTau20"),
         leg1 = cms.int32(13),
@@ -49,6 +49,49 @@ HLTLIST = cms.VPSet(
         leg1 = cms.int32(13),
         leg2 = cms.int32(15)
     ),
+    cms.PSet (
+        HLT = cms.string("HLT_IsoMu24_eta2p1_LooseChargedIsoPFTau35_Trk1_eta2p1_Reg_CrossL1_v1"),
+        path1 = cms.vstring ("hltL3crIsoL1sBigOrMuXXerIsoTauYYerL1f0L2f10QL3f20QL3trkIsoFiltered0p07", "hltOverlapFilterIsoMu24LooseChargedIsoPFTau35MonitoringReg"),
+        path2 = cms.vstring ("hltSelectedPFTau35TrackPt1LooseChargedIsolationL1HLTMatchedReg", "hltOverlapFilterIsoMu24LooseChargedIsoPFTau35MonitoringReg"),
+        leg1 = cms.int32(13),
+        leg2 = cms.int32(15)
+    ),
+    cms.PSet (
+        HLT = cms.string("HLT_IsoMu24_eta2p1_LooseChargedIsoPFTau35_Trk1_TightID_eta2p1_Reg_CrossL1_v1"),
+        path1 = cms.vstring ("hltL3crIsoL1sBigOrMuXXerIsoTauYYerL1f0L2f10QL3f20QL3trkIsoFiltered0p07", "hltOverlapFilterIsoMu24LooseChargedIsoAndTightOOSCPhotonsPFTau35MonitoringReg"),
+        path2 = cms.vstring ("hltSelectedPFTau35TrackPt1LooseChargedIsolationAndTightOOSCPhotonsL1HLTMatchedReg", "hltOverlapFilterIsoMu24LooseChargedIsoAndTightOOSCPhotonsPFTau35MonitoringReg"),
+        leg1 = cms.int32(13),
+        leg2 = cms.int32(15)
+    ),
+    cms.PSet (
+        HLT = cms.string("HLT_IsoMu24_eta2p1_MediumChargedIsoPFTau35_Trk1_eta2p1_Reg_CrossL1_v1"),
+        path1 = cms.vstring ("hltL3crIsoL1sBigOrMuXXerIsoTauYYerL1f0L2f10QL3f20QL3trkIsoFiltered0p07", "hltOverlapFilterIsoMu24MediumChargedIsoPFTau35MonitoringReg"),
+        path2 = cms.vstring ("hltSelectedPFTau35TrackPt1MediumChargedIsolationL1HLTMatchedReg", "hltOverlapFilterIsoMu24MediumChargedIsoPFTau35MonitoringReg"),
+        leg1 = cms.int32(13),
+        leg2 = cms.int32(15)
+    ),
+    cms.PSet (
+        HLT = cms.string("HLT_IsoMu24_eta2p1_MediumChargedIsoPFTau35_Trk1_TightID_eta2p1_Reg_CrossL1_v1"),
+        path1 = cms.vstring ("hltL3crIsoL1sBigOrMuXXerIsoTauYYerL1f0L2f10QL3f20QL3trkIsoFiltered0p07", "hltOverlapFilterIsoMu24MediumChargedIsoAndTightOOSCPhotonsPFTau35MonitoringReg"),
+        path2 = cms.vstring ("hltSelectedPFTau35TrackPt1MediumChargedIsolationAndTightOOSCPhotonsL1HLTMatchedReg", "hltOverlapFilterIsoMu24MediumChargedIsoAndTightOOSCPhotonsPFTau35MonitoringReg"),
+        leg1 = cms.int32(13),
+        leg2 = cms.int32(15)
+    ),
+    cms.PSet (
+        HLT = cms.string("HLT_IsoMu24_eta2p1_TightChargedIsoPFTau35_Trk1_eta2p1_Reg_CrossL1_v1"),
+        path1 = cms.vstring ("hltL3crIsoL1sBigOrMuXXerIsoTauYYerL1f0L2f10QL3f20QL3trkIsoFiltered0p07", "hltOverlapFilterIsoMu24TightChargedIsoPFTau35MonitoringReg"),
+        path2 = cms.vstring ("hltSelectedPFTau35TrackPt1TightChargedIsolationL1HLTMatchedReg", "hltOverlapFilterIsoMu24TightChargedIsoPFTau35MonitoringReg"),
+        leg1 = cms.int32(13),
+        leg2 = cms.int32(15)
+    ),
+    cms.PSet (
+        HLT = cms.string("HLT_IsoMu24_eta2p1_TightChargedIsoPFTau35_Trk1_TightID_eta2p1_Reg_CrossL1_v1"),
+        path1 = cms.vstring ("hltL3crIsoL1sBigOrMuXXerIsoTauYYerL1f0L2f10QL3f20QL3trkIsoFiltered0p07", "hltOverlapFilterIsoMu24TightChargedIsoAndTightOOSCPhotonsPFTau35MonitoringReg"),
+        path2 = cms.vstring ("hltSelectedPFTau35TrackPt1TightChargedIsolationAndTightOOSCPhotonsL1HLTMatchedReg", "hltOverlapFilterIsoMu24TightChargedIsoAndTightOOSCPhotonsPFTau35MonitoringReg"),
+        leg1 = cms.int32(13),
+        leg2 = cms.int32(15)
+    ),
+ 
 )
 
 
@@ -60,7 +103,17 @@ hltFilter = hlt.hltHighLevel.clone(
     throw = cms.bool(True) #if True: throws exception if a trigger path is invalid
 )
 
-
+## good muons for T&P
+goodMuons = cms.EDFilter("PATMuonRefSelector",
+        src = cms.InputTag("slimmedMuons"),
+        cut = cms.string(
+         #       'pt > 5 && abs(eta) < 2.1 ' # kinematics
+                'pt > 24 && abs(eta) < 2.1 ' # kinematics
+                '&& ( (pfIsolationR04().sumChargedHadronPt + max(pfIsolationR04().sumNeutralHadronEt + pfIsolationR04().sumPhotonEt - 0.5 * pfIsolationR04().sumPUPt, 0.0)) / pt() ) < 0.1 ' # isolation
+                '&& isLooseMuon()' # quality -- medium muon
+        ),
+        filter = cms.bool(True)
+)
 
 ## good taus - apply analysis selection
 goodTaus = cms.EDFilter("PATTauRefSelector",
@@ -78,13 +131,21 @@ goodTaus = cms.EDFilter("PATTauRefSelector",
 )
 
 
+patTriggerUnpacker = cms.EDProducer("PATTriggerObjectStandAloneUnpacker",
+  patTriggerObjectsStandAlone = cms.InputTag("slimmedPatTrigger"),
+  triggerResults = cms.InputTag('TriggerResults', '', "HLT"),
+  unpackFilterLabels = cms.bool(True)
+)
+
+
+
 
 Ntuplizer = cms.EDAnalyzer("Ntuplizer",
     treeName = cms.string("TagAndProbe"),
-    muons = cms.InputTag("TagAndProbe"),
-    taus = cms.InputTag("TagAndProbe"),
+    muons = cms.InputTag("goodMuons"),
+    taus = cms.InputTag("goodTaus"),
     triggerList = HLTLIST,
-    triggerSet = cms.InputTag("selectedPatTrigger"),
+    triggerSet = cms.InputTag("patTriggerUnpacker"),
     triggerResultsLabel = cms.InputTag("TriggerResults", "", "HLT"),
     L1Tau = cms.InputTag("caloStage2Digis", "Tau", "RECO"),
     #L1EmuTau = cms.InputTag("simCaloStage2Digis"),
@@ -94,9 +155,11 @@ Ntuplizer = cms.EDAnalyzer("Ntuplizer",
 
 TAndPseq = cms.Sequence(
     hltFilter        +
+    goodMuons +
     goodTaus
 )
 
 NtupleSeq = cms.Sequence(
+    patTriggerUnpacker +
     Ntuplizer
 )
