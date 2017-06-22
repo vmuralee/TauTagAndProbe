@@ -36,6 +36,7 @@ class TauTagAndProbeFilter : public edm::EDFilter {
         EDGetTokenT<pat::TauRefVector>   _tausTag;
         EDGetTokenT<pat::MuonRefVector>  _muonsTag;
         EDGetTokenT<pat::METCollection>  _metTag;
+        bool _useMassCuts;
 };
 
 TauTagAndProbeFilter::TauTagAndProbeFilter(const edm::ParameterSet & iConfig) :
@@ -45,6 +46,7 @@ _metTag   (consumes<pat::METCollection> (iConfig.getParameter<InputTag>("met")))
 {
     produces <pat::TauRefVector>  (); // probe
     produces <pat::MuonRefVector> (); // tag
+    _useMassCuts = iConfig.getParameter<bool>("useMassCuts");
 }
 
 TauTagAndProbeFilter::~TauTagAndProbeFilter()
@@ -69,9 +71,8 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
 
     // reject events with more than 1 mu in the event (reject DY)
     // or without mu (should not happen in SingleMu dataset)
-    if (muonHandle->size() != 1) return false;
+    //if (muonHandle->size() != 1) return false;
 
-    //cout<<"pass muonHandle"<<endl;
 
     // for loop is now dummy, leaving it for debug
     // for (size_t imu = 0; imu < muonHandle->size(); ++imu )
@@ -94,9 +95,7 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
 
     //cout<<"mt = "<<mt<<endl;
 
-    if (mt >= 30) return false; // reject W+jets
-
-    //cout<<"pass mT"<<endl;
+    if (mt >= 30 && _useMassCuts) return false; // reject W+jets
 
     Handle<pat::TauRefVector> tauHandle;
     iEvent.getByToken (_tausTag, tauHandle);
@@ -109,7 +108,7 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
     {
         const pat::TauRef tau = (*tauHandle)[itau] ;
         math::XYZTLorentzVector pSum = mu->p4() + tau->p4();
-        if (pSum.mass() <= 40 || pSum.mass() >= 80) continue; // visible mass in (40, 80)
+        if (_useMassCuts && (pSum.mass() <= 40 || pSum.mass() >= 80)) continue; // visible mass in (40, 80)
         if (deltaR(*tau, *mu) < 0.5) continue;
 
         // max pt

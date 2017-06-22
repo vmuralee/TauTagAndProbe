@@ -98,7 +98,7 @@ HLTLIST = cms.VPSet(
 
 hltFilter = hlt.hltHighLevel.clone(
     TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),
-    HLTPaths = ['HLT_IsoMu24_eta2p1_v*'],
+    HLTPaths = ['HLT_IsoMu27_v*'],
     andOr = cms.bool(True), # how to deal with multiple triggers: True (OR) accept if ANY is true, False (AND) accept if ALL are true
     throw = cms.bool(True) #if True: throws exception if a trigger path is invalid
 )
@@ -108,7 +108,7 @@ goodMuons = cms.EDFilter("PATMuonRefSelector",
         src = cms.InputTag("slimmedMuons"),
         cut = cms.string(
          #       'pt > 5 && abs(eta) < 2.1 ' # kinematics
-                'pt > 24 && abs(eta) < 2.1 ' # kinematics
+                'pt > 27 && abs(eta) < 2.1 ' # kinematics
                 '&& ( (pfIsolationR04().sumChargedHadronPt + max(pfIsolationR04().sumNeutralHadronEt + pfIsolationR04().sumPhotonEt - 0.5 * pfIsolationR04().sumPUPt, 0.0)) / pt() ) < 0.1 ' # isolation
                 '&& isLooseMuon()' # quality -- medium muon
         ),
@@ -125,7 +125,7 @@ goodTaus = cms.EDFilter("PATTauRefSelector",
                 '&& tauID("decayModeFinding") > 0.5 ' # tau ID
                 '&& tauID("byLooseIsolationMVArun2v1DBoldDMwLT") > 0.5 '
                 '&& tauID("againstMuonTight3") > 0.5 ' # anti Muon tight
-                '&& tauID("againstElectronVLooseMVA6") > 0.5 ' # anti-Ele loose
+                #'&& tauID("againstElectronVLooseMVA6") > 0.5 ' # anti-Ele loose
         ),
         filter = cms.bool(True)
 )
@@ -139,11 +139,17 @@ patTriggerUnpacker = cms.EDProducer("PATTriggerObjectStandAloneUnpacker",
 
 
 
+TagAndProbe = cms.EDFilter("TauTagAndProbeFilter",
+        taus  = cms.InputTag("goodTaus"),
+        muons = cms.InputTag("goodMuons"),
+        met   = cms.InputTag("slimmedMETs"),
+        useMassCuts = cms.bool(False)
+)
 
 Ntuplizer = cms.EDAnalyzer("Ntuplizer",
     treeName = cms.string("TagAndProbe"),
-    muons = cms.InputTag("goodMuons"),
-    taus = cms.InputTag("goodTaus"),
+    muons = cms.InputTag("TagAndProbe"),
+    taus = cms.InputTag("TagAndProbe"),
     triggerList = HLTLIST,
     triggerSet = cms.InputTag("patTriggerUnpacker"),
     triggerResultsLabel = cms.InputTag("TriggerResults", "", "HLT"),
@@ -156,7 +162,8 @@ Ntuplizer = cms.EDAnalyzer("Ntuplizer",
 TAndPseq = cms.Sequence(
     hltFilter        +
     goodMuons +
-    goodTaus
+    goodTaus +
+    TagAndProbe
 )
 
 NtupleSeq = cms.Sequence(

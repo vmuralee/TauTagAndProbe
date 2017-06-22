@@ -341,6 +341,10 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
 
     for (pat::TriggerObjectStandAlone  obj : *triggerObjects)
     {
+
+      obj.unpackPathNames(names);
+      const edm::TriggerNames::Strings& triggerNames = names.triggerNames();
+
         const float dR = deltaR (*tau, obj);
         if ( dR < 0.5)
         {
@@ -348,8 +352,8 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
             this -> _hasTriggerTauType = obj.hasTriggerObjectType(trigger::TriggerTau);	   
             this -> _hasTriggerMuonType = obj.hasTriggerObjectType(trigger::TriggerMuon);
 
-            obj.unpackPathNames(names);
-            const edm::TriggerNames::Strings& triggerNames = names.triggerNames();
+            //obj.unpackPathNames(names);
+            //const edm::TriggerNames::Strings& triggerNames = names.triggerNames();
             //Looking for the path
             unsigned int x = 0;
             bool foundTrigger = false;

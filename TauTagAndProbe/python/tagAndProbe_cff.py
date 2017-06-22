@@ -124,7 +124,8 @@ bjets = cms.EDFilter("PATJetRefSelector",
 TagAndProbe = cms.EDFilter("TauTagAndProbeFilter",
         taus  = cms.InputTag("goodTaus"),
         muons = cms.InputTag("goodMuons"),
-        met   = cms.InputTag("slimmedMETs")
+        met   = cms.InputTag("slimmedMETs"),
+        useMassCuts = cms.bool(True)
 )
 
 Ntuplizer = cms.EDAnalyzer("Ntuplizer",
