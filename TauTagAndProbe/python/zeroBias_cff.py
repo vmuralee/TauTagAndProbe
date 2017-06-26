@@ -301,7 +301,7 @@ HLTLIST = cms.VPSet(
         leg2 = cms.int32(999)
     ),
     cms.PSet (
-        HLT = cms.string("HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_1pr_v"),
+        HLT = cms.string("HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v"),
         path1 = cms.vstring ("hltSelectedPFTau180MediumChargedIsolationL1HLTMatched1Prong"),
         path2 = cms.vstring (""),
         leg1 = cms.int32(15),
