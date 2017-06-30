@@ -76,6 +76,25 @@ class Ntuplizer : public edm::EDAnalyzer {
         float _tauPt;
         float _tauEta;
         float _tauPhi;
+  
+        bool _byLooseCombinedIsolationDeltaBetaCorr3Hits;
+        bool _byMediumCombinedIsolationDeltaBetaCorr3Hits;
+        bool _byTightCombinedIsolationDeltaBetaCorr3Hits;
+        bool _byVLooseIsolationMVArun2v1DBoldDMwLT;
+        bool _byLooseIsolationMVArun2v1DBoldDMwLT;
+        bool _byMediumIsolationMVArun2v1DBoldDMwLT;
+        bool _byTightIsolationMVArun2v1DBoldDMwLT;
+        bool _byVTightIsolationMVArun2v1DBoldDMwLT;
+        bool _byVLooseIsolationMVArun2v1DBnewDMwLT;
+        bool _byLooseIsolationMVArun2v1DBnewDMwLT;
+        bool _byMediumIsolationMVArun2v1DBnewDMwLT;
+        bool _byTightIsolationMVArun2v1DBnewDMwLT;
+        bool _byVTightIsolationMVArun2v1DBnewDMwLT;       
+        bool _byLooseIsolationMVArun2v1DBdR03oldDMwLT;
+        bool _byMediumIsolationMVArun2v1DBdR03oldDMwLT;
+        bool _byTightIsolationMVArun2v1DBdR03oldDMwLT;
+        bool _byVTightIsolationMVArun2v1DBdR03oldDMwLT;
+          
         float _hltPt;
         float _hltEta;
         float _hltPhi;
@@ -187,18 +206,18 @@ void Ntuplizer::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
     }
 
     const edm::TriggerNames::Strings& triggerNames = this -> _hltConfig.triggerNames();
-    //std::cout << " ===== LOOKING FOR THE PATH INDEXES =====" << std::endl;
+    std::cout << " ===== LOOKING FOR THE PATH INDEXES =====" << std::endl;
     for (tParameterSet& parameter : this -> _parameters){
         const std::string& hltPath = parameter.hltPath;
         bool found = false;
         for(unsigned int j=0; j < triggerNames.size(); j++)
         {
-            //std::cout << triggerNames[j] << std::endl;
+	  std::cout << triggerNames[j] << std::endl;
             if (triggerNames[j].find(hltPath) != std::string::npos) {
                 found = true;
                 parameter.hltPathIndex = j;
 
-                //std::cout << "### FOUND AT INDEX #" << j << " --> " << triggerNames[j] << std::endl;
+                std::cout << "### FOUND AT INDEX #" << j << " --> " << triggerNames[j] << std::endl;
             }
         }
         if (!found) parameter.hltPathIndex = -1;
@@ -213,6 +232,25 @@ void Ntuplizer::Initialize() {
     this -> _tauPt = -1.;
     this -> _tauEta = -1.;
     this -> _tauPhi = -1.;
+
+    this -> _byLooseCombinedIsolationDeltaBetaCorr3Hits = 0;
+    this -> _byMediumCombinedIsolationDeltaBetaCorr3Hits = 0;
+    this -> _byTightCombinedIsolationDeltaBetaCorr3Hits = 0;
+    this -> _byVLooseIsolationMVArun2v1DBoldDMwLT = 0;
+    this -> _byLooseIsolationMVArun2v1DBoldDMwLT = 0;
+    this -> _byMediumIsolationMVArun2v1DBoldDMwLT = 0;
+    this -> _byTightIsolationMVArun2v1DBoldDMwLT = 0;
+    this -> _byVTightIsolationMVArun2v1DBoldDMwLT = 0;
+    this -> _byVLooseIsolationMVArun2v1DBnewDMwLT = 0;
+    this -> _byLooseIsolationMVArun2v1DBnewDMwLT = 0;
+    this -> _byMediumIsolationMVArun2v1DBnewDMwLT = 0;
+    this -> _byTightIsolationMVArun2v1DBnewDMwLT = 0;
+    this -> _byVTightIsolationMVArun2v1DBnewDMwLT = 0;    
+    this -> _byLooseIsolationMVArun2v1DBdR03oldDMwLT = 0;
+    this -> _byMediumIsolationMVArun2v1DBdR03oldDMwLT = 0;
+    this -> _byTightIsolationMVArun2v1DBdR03oldDMwLT = 0;
+    this -> _byVTightIsolationMVArun2v1DBdR03oldDMwLT = 0;
+
     this -> _muonPt = -1.;
     this -> _muonEta = -1.;
     this -> _muonPhi = -1.;
@@ -254,6 +292,26 @@ void Ntuplizer::beginJob()
     this -> _tree -> Branch("tauPt",  &_tauPt,  "tauPt/F");
     this -> _tree -> Branch("tauEta", &_tauEta, "tauEta/F");
     this -> _tree -> Branch("tauPhi", &_tauPhi, "tauPhi/F");
+
+    this -> _tree -> Branch("byLooseCombinedIsolationDeltaBetaCorr3Hits", &_byLooseCombinedIsolationDeltaBetaCorr3Hits, "byLooseCombinedIsolationDeltaBetaCorr3Hits/O");
+    this -> _tree -> Branch("byMediumCombinedIsolationDeltaBetaCorr3Hits", &_byMediumCombinedIsolationDeltaBetaCorr3Hits, "byMediumCombinedIsolationDeltaBetaCorr3Hits/O");
+    this -> _tree -> Branch("byTightCombinedIsolationDeltaBetaCorr3Hits", &_byTightCombinedIsolationDeltaBetaCorr3Hits, "byTightCombinedIsolationDeltaBetaCorr3Hits/O");
+    this -> _tree -> Branch("byVLooseIsolationMVArun2v1DBoldDMwLT", &_byVLooseIsolationMVArun2v1DBoldDMwLT, "byVLooseIsolationMVArun2v1DBoldDMwLT/O");
+    this -> _tree -> Branch("byLooseIsolationMVArun2v1DBoldDMwLT", &_byLooseIsolationMVArun2v1DBoldDMwLT, "byLooseIsolationMVArun2v1DBoldDMwLT/O");
+    this -> _tree -> Branch("byMediumIsolationMVArun2v1DBoldDMwLT", &_byMediumIsolationMVArun2v1DBoldDMwLT, "byMediumIsolationMVArun2v1DBoldDMwLT/O");
+    this -> _tree -> Branch("byTightIsolationMVArun2v1DBoldDMwLT", &_byTightIsolationMVArun2v1DBoldDMwLT, "byTightIsolationMVArun2v1DBoldDMwLT/O");
+    this -> _tree -> Branch("byVTightIsolationMVArun2v1DBoldDMwLT", &_byVTightIsolationMVArun2v1DBoldDMwLT, "byVTightIsolationMVArun2v1DBoldDMwLT/O");
+    this -> _tree -> Branch("byVLooseIsolationMVArun2v1DBnewDMwLT", &_byVLooseIsolationMVArun2v1DBnewDMwLT, "byVLooseIsolationMVArun2v1DBnewDMwLT/O");
+    this -> _tree -> Branch("byLooseIsolationMVArun2v1DBnewDMwLT", &_byLooseIsolationMVArun2v1DBnewDMwLT, "byLooseIsolationMVArun2v1DBnewDMwLT/O");
+    this -> _tree -> Branch("byMediumIsolationMVArun2v1DBnewDMwLT", &_byMediumIsolationMVArun2v1DBnewDMwLT, "byMediumIsolationMVArun2v1DBnewDMwLT/O");
+    this -> _tree -> Branch("byTightIsolationMVArun2v1DBnewDMwLT", &_byTightIsolationMVArun2v1DBnewDMwLT, "byTightIsolationMVArun2v1DBnewDMwLT/O");
+    this -> _tree -> Branch("byVTightIsolationMVArun2v1DBnewDMwLT", &_byVTightIsolationMVArun2v1DBnewDMwLT, "byVTightIsolationMVArun2v1DBnewDMwLT/O");    
+    this -> _tree -> Branch("byLooseIsolationMVArun2v1DBdR03oldDMwLT", &_byLooseIsolationMVArun2v1DBdR03oldDMwLT, "byLooseIsolationMVArun2v1DBdR03oldDMwLT/O");
+    this -> _tree -> Branch("byMediumIsolationMVArun2v1DBdR03oldDMwLT", &_byMediumIsolationMVArun2v1DBdR03oldDMwLT, "byMediumIsolationMVArun2v1DBdR03oldDMwLT/O");
+    this -> _tree -> Branch("byTightIsolationMVArun2v1DBdR03oldDMwLT", &_byTightIsolationMVArun2v1DBdR03oldDMwLT, "byTightIsolationMVArun2v1DBdR03oldDMwLT/O");
+    this -> _tree -> Branch("byVTightIsolationMVArun2v1DBdR03oldDMwLT", &_byVTightIsolationMVArun2v1DBdR03oldDMwLT, "byVTightIsolationMVArun2v1DBdR03oldDMwLT/O");
+
+
     this -> _tree -> Branch("muonPt",  &_muonPt,  "muonPt/F");
     this -> _tree -> Branch("muonEta", &_muonEta, "muonEta/F");
     this -> _tree -> Branch("muonPhi", &_muonPhi, "muonPhi/F");
@@ -310,7 +368,7 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     _runNumber = iEvent.id().run();
     _lumi = iEvent.luminosityBlock();
 
-    cout<<"EventNumber = "<<_indexevents<<endl;
+    //cout<<"EventNumber = "<<_indexevents<<endl;
 
     // std::auto_ptr<pat::MuonRefVector> resultMuon(new pat::MuonRefVector);
 
@@ -338,18 +396,21 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     this -> _tauTriggerBitSet.reset();
 
 
-
     for (pat::TriggerObjectStandAlone  obj : *triggerObjects)
     {
+
+      obj.unpackPathNames(names);
+      const edm::TriggerNames::Strings& triggerNames = names.triggerNames();
+
         const float dR = deltaR (*tau, obj);
         if ( dR < 0.5)
         {
             this -> _isMatched = true;
-            this -> _hasTriggerTauType = obj.hasTriggerObjectType(trigger::TriggerTau);
+            this -> _hasTriggerTauType = obj.hasTriggerObjectType(trigger::TriggerTau);	   
             this -> _hasTriggerMuonType = obj.hasTriggerObjectType(trigger::TriggerMuon);
 
-            obj.unpackPathNames(names);
-            const edm::TriggerNames::Strings& triggerNames = names.triggerNames();
+            //obj.unpackPathNames(names);
+            //const edm::TriggerNames::Strings& triggerNames = names.triggerNames();
             //Looking for the path
             unsigned int x = 0;
             bool foundTrigger = false;
@@ -357,14 +418,19 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
             {
                 if ((parameter.hltPathIndex >= 0)&&(obj.hasPathName(triggerNames[parameter.hltPathIndex], true, false)))
                 {
+
                     foundTrigger = true;
                     //Path found, now looking for the label 1, if present in the parameter set
                     //std::cout << "==== FOUND PATH " << triggerNames[parameter.hltPathIndex] << " ====" << std::endl;
+
                     //Retrieving filter list for the event
-                    const std::vector<std::string>& filters = (parameter.leg1 == 15)? (parameter.hltFilters1):(parameter.hltFilters2);
-                    if (this -> hasFilters(obj, filters))
+		    
+		    //Filters are bugged for now
+                    //const std::vector<std::string>& filters = (parameter.leg1 == 15)? (parameter.hltFilters1):(parameter.hltFilters2);
+                    //if (this -> hasFilters(obj, filters))
+		    if(this -> _hasTriggerTauType)
                     {
-                        //std::cout << "#### FOUND TAU WITH HLT PATH " << x << " ####" << std::endl;
+		      //std::cout << "#### FOUND TAU WITH HLT PATH " << x << " ####" << std::endl;
                         this -> _hltPt = obj.pt();
                         this -> _hltEta = obj.eta();
                         this -> _hltPhi = obj.phi();
@@ -393,7 +459,7 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
         const float dR = deltaR(*tau, *bx0TauIt);
 	const l1t::Tau& l1tTau = *bx0TauIt;
 
-	cout<<"FW Tau, pT = "<<l1tTau.pt()<<", eta = "<<l1tTau.eta()<<", phi = "<<l1tTau.phi()<<endl;
+	//cout<<"FW Tau, pT = "<<l1tTau.pt()<<", eta = "<<l1tTau.eta()<<", phi = "<<l1tTau.phi()<<endl;
 
         if (dR < minDR) //Uncomment for new match algo
         //if (dR < 0.5) //Uncomment for old match algo
@@ -419,7 +485,7 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
 	    const float dR = deltaR(*tau, *bx0EmuTauIt);
 	    const l1t::Tau& l1tEmuTau = *bx0EmuTauIt;
 	    
-	    cout<<"Emul Tau, pT = "<<l1tEmuTau.pt()<<", eta = "<<l1tEmuTau.eta()<<", phi = "<<l1tEmuTau.phi()<<endl;
+	    //cout<<"Emul Tau, pT = "<<l1tEmuTau.pt()<<", eta = "<<l1tEmuTau.eta()<<", phi = "<<l1tEmuTau.phi()<<endl;
 	    
 	    if (dR < minDR) //Uncomment for new match algo
 	      {
@@ -445,6 +511,24 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     this -> _tauEta = tau -> eta();
     this -> _tauPhi = tau -> phi();
 
+    this -> _byLooseCombinedIsolationDeltaBetaCorr3Hits = tau->tauID("byLooseCombinedIsolationDeltaBetaCorr3Hits");
+    this -> _byMediumCombinedIsolationDeltaBetaCorr3Hits = tau->tauID("byMediumCombinedIsolationDeltaBetaCorr3Hits");
+    this -> _byTightCombinedIsolationDeltaBetaCorr3Hits = tau->tauID("byTightCombinedIsolationDeltaBetaCorr3Hits");
+    this -> _byVLooseIsolationMVArun2v1DBoldDMwLT = tau->tauID("byVLooseIsolationMVArun2v1DBoldDMwLT");
+    this -> _byLooseIsolationMVArun2v1DBoldDMwLT = tau->tauID("byLooseIsolationMVArun2v1DBoldDMwLT");
+    this -> _byMediumIsolationMVArun2v1DBoldDMwLT = tau->tauID("byMediumIsolationMVArun2v1DBoldDMwLT");
+    this -> _byTightIsolationMVArun2v1DBoldDMwLT = tau->tauID("byTightIsolationMVArun2v1DBoldDMwLT");
+    this -> _byVTightIsolationMVArun2v1DBoldDMwLT = tau->tauID("byVTightIsolationMVArun2v1DBoldDMwLT");
+    this -> _byVLooseIsolationMVArun2v1DBnewDMwLT = tau->tauID("byVLooseIsolationMVArun2v1DBnewDMwLT");
+    this -> _byLooseIsolationMVArun2v1DBnewDMwLT = tau->tauID("byLooseIsolationMVArun2v1DBnewDMwLT");
+    this -> _byMediumIsolationMVArun2v1DBnewDMwLT = tau->tauID("byMediumIsolationMVArun2v1DBnewDMwLT");
+    this -> _byTightIsolationMVArun2v1DBnewDMwLT = tau->tauID("byTightIsolationMVArun2v1DBnewDMwLT");
+    this -> _byVTightIsolationMVArun2v1DBnewDMwLT = tau->tauID("byVTightIsolationMVArun2v1DBnewDMwLT");
+    this -> _byLooseIsolationMVArun2v1DBdR03oldDMwLT = tau->tauID("byLooseIsolationMVArun2v1DBdR03oldDMwLT");
+    this -> _byMediumIsolationMVArun2v1DBdR03oldDMwLT = tau->tauID("byMediumIsolationMVArun2v1DBdR03oldDMwLT");
+    this -> _byTightIsolationMVArun2v1DBdR03oldDMwLT = tau->tauID("byTightIsolationMVArun2v1DBdR03oldDMwLT");
+    this -> _byVTightIsolationMVArun2v1DBdR03oldDMwLT = tau->tauID("byVTightIsolationMVArun2v1DBdR03oldDMwLT");
+
     if(muonHandle.isValid()) this -> _muonPt=muon->pt();
     if(muonHandle.isValid()) this -> _muonEta=muon->eta();
     if(muonHandle.isValid()) this -> _muonPhi=muon->phi();
@@ -469,6 +553,8 @@ bool Ntuplizer::hasFilters(const pat::TriggerObjectStandAlone&  obj , const std:
         bool found = false;
         for (const std::string& label : eventLabels)
         {
+
+	  //cout<<"label="<<label<<endl;
             //if (label == std::string("hltOverlapFilterIsoMu17MediumIsoPFTau40Reg"))
             if (label == filter)
             {

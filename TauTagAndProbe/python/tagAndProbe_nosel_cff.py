@@ -7,7 +7,6 @@ import HLTrigger.HLTfilters.hltHighLevel_cfi as hlt
 
 
 HLTLIST = cms.VPSet(
-    #MuTau SingleL1
     cms.PSet (
         HLT = cms.string("HLT_IsoMu24_eta2p1_LooseChargedIsoPFTau20_SingleL1_v"),
         path1 = cms.vstring ("hltL3crIsoL1sSingleMu22erL1f0L2f10QL3f24QL3trkIsoFiltered0p07", "hltOverlapFilterIsoMu24LooseChargedIsoPFTau20"),
@@ -92,58 +91,9 @@ HLTLIST = cms.VPSet(
         leg1 = cms.int32(13),
         leg2 = cms.int32(15)
     ),
-    cms.PSet (
-        HLT = cms.string("HLT_IsoMu24_eta2p1_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_v"),
-        path1 = cms.vstring ("hltL3crIsoL1sMu22erIsoTau40erL1f0L2f10QL3f20QL3trkIsoFiltered0p07"),
-        path2 = cms.vstring ("hltSelectedPFTau50MediumChargedIsolationL1HLTMatchedMu22IsoTau40"),
-        leg1 = cms.int32(13),
-        leg2 = cms.int32(15)
-    ),
-
-    #MuTau CrossL1
-    cms.PSet (
-        HLT = cms.string("HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v"),
-        path1 = cms.vstring ("hltL3crIsoL1sMu18erTau24erIorMu20erTau24erL1f0L2f10QL3f20QL3trkIsoFiltered0p07", "hltOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded"),
-        path2 = cms.vstring ("hltSelectedPFTau27LooseChargedIsolationAgainstMuonL1HLTMatched", "hltOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded"),
-        leg1 = cms.int32(13),
-        leg2 = cms.int32(15)
-    ),
-    cms.PSet (
-        HLT = cms.string("HLT_IsoMu20_eta2p1_MediumChargedIsoPFTau27_eta2p1_CrossL1_v"),
-        path1 = cms.vstring ("hltL3crIsoL1sMu18erTau24erIorMu20erTau24erL1f0L2f10QL3f20QL3trkIsoFiltered0p07", "hltOverlapFilterIsoMu20MediumChargedIsoPFTau27L1Seeded"),
-        path2 = cms.vstring ("hltSelectedPFTau27MediumChargedIsolationAgainstMuonL1HLTMatched", "hltOverlapFilterIsoMu20MediumChargedIsoPFTau27L1Seeded"),
-        leg1 = cms.int32(13),
-        leg2 = cms.int32(15)
-    ),
-    cms.PSet (
-        HLT = cms.string("HLT_IsoMu20_eta2p1_TightChargedIsoPFTau27_eta2p1_CrossL1_v"),
-        path1 = cms.vstring ("hltL3crIsoL1sMu18erTau24erIorMu20erTau24erL1f0L2f10QL3f20QL3trkIsoFiltered0p07", "hltOverlapFilterIsoMu20TightChargedIsoPFTau27L1Seeded"),
-        path2 = cms.vstring ("hltSelectedPFTau27TightChargedIsolationAgainstMuonL1HLTMatched", "hltOverlapFilterIsoMu20TightChargedIsoPFTau27L1Seeded"),
-        leg1 = cms.int32(13),
-        leg2 = cms.int32(15)
-    ),
-    cms.PSet (
-        HLT = cms.string("HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_TightID_CrossL1_v"),
-        path1 = cms.vstring ("hltL3crIsoL1sMu18erTau24erIorMu20erTau24erL1f0L2f10QL3f20QL3trkIsoFiltered0p07", "hltOverlapFilterIsoMu20LooseChargedIsoTightOOSCPhotonsPFTau27L1Seeded"),
-        path2 = cms.vstring ("hltSelectedPFTau27LooseChargedIsolationTightOOSCPhotonsAgainstMuonL1HLTMatched", "hltOverlapFilterIsoMu20LooseChargedIsoTightOOSCPhotonsPFTau27L1Seeded"),
-        leg1 = cms.int32(13),
-        leg2 = cms.int32(15)
-    ),
-    cms.PSet (
-        HLT = cms.string("HLT_IsoMu20_eta2p1_MediumChargedIsoPFTau27_eta2p1_TightID_CrossL1_v"),
-        path1 = cms.vstring ("hltL3crIsoL1sMu18erTau24erIorMu20erTau24erL1f0L2f10QL3f20QL3trkIsoFiltered0p07", "hltOverlapFilterIsoMu20MediumChargedIsoTightOOSCPhotonsPFTau27L1Seeded"),
-        path2 = cms.vstring ("hltSelectedPFTau27MediumChargedIsolationTightOOSCPhotonsAgainstMuonL1HLTMatched", "hltOverlapFilterIsoMu20MediumChargedIsoTightOOSCPhotonsPFTau27L1Seeded"),
-        leg1 = cms.int32(13),
-        leg2 = cms.int32(15)
-    ),
-    cms.PSet (
-        HLT = cms.string("HLT_IsoMu20_eta2p1_TightChargedIsoPFTau27_eta2p1_TightID_CrossL1_v"),
-        path1 = cms.vstring ("hltL3crIsoL1sMu18erTau24erIorMu20erTau24erL1f0L2f10QL3f20QL3trkIsoFiltered0p07", "hltOverlapFilterIsoMu20TightChargedIsoTightOOSCPhotonsPFTau27L1Seeded"),
-        path2 = cms.vstring ("hltSelectedPFTau27TightChargedIsolationTightOOSCPhotonsAgainstMuonL1HLTMatched", "hltOverlapFilterIsoMu20TightChargedIsoTightOOSCPhotonsPFTau27L1Seeded"),
-        leg1 = cms.int32(13),
-        leg2 = cms.int32(15)
-    ),
+ 
 )
+
 
 
 hltFilter = hlt.hltHighLevel.clone(
@@ -153,17 +103,12 @@ hltFilter = hlt.hltHighLevel.clone(
     throw = cms.bool(True) #if True: throws exception if a trigger path is invalid
 )
 
-## only events where slimmedMuons has exactly 1 muon
-muonNumberFilter = cms.EDFilter ("muonNumberFilter",
-    src = cms.InputTag("slimmedMuons")
-)
-
 ## good muons for T&P
 goodMuons = cms.EDFilter("PATMuonRefSelector",
         src = cms.InputTag("slimmedMuons"),
         cut = cms.string(
          #       'pt > 5 && abs(eta) < 2.1 ' # kinematics
-                'pt > 24 && abs(eta) < 2.1 ' # kinematics
+                'pt > 27 && abs(eta) < 2.1 ' # kinematics
                 '&& ( (pfIsolationR04().sumChargedHadronPt + max(pfIsolationR04().sumNeutralHadronEt + pfIsolationR04().sumPhotonEt - 0.5 * pfIsolationR04().sumPUPt, 0.0)) / pt() ) < 0.1 ' # isolation
                 '&& isLooseMuon()' # quality -- medium muon
         ),
@@ -178,36 +123,27 @@ goodTaus = cms.EDFilter("PATTauRefSelector",
                 'pt > 20 && abs(eta) < 2.1 ' #kinematics
                 '&& abs(charge) > 0 && abs(charge) < 2 ' #sometimes 2 prongs have charge != 1
                 '&& tauID("decayModeFinding") > 0.5 ' # tau ID
-                '&& tauID("byTightIsolationMVArun2v1DBoldDMwLT") > 0.5 '
+                '&& tauID("byLooseIsolationMVArun2v1DBoldDMwLT") > 0.5 '
                 '&& tauID("againstMuonTight3") > 0.5 ' # anti Muon tight
-                '&& tauID("againstElectronVLooseMVA6") > 0.5 ' # anti-Ele loose
+                #'&& tauID("againstElectronVLooseMVA6") > 0.5 ' # anti-Ele loose
         ),
         filter = cms.bool(True)
 )
-
-## b jet veto : no additional b jets in the event (reject tt) -- use in sequence with
-bjets = cms.EDFilter("PATJetRefSelector",
-        src = cms.InputTag("slimmedJets"),
-        cut = cms.string(
-                'pt > 20 && abs(eta) < 2.4 ' #kinematics
-                '&& bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") > 0.800' # b tag with medium WP
-        ),
-        filter = cms.bool(True)
-)
-
-TagAndProbe = cms.EDFilter("TauTagAndProbeFilter",
-        taus  = cms.InputTag("goodTaus"),
-        muons = cms.InputTag("goodMuons"),
-        met   = cms.InputTag("slimmedMETs"),
-        useMassCuts = cms.bool(True)
-)
-
 
 
 patTriggerUnpacker = cms.EDProducer("PATTriggerObjectStandAloneUnpacker",
   patTriggerObjectsStandAlone = cms.InputTag("slimmedPatTrigger"),
   triggerResults = cms.InputTag('TriggerResults', '', "HLT"),
   unpackFilterLabels = cms.bool(True)
+)
+
+
+
+TagAndProbe = cms.EDFilter("TauTagAndProbeFilter",
+        taus  = cms.InputTag("goodTaus"),
+        muons = cms.InputTag("goodMuons"),
+        met   = cms.InputTag("slimmedMETs"),
+        useMassCuts = cms.bool(False)
 )
 
 Ntuplizer = cms.EDAnalyzer("Ntuplizer",
@@ -225,10 +161,8 @@ Ntuplizer = cms.EDAnalyzer("Ntuplizer",
 
 TAndPseq = cms.Sequence(
     hltFilter        +
-    muonNumberFilter +
-    goodMuons        +
-    goodTaus         +
-    #~bjets           +
+    goodMuons +
+    goodTaus +
     TagAndProbe
 )
 
