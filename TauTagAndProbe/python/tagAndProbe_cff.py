@@ -148,7 +148,7 @@ HLTLIST = cms.VPSet(
 
 hltFilter = hlt.hltHighLevel.clone(
     TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),
-    HLTPaths = ['HLT_IsoMu24_eta2p1_v'],
+    HLTPaths = ['HLT_IsoMu27_v*'],
     andOr = cms.bool(True), # how to deal with multiple triggers: True (OR) accept if ANY is true, False (AND) accept if ALL are true
     throw = cms.bool(True) #if True: throws exception if a trigger path is invalid
 )
@@ -202,12 +202,20 @@ TagAndProbe = cms.EDFilter("TauTagAndProbeFilter",
         useMassCuts = cms.bool(True)
 )
 
+
+
+patTriggerUnpacker = cms.EDProducer("PATTriggerObjectStandAloneUnpacker",
+  patTriggerObjectsStandAlone = cms.InputTag("slimmedPatTrigger"),
+  triggerResults = cms.InputTag('TriggerResults', '', "HLT"),
+  unpackFilterLabels = cms.bool(True)
+)
+
 Ntuplizer = cms.EDAnalyzer("Ntuplizer",
     treeName = cms.string("TagAndProbe"),
     muons = cms.InputTag("TagAndProbe"),
     taus = cms.InputTag("TagAndProbe"),
     triggerList = HLTLIST,
-    triggerSet = cms.InputTag("selectedPatTrigger"),
+    triggerSet = cms.InputTag("patTriggerUnpacker"),
     triggerResultsLabel = cms.InputTag("TriggerResults", "", "HLT"),
     L1Tau = cms.InputTag("caloStage2Digis", "Tau", "RECO"),
     #L1EmuTau = cms.InputTag("simCaloStage2Digis"),
@@ -225,5 +233,6 @@ TAndPseq = cms.Sequence(
 )
 
 NtupleSeq = cms.Sequence(
+    patTriggerUnpacker +
     Ntuplizer
 )

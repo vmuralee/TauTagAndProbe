@@ -396,21 +396,23 @@ void ZeroBias::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
   _lumi = iEvent.luminosityBlock();
 
   edm::Handle< BXVector<l1t::Tau> >  L1TauHandle;
-  iEvent.getByToken(_L1TauTag, L1TauHandle);
+  try {iEvent.getByToken(_L1TauTag, L1TauHandle);}  catch (...) {;}
 
-  for (l1t::TauBxCollection::const_iterator bx0TauIt = L1TauHandle->begin(0); bx0TauIt != L1TauHandle->end(0) ; bx0TauIt++)
-    {
-      const l1t::Tau& l1tTau = *bx0TauIt;
-
-      //cout<<"FW Tau, pT = "<<l1tTau.pt()<<", eta = "<<l1tTau.eta()<<", phi = "<<l1tTau.phi()<<endl;
-
-      this -> _l1tPt.push_back(l1tTau.pt());
-      this -> _l1tEta.push_back(l1tTau.eta());
-      this -> _l1tPhi.push_back(l1tTau.phi());
-      this -> _l1tIso.push_back(l1tTau.hwIso());
-      this -> _l1tQual.push_back(l1tTau.hwQual());
-
-    }
+  if(L1TauHandle.isValid()){
+    for (l1t::TauBxCollection::const_iterator bx0TauIt = L1TauHandle->begin(0); bx0TauIt != L1TauHandle->end(0) ; bx0TauIt++)
+      {
+	const l1t::Tau& l1tTau = *bx0TauIt;
+	
+	//cout<<"FW Tau, pT = "<<l1tTau.pt()<<", eta = "<<l1tTau.eta()<<", phi = "<<l1tTau.phi()<<endl;
+	
+	this -> _l1tPt.push_back(l1tTau.pt());
+	this -> _l1tEta.push_back(l1tTau.eta());
+	this -> _l1tPhi.push_back(l1tTau.phi());
+	this -> _l1tIso.push_back(l1tTau.hwIso());
+	this -> _l1tQual.push_back(l1tTau.hwQual());
+	
+      }
+  }
 
   edm::Handle< BXVector<l1t::Tau> >  L1EmuTauHandle;
   try {iEvent.getByToken(_L1EmuTauTag, L1EmuTauHandle);} catch (...) {;}
@@ -440,20 +442,22 @@ void ZeroBias::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     }
 
   edm::Handle<BXVector<l1t::Jet>> l1tJetHandle;
-  
-  iEvent.getByToken(this -> _l1tJetTag, l1tJetHandle);
-  for(BXVector<l1t::Jet>::const_iterator jet = l1tJetHandle -> begin(0); jet != l1tJetHandle -> end(0) ; jet++)
-    {
+  try {iEvent.getByToken(this -> _l1tJetTag, l1tJetHandle);}  catch (...) {;}
+
+  if(l1tJetHandle.isValid()){
+    for(BXVector<l1t::Jet>::const_iterator jet = l1tJetHandle -> begin(0); jet != l1tJetHandle -> end(0) ; jet++)
+      {
 	
-      this -> _l1tPtJet        . push_back(jet -> pt());
-      this -> _l1tEtaJet       . push_back(jet -> eta());
-      this -> _l1tPhiJet       . push_back(jet -> phi());
-      this -> _l1tIsoJet       . push_back(jet -> hwIso());
-      this -> _l1tQualJet      . push_back(jet -> hwQual());
-      this -> _l1tTowerIEtaJet . push_back(jet -> towerIEta());
-      this -> _l1tTowerIPhiJet . push_back(jet -> towerIPhi());
-      this -> _l1tRawEtJet     . push_back(jet -> rawEt());
-    }
+	this -> _l1tPtJet        . push_back(jet -> pt());
+	this -> _l1tEtaJet       . push_back(jet -> eta());
+	this -> _l1tPhiJet       . push_back(jet -> phi());
+	this -> _l1tIsoJet       . push_back(jet -> hwIso());
+	this -> _l1tQualJet      . push_back(jet -> hwQual());
+	this -> _l1tTowerIEtaJet . push_back(jet -> towerIEta());
+	this -> _l1tTowerIPhiJet . push_back(jet -> towerIPhi());
+	this -> _l1tRawEtJet     . push_back(jet -> rawEt());
+      }
+  }
 
   edm::Handle<BXVector<l1t::Jet> > l1tEmuJetHandle;  
   try {iEvent.getByToken(this -> _l1tEmuJetTag, l1tEmuJetHandle);}  catch (...) {;}

@@ -3,8 +3,7 @@ import FWCore.PythonUtilities.LumiList as LumiList
 import FWCore.ParameterSet.Config as cms
 process = cms.Process("TagAndProbe")
 
-isMC = True
-#isMC = False
+isMC = False
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 
@@ -22,36 +21,32 @@ options.register ('JSONfile',
                   VarParsing.VarParsing.multiplicity.singleton, # singleton or list
                   VarParsing.VarParsing.varType.string,          # string, int, or float
                   "JSON file (empty for no JSON)")
-options.outputFile = 'NTuple_MC.root'
+options.outputFile = 'NTuple_SingleMu.root'
 options.inputFiles = []
 options.maxEvents  = -999
 options.parseArguments()
 
-if not isMC: # will use 80X
+if not isMC:
     from Configuration.AlCa.autoCond import autoCond
-    process.GlobalTag.globaltag = '80X_dataRun2_Prompt_v8'
-    process.load('TauTagAndProbe.TauTagAndProbe.tagAndProbe_cff')
+    process.GlobalTag.globaltag = '92X_dataRun2_HLT_v3'
+    process.load('TauTagAndProbe.TauTagAndProbe.tagAndProbe_nosel_cff')
     process.source = cms.Source("PoolSource",
         fileNames = cms.untracked.vstring(
-            '/store/data/Run2016H/SingleMuon/MINIAOD/PromptReco-v2/000/282/092/00000/DE499C8E-1B8B-E611-8C93-02163E014207.root'
+            '/store/data/Run2017B/SingleMuon/RAW-RECO/MuTau-PromptReco-v1/000/297/488/00000/0CAAC254-9D5B-E711-8206-02163E01A792.root'
         ),
     )
+
+
+
 else:
     process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_miniAODv2' #MC 25 ns miniAODv2
     # process.GlobalTag.globaltag = '76X_dataRun2_16Dec2015_v0'
     process.load('TauTagAndProbe.TauTagAndProbe.MCanalysis_cff')
     process.source = cms.Source("PoolSource",
         fileNames = cms.untracked.vstring(            
-            '/store/user/tstreble/SingleTau2017_MC_92Xmenu_MuTau/VBFHToTauTau_M125_13TeV_powheg_pythia8/SingleTau2017_MC_92Xmenu_MuTau/170622_083847/0000/outputFULL_1.root'
+            '/store/mc/RunIISpring16MiniAODv2/GluGluHToTauTau_M125_13TeV_powheg_pythia8/MINIAODSIM/FlatPU20to70HcalNZSRAW_withHLT_80X_mcRun2_asymptotic_v14-v1/50000/B0D22F36-9567-E611-A5FB-0CC47A4DEE76.root'
         )
     )
-
-
-
-process.hltFilter.TriggerResultsTag = cms.InputTag("TriggerResults","","MYHLT")
-process.Ntuplizer.triggerSet = cms.InputTag("selectedPatTriggerCustom","","MYHLT")
-process.Ntuplizer.triggerResultsLabel = cms.InputTag("TriggerResults", "", "MYHLT")
-
 
 if options.JSONfile:
     print "Using JSON: " , options.JSONfile

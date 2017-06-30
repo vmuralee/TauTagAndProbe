@@ -55,8 +55,8 @@ if not isMC:
     process.GlobalTag.globaltag = '92X_dataRun2_HLT_v3'
     process.load('TauTagAndProbe.TauTagAndProbe.zeroBias_cff')
     process.source = cms.Source("PoolSource",
-        fileNames = cms.untracked.vstring(
-
+        #fileNames = cms.untracked.vstring("/store/data/Run2017B/HLTPhysics/MINIAOD/PromptReco-v1/000/297/101/00000/06603FD2-2457-E711-9D4C-02163E014329.root"
+                                fileNames = cms.untracked.vstring("/store/data/Run2017B/SingleElectron/MINIAOD/PromptReco-v1/000/297/046/00000/02CBE6D1-4456-E711-82F5-02163E019D97.root"                      
         ),
     )
 
@@ -71,7 +71,7 @@ if options.inputFiles:
     process.source.fileNames = cms.untracked.vstring(options.inputFiles)
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1000)
+    input = cms.untracked.int32(-1)
 )
 
 if options.maxEvents >= -1:
@@ -85,10 +85,10 @@ process.options = cms.untracked.PSet(
 
 
 
-process.ZeroBias.L1Tau = cms.InputTag("hltGtStage2Digis", "Tau", "TEST")
-process.ZeroBias.l1tJetCollection = cms.InputTag("hltGtStage2Digis", "Jet", "TEST")
-process.ZeroBias.triggerSet = cms.InputTag("selectedPatTriggerCustom","","TEST")
-process.ZeroBias.triggerResultsLabel = cms.InputTag("TriggerResults", "", "TEST")
+#process.ZeroBias.L1Tau = cms.InputTag("hltGtStage2Digis", "Tau", "TEST")
+#process.ZeroBias.l1tJetCollection = cms.InputTag("hltGtStage2Digis", "Jet", "TEST")
+#process.ZeroBias.triggerSet = cms.InputTag("selectedPatTriggerCustom","","TEST")
+#process.ZeroBias.triggerResultsLabel = cms.InputTag("TriggerResults", "", "TEST")
 
 process.p = cms.Path ( 
     process.NtupleZeroBiasSeq
