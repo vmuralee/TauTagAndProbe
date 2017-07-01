@@ -26,6 +26,8 @@
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 #include "DataFormats/L1Trigger/interface/Tau.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
+#include "DataFormats/JetReco/interface/CaloJet.h"
+#include "DataFormats/BTauReco/interface/JetTag.h"
 
 #include "DataFormats/Common/interface/TriggerResults.h"
 
@@ -98,6 +100,11 @@ class Ntuplizer : public edm::EDAnalyzer {
         float _hltPt;
         float _hltEta;
         float _hltPhi;
+        float _hltL2CaloJetPt;
+        float _hltL2CaloJetEta;
+        float _hltL2CaloJetPhi;
+        float _hltL2CaloJetIso;
+
         int _l1tQual;
         float _l1tPt;
         float _l1tEta;
@@ -132,6 +139,8 @@ class Ntuplizer : public edm::EDAnalyzer {
         edm::EDGetTokenT<l1t::TauBxCollection> _L1TauTag  ;
         edm::EDGetTokenT<l1t::TauBxCollection> _L1EmuTauTag  ;
         edm::EDGetTokenT<std::vector<reco::Vertex>> _VtxTag;
+        edm::EDGetTokenT<reco::CaloJetCollection> _hltL2CaloJet_ForIsoPix_Tag;
+        edm::EDGetTokenT<reco::JetTagCollection> _hltL2CaloJet_ForIsoPix_IsoTag;
 
         //!Contains the parameters
         tVParameterSet _parameters;
@@ -163,7 +172,9 @@ _triggerObjects (consumes<pat::TriggerObjectStandAloneCollection> (iConfig.getPa
 _triggerBits    (consumes<edm::TriggerResults>                    (iConfig.getParameter<edm::InputTag>("triggerResultsLabel"))),
 _L1TauTag       (consumes<l1t::TauBxCollection>                   (iConfig.getParameter<edm::InputTag>("L1Tau"))),
 _L1EmuTauTag    (consumes<l1t::TauBxCollection>                   (iConfig.getParameter<edm::InputTag>("L1EmuTau"))),
-_VtxTag         (consumes<std::vector<reco::Vertex>>              (iConfig.getParameter<edm::InputTag>("Vertexes")))
+_VtxTag         (consumes<std::vector<reco::Vertex>>              (iConfig.getParameter<edm::InputTag>("Vertexes"))),
+_hltL2CaloJet_ForIsoPix_Tag(consumes<reco::CaloJetCollection>     (iConfig.getParameter<edm::InputTag>("L2CaloJet_ForIsoPix_Collection"))),
+_hltL2CaloJet_ForIsoPix_IsoTag(consumes<reco::JetTagCollection>   (iConfig.getParameter<edm::InputTag>("L2CaloJet_ForIsoPix_IsoCollection")))
 {
     this -> _treeName = iConfig.getParameter<std::string>("treeName");
     this -> _processName = iConfig.getParameter<edm::InputTag>("triggerResultsLabel");
@@ -255,9 +266,15 @@ void Ntuplizer::Initialize() {
     this -> _muonEta = -1.;
     this -> _muonPhi = -1.;
     this -> _isMatched = false;
+
     this -> _hltPt = -1;
     this -> _hltEta = 666;
     this -> _hltPhi = 666;
+    this -> _hltL2CaloJetPt = -1;
+    this -> _hltL2CaloJetEta = 666;
+    this -> _hltL2CaloJetPhi = 666;
+    this -> _hltL2CaloJetIso = -1;
+
     this -> _l1tPt = -1;
     this -> _l1tEta = 666;
     this -> _l1tPhi = 666;
@@ -315,9 +332,16 @@ void Ntuplizer::beginJob()
     this -> _tree -> Branch("muonPt",  &_muonPt,  "muonPt/F");
     this -> _tree -> Branch("muonEta", &_muonEta, "muonEta/F");
     this -> _tree -> Branch("muonPhi", &_muonPhi, "muonPhi/F");
+    
     this -> _tree -> Branch("hltPt",  &_hltPt,  "hltPt/F");
     this -> _tree -> Branch("hltEta", &_hltEta, "hltEta/F");
     this -> _tree -> Branch("hltPhi", &_hltPhi, "hltPhi/F");
+
+    this -> _tree -> Branch("hltL2CaloJetPt",  &_hltL2CaloJetPt,  "hltL2CaloJetPt/F");
+    this -> _tree -> Branch("hltL2CaloJetEta", &_hltL2CaloJetEta, "hltL2CaloJetEta/F");
+    this -> _tree -> Branch("hltL2CaloJetPhi", &_hltL2CaloJetPhi, "hltL2CaloJetPhi/F");
+    this -> _tree -> Branch("hltL2CaloJetIso", &_hltL2CaloJetIso, "hltL2CaloJetIso/F");
+
     this -> _tree -> Branch("l1tPt",  &_l1tPt,  "l1tPt/F");
     this -> _tree -> Branch("l1tEta", &_l1tEta, "l1tEta/F");
     this -> _tree -> Branch("l1tPhi", &_l1tPhi, "l1tPhi/F");
@@ -378,12 +402,20 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     edm::Handle<pat::TriggerObjectStandAloneCollection> triggerObjects;
     edm::Handle<edm::TriggerResults> triggerBits;
     edm::Handle<std::vector<reco::Vertex> >  vertexes;
+    edm::Handle< reco::CaloJetCollection > L2CaloJets_ForIsoPix_Handle;
+    edm::Handle< reco::JetTagCollection > L2CaloJets_ForIsoPix_IsoHandle;
+
 
     iEvent.getByToken(this -> _muonsTag, muonHandle);
     iEvent.getByToken(this -> _tauTag,   tauHandle);
     iEvent.getByToken(this -> _triggerObjects, triggerObjects);
     iEvent.getByToken(this -> _triggerBits, triggerBits);
     iEvent.getByToken(this -> _VtxTag,vertexes);
+    
+    try {iEvent.getByToken(_hltL2CaloJet_ForIsoPix_Tag, L2CaloJets_ForIsoPix_Handle);}  catch (...) {;}
+    try {iEvent.getByToken(_hltL2CaloJet_ForIsoPix_IsoTag, L2CaloJets_ForIsoPix_IsoHandle);}  catch (...) {;}
+
+
 
 //! TagAndProbe on HLT taus
     const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
@@ -443,6 +475,28 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
             if (foundTrigger) this -> _foundJet++;
         }
     }
+
+
+    if(L2CaloJets_ForIsoPix_Handle.isValid() && L2CaloJets_ForIsoPix_IsoHandle.isValid()){
+
+      for (auto const &  jet : *L2CaloJets_ForIsoPix_IsoHandle){
+	edm::Ref<reco::CaloJetCollection> jetRef = edm::Ref<reco::CaloJetCollection>(L2CaloJets_ForIsoPix_Handle,jet.first.key());
+	
+	const float dR = deltaR (*tau, *(jet.first));
+	
+	if ( dR < 0.5)
+	  {
+	    this -> _hltL2CaloJetPt = jet.first->pt();
+	    this -> _hltL2CaloJetEta = jet.first->eta();
+	    this -> _hltL2CaloJetPhi = jet.first->phi();
+	    this -> _hltL2CaloJetIso = jet.second;
+	  }
+
+      }
+
+    }
+
+
 
 
     //! TagAndProbe on L1T taus
