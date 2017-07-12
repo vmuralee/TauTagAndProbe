@@ -441,6 +441,12 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
             this -> _hasTriggerTauType = obj.hasTriggerObjectType(trigger::TriggerTau);	   
             this -> _hasTriggerMuonType = obj.hasTriggerObjectType(trigger::TriggerMuon);
 
+  	    /*cout<<"hasTriggerTauType="<<this -> _hasTriggerTauType<<endl;
+	    cout<<"hasTriggerMuonType="<<this -> _hasTriggerMuonType<<endl;
+            const std::vector<std::string>& eventLabels = obj.filterLabels();
+	    for(unsigned int i=0; i<eventLabels.size();i++)	
+	        cout<<eventLabels[i]<<endl;*/
+
             //obj.unpackPathNames(names);
             //const edm::TriggerNames::Strings& triggerNames = names.triggerNames();
             //Looking for the path
@@ -455,12 +461,10 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
                     //Path found, now looking for the label 1, if present in the parameter set
                     //std::cout << "==== FOUND PATH " << triggerNames[parameter.hltPathIndex] << " ====" << std::endl;
 
-                    //Retrieving filter list for the event
-		    
-		    //Filters are bugged for now
-                    //const std::vector<std::string>& filters = (parameter.leg1 == 15)? (parameter.hltFilters1):(parameter.hltFilters2);
-                    //if (this -> hasFilters(obj, filters))
-		    if(this -> _hasTriggerTauType)
+                    //Retrieving filter list for the event		    		   
+                    const std::vector<std::string>& filters = (parameter.leg1 == 15)? (parameter.hltFilters1):(parameter.hltFilters2);
+                    if (this -> hasFilters(obj, filters))
+		    //if(this -> _hasTriggerTauType)
                     {
 		      //std::cout << "#### FOUND TAU WITH HLT PATH " << x << " ####" << std::endl;
                         this -> _hltPt = obj.pt();
