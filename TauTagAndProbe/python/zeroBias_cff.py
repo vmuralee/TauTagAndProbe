@@ -323,6 +323,10 @@ ZeroBias = cms.EDAnalyzer("ZeroBias",
     triggerList = HLTLIST,
     triggerSet = cms.InputTag("slimmedPatTrigger"),
     triggerResultsLabel = cms.InputTag("TriggerResults", "", "HLT"),
+    L2CaloJet_L1TauSeeded_Collection = cms.InputTag("hltL2TauJetsL1IsoTauSeeded", "", "TEST"),
+    L2CaloJet_ForIsoPix_Collection = cms.InputTag("hltL2TausForPixelIsolation", "", "TEST"),
+    L2CaloJet_ForIsoPix_IsoCollection = cms.InputTag("hltL2TauPixelIsoTagProducer", "", "TEST"),                      
+    L2CaloJet_IsoPix_Collection = cms.InputTag("hltL2TauJetsIso", "", "TEST")
 )
 
 NtupleZeroBiasSeq = cms.Sequence(

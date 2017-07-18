@@ -76,7 +76,9 @@ Ntuplizer_noTagAndProbe_multipleTaus = cms.EDAnalyzer("Ntuplizer_noTagAndProbe_m
     jetCollection = cms.InputTag("slimmedJets"),
     l1tJetCollection = cms.InputTag("caloStage2Digis","Jet"),
     Vertexes = cms.InputTag("offlineSlimmedPrimaryVertices"),
-    triggerList = HLTLIST
+    triggerList = HLTLIST,
+    L2CaloJet_ForIsoPix_Collection = cms.InputTag("hltL2TausForPixelIsolation", "", "TEST"),
+    L2CaloJet_ForIsoPix_IsoCollection = cms.InputTag("hltL2TauPixelIsoTagProducer", "", "TEST")   
 )
 
 TAndPseq = cms.Sequence(

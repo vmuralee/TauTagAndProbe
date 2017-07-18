@@ -27,6 +27,8 @@
 #include "DataFormats/L1Trigger/interface/Tau.h"
 #include "DataFormats/L1Trigger/interface/Jet.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
+#include "DataFormats/JetReco/interface/CaloJet.h"
+#include "DataFormats/BTauReco/interface/JetTag.h"
 
 
 #include "tParameterSet.h"
@@ -126,6 +128,22 @@ private:
   std::vector<float> _hltElePhi;
   std::vector<int> _hltEleTriggerBits;
   
+  int _hlt_L2CaloJets_L1TauSeeded_N;
+  std::vector<float> _hlt_L2CaloJets_L1TauSeeded_Pt;
+  std::vector<float> _hlt_L2CaloJets_L1TauSeeded_Eta;
+  std::vector<float> _hlt_L2CaloJets_L1TauSeeded_Phi;
+
+  int _hlt_L2CaloJets_ForIsoPix_N;
+  std::vector<float> _hlt_L2CaloJets_ForIsoPix_Pt;
+  std::vector<float> _hlt_L2CaloJets_ForIsoPix_Eta;
+  std::vector<float> _hlt_L2CaloJets_ForIsoPix_Phi;
+  std::vector<float> _hlt_L2CaloJets_ForIsoPix_Iso;
+
+  int _hlt_L2CaloJets_IsoPix_N;
+  std::vector<float> _hlt_L2CaloJets_IsoPix_Pt;
+  std::vector<float> _hlt_L2CaloJets_IsoPix_Eta;
+  std::vector<float> _hlt_L2CaloJets_IsoPix_Phi;
+
 
   edm::EDGetTokenT<l1t::TauBxCollection> _L1TauTag  ;
   edm::EDGetTokenT<l1t::TauBxCollection> _L1EmuTauTag  ;
@@ -133,6 +151,11 @@ private:
   edm::EDGetTokenT<BXVector<l1t::Jet> > _l1tEmuJetTag;
   edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> _triggerObjects;
   edm::EDGetTokenT<edm::TriggerResults> _triggerBits;
+
+  edm::EDGetTokenT<reco::CaloJetCollection> _hltL2CaloJet_L1TauSeeded_Tag;
+  edm::EDGetTokenT<reco::CaloJetCollection> _hltL2CaloJet_ForIsoPix_Tag;
+  edm::EDGetTokenT<reco::JetTagCollection> _hltL2CaloJet_ForIsoPix_IsoTag;
+  edm::EDGetTokenT<reco::CaloJetCollection> _hltL2CaloJet_IsoPix_Tag;
 
   //!Contains the parameters
   tVParameterSet _parameters;
@@ -163,7 +186,11 @@ ZeroBias::ZeroBias(const edm::ParameterSet& iConfig) :
   _l1tJetTag      (consumes<BXVector<l1t::Jet> >                     (iConfig.getParameter<edm::InputTag>("l1tJetCollection"))),
   _l1tEmuJetTag   (consumes<BXVector<l1t::Jet> >                     (iConfig.getParameter<edm::InputTag>("l1tEmuJetCollection"))),
   _triggerObjects (consumes<pat::TriggerObjectStandAloneCollection> (iConfig.getParameter<edm::InputTag>("triggerSet"))),
-  _triggerBits    (consumes<edm::TriggerResults>                    (iConfig.getParameter<edm::InputTag>("triggerResultsLabel")))
+  _triggerBits    (consumes<edm::TriggerResults>                    (iConfig.getParameter<edm::InputTag>("triggerResultsLabel"))),
+  _hltL2CaloJet_L1TauSeeded_Tag(consumes<reco::CaloJetCollection>   (iConfig.getParameter<edm::InputTag>("L2CaloJet_L1TauSeeded_Collection"))), 
+  _hltL2CaloJet_ForIsoPix_Tag(consumes<reco::CaloJetCollection>     (iConfig.getParameter<edm::InputTag>("L2CaloJet_ForIsoPix_Collection"))),
+  _hltL2CaloJet_ForIsoPix_IsoTag(consumes<reco::JetTagCollection>   (iConfig.getParameter<edm::InputTag>("L2CaloJet_ForIsoPix_IsoCollection"))),
+  _hltL2CaloJet_IsoPix_Tag(consumes<reco::CaloJetCollection>   (iConfig.getParameter<edm::InputTag>("L2CaloJet_IsoPix_Collection"))) 
 {
   this -> _treeName = iConfig.getParameter<std::string>("treeName");
   this -> _processName = iConfig.getParameter<edm::InputTag>("triggerResultsLabel");
@@ -306,6 +333,22 @@ void ZeroBias::Initialize() {
   this -> _hltElePhi .clear();
   this -> _hltEleTriggerBits .clear();
 
+  this -> _hlt_L2CaloJets_L1TauSeeded_N = 0;
+  this -> _hlt_L2CaloJets_L1TauSeeded_Pt.clear();
+  this -> _hlt_L2CaloJets_L1TauSeeded_Eta.clear();
+  this -> _hlt_L2CaloJets_L1TauSeeded_Phi.clear();
+
+  this -> _hlt_L2CaloJets_ForIsoPix_N = 0;
+  this -> _hlt_L2CaloJets_ForIsoPix_Pt.clear();
+  this -> _hlt_L2CaloJets_ForIsoPix_Eta.clear();
+  this -> _hlt_L2CaloJets_ForIsoPix_Phi.clear();
+  this -> _hlt_L2CaloJets_ForIsoPix_Iso.clear();
+
+  this -> _hlt_L2CaloJets_IsoPix_N = 0;
+  this -> _hlt_L2CaloJets_IsoPix_Pt.clear();
+  this -> _hlt_L2CaloJets_IsoPix_Eta.clear();
+  this -> _hlt_L2CaloJets_IsoPix_Phi.clear();
+
 }
 
 
@@ -370,6 +413,21 @@ void ZeroBias::beginJob()
   this -> _tree -> Branch("hltElePhi", &_hltElePhi);
   this -> _tree -> Branch("hltEleTriggerBits", &_hltEleTriggerBits);
 
+  this -> _tree -> Branch("hlt_L2CaloJets_L1TauSeeded_N", &_hlt_L2CaloJets_L1TauSeeded_N, "hlt_L2CaloJets_L1TauSeeded_N/I");
+  this -> _tree -> Branch("hlt_L2CaloJets_L1TauSeeded_Pt", &_hlt_L2CaloJets_L1TauSeeded_Pt);
+  this -> _tree -> Branch("hlt_L2CaloJets_L1TauSeeded_Eta", &_hlt_L2CaloJets_L1TauSeeded_Eta);
+  this -> _tree -> Branch("hlt_L2CaloJets_L1TauSeeded_Phi", &_hlt_L2CaloJets_L1TauSeeded_Phi);
+
+  this -> _tree -> Branch("hlt_L2CaloJets_ForIsoPix_N", &_hlt_L2CaloJets_ForIsoPix_N, "hlt_L2CaloJets_ForIsoPix_N/I");
+  this -> _tree -> Branch("hlt_L2CaloJets_ForIsoPix_Pt", &_hlt_L2CaloJets_ForIsoPix_Pt);
+  this -> _tree -> Branch("hlt_L2CaloJets_ForIsoPix_Eta", &_hlt_L2CaloJets_ForIsoPix_Eta);
+  this -> _tree -> Branch("hlt_L2CaloJets_ForIsoPix_Phi", &_hlt_L2CaloJets_ForIsoPix_Phi);
+  this -> _tree -> Branch("hlt_L2CaloJets_ForIsoPix_Iso", &_hlt_L2CaloJets_ForIsoPix_Iso);
+
+  this -> _tree -> Branch("hlt_L2CaloJets_IsoPix_N", &_hlt_L2CaloJets_IsoPix_N, "hlt_L2CaloJets_IsoPix_N/I");
+  this -> _tree -> Branch("hlt_L2CaloJets_IsoPix_Pt", &_hlt_L2CaloJets_IsoPix_Pt);
+  this -> _tree -> Branch("hlt_L2CaloJets_IsoPix_Eta", &_hlt_L2CaloJets_IsoPix_Eta);
+  this -> _tree -> Branch("hlt_L2CaloJets_IsoPix_Phi", &_hlt_L2CaloJets_IsoPix_Phi);
 
   return;
 }
@@ -548,6 +606,64 @@ void ZeroBias::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
       }
 
   }
+
+
+  edm::Handle< reco::CaloJetCollection > L2CaloJets_L1TauSeeded_Handle;
+  try {iEvent.getByToken(_hltL2CaloJet_L1TauSeeded_Tag, L2CaloJets_L1TauSeeded_Handle);}  catch (...) {;}
+
+  if(L2CaloJets_L1TauSeeded_Handle.isValid()){
+
+    for (reco::CaloJet  jet : *L2CaloJets_L1TauSeeded_Handle){
+
+      _hlt_L2CaloJets_L1TauSeeded_N++;
+      _hlt_L2CaloJets_L1TauSeeded_Pt.push_back(jet.pt());
+      _hlt_L2CaloJets_L1TauSeeded_Eta.push_back(jet.eta());
+      _hlt_L2CaloJets_L1TauSeeded_Phi.push_back(jet.phi());
+      
+    }
+
+  }
+
+
+  edm::Handle< reco::CaloJetCollection > L2CaloJets_ForIsoPix_Handle;
+  try {iEvent.getByToken(_hltL2CaloJet_ForIsoPix_Tag, L2CaloJets_ForIsoPix_Handle);}  catch (...) {;}
+
+  edm::Handle< reco::JetTagCollection > L2CaloJets_ForIsoPix_IsoHandle;
+  try {iEvent.getByToken(_hltL2CaloJet_ForIsoPix_IsoTag, L2CaloJets_ForIsoPix_IsoHandle);}  catch (...) {;}
+  
+
+  if(L2CaloJets_ForIsoPix_Handle.isValid() && L2CaloJets_ForIsoPix_IsoHandle.isValid()){
+
+    for (auto const &  jet : *L2CaloJets_ForIsoPix_IsoHandle){
+      edm::Ref<reco::CaloJetCollection> jetRef = edm::Ref<reco::CaloJetCollection>(L2CaloJets_ForIsoPix_Handle,jet.first.key());
+      _hlt_L2CaloJets_ForIsoPix_N++;
+      _hlt_L2CaloJets_ForIsoPix_Pt.push_back(jet.first->pt());
+      _hlt_L2CaloJets_ForIsoPix_Eta.push_back(jet.first->eta());
+      _hlt_L2CaloJets_ForIsoPix_Phi.push_back(jet.first->phi());
+      _hlt_L2CaloJets_ForIsoPix_Iso.push_back(jet.second);
+   
+    }
+
+  }
+
+
+
+  edm::Handle< reco::CaloJetCollection > L2CaloJets_IsoPix_Handle;
+  try {iEvent.getByToken(_hltL2CaloJet_IsoPix_Tag, L2CaloJets_IsoPix_Handle);}  catch (...) {;}
+
+  if(L2CaloJets_IsoPix_Handle.isValid()){
+
+    for (reco::CaloJet  jet : *L2CaloJets_IsoPix_Handle){
+
+      _hlt_L2CaloJets_IsoPix_N++;
+      _hlt_L2CaloJets_IsoPix_Pt.push_back(jet.pt());
+      _hlt_L2CaloJets_IsoPix_Eta.push_back(jet.eta());
+      _hlt_L2CaloJets_IsoPix_Phi.push_back(jet.phi());
+      
+    }
+
+  }
+
 
   this -> _tree -> Fill();
 

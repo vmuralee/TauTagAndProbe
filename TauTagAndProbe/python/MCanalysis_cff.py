@@ -197,7 +197,9 @@ Ntuplizer = cms.EDAnalyzer("Ntuplizer",
     L1Tau = cms.InputTag("caloStage2Digis", "Tau", "RECO"),
     L1EmuTau = cms.InputTag("simCaloStage2Digis", "MP"),
     Vertexes = cms.InputTag("offlineSlimmedPrimaryVertices"),
-    triggerList = HLTLIST
+    triggerList = HLTLIST,
+    L2CaloJet_ForIsoPix_Collection = cms.InputTag("hltL2TausForPixelIsolation", "", "TEST"),
+    L2CaloJet_ForIsoPix_IsoCollection = cms.InputTag("hltL2TauPixelIsoTagProducer", "", "TEST")   
 )
 
 TAndPseq = cms.Sequence(

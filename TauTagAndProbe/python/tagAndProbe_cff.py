@@ -205,10 +205,10 @@ TagAndProbe = cms.EDFilter("TauTagAndProbeFilter",
 
 
 patTriggerUnpacker = cms.EDProducer("PATTriggerObjectStandAloneUnpacker",
-  patTriggerObjectsStandAlone = cms.InputTag("slimmedPatTrigger"),
-  triggerResults = cms.InputTag('TriggerResults', '', "HLT"),
-  unpackFilterLabels = cms.bool(True)
-)
+                                    patTriggerObjectsStandAlone = cms.InputTag("slimmedPatTrigger"),
+                                    triggerResults = cms.InputTag('TriggerResults', '', "HLT"),
+                                    unpackFilterLabels = cms.bool(True)
+                                    )
 
 Ntuplizer = cms.EDAnalyzer("Ntuplizer",
     treeName = cms.string("TagAndProbe"),
@@ -220,7 +220,9 @@ Ntuplizer = cms.EDAnalyzer("Ntuplizer",
     L1Tau = cms.InputTag("caloStage2Digis", "Tau", "RECO"),
     #L1EmuTau = cms.InputTag("simCaloStage2Digis"),
     L1EmuTau = cms.InputTag("simCaloStage2Digis", "MP"),
-    Vertexes = cms.InputTag("offlineSlimmedPrimaryVertices")
+    Vertexes = cms.InputTag("offlineSlimmedPrimaryVertices"),
+    L2CaloJet_ForIsoPix_Collection = cms.InputTag("hltL2TausForPixelIsolation", "", "TEST"),
+    L2CaloJet_ForIsoPix_IsoCollection = cms.InputTag("hltL2TauPixelIsoTagProducer", "", "TEST")   
 )
 
 TAndPseq = cms.Sequence(

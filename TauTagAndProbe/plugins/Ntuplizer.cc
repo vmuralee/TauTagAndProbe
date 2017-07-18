@@ -26,6 +26,8 @@
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 #include "DataFormats/L1Trigger/interface/Tau.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
+#include "DataFormats/JetReco/interface/CaloJet.h"
+#include "DataFormats/BTauReco/interface/JetTag.h"
 
 #include "DataFormats/Common/interface/TriggerResults.h"
 
@@ -76,6 +78,7 @@ class Ntuplizer : public edm::EDAnalyzer {
         float _tauPt;
         float _tauEta;
         float _tauPhi;
+        int _tauDM;
   
         bool _byLooseCombinedIsolationDeltaBetaCorr3Hits;
         bool _byMediumCombinedIsolationDeltaBetaCorr3Hits;
@@ -95,9 +98,34 @@ class Ntuplizer : public edm::EDAnalyzer {
         bool _byTightIsolationMVArun2v1DBdR03oldDMwLT;
         bool _byVTightIsolationMVArun2v1DBdR03oldDMwLT;
           
+        bool _againstMuonLoose3;
+        bool _againstMuonTight3;
+        bool _againstElectronVLooseMVA6;
+        bool _againstElectronLooseMVA6;
+        bool _againstElectronMediumMVA6;
+        bool _againstElectronTightMVA6;
+        bool _againstElectronVTightMVA6;
+
         float _hltPt;
         float _hltEta;
         float _hltPhi;
+        float _hltL2CaloJetPt;
+        float _hltL2CaloJetEta;
+        float _hltL2CaloJetPhi;
+        float _hltL2CaloJetIso;
+        float _hltL2CaloJetIsoPixPt;
+        float _hltL2CaloJetIsoPixEta;
+        float _hltL2CaloJetIsoPixPhi;
+        float _hltPFTauTrackPt;
+        float _hltPFTauTrackEta;
+        float _hltPFTauTrackPhi;
+        float _hltPFTauTrackRegPt;
+        float _hltPFTauTrackRegEta;
+        float _hltPFTauTrackRegPhi;
+        float _hltPFTau35TrackPt1RegPt;
+        float _hltPFTau35TrackPt1RegEta;
+        float _hltPFTau35TrackPt1RegPhi;
+
         int _l1tQual;
         float _l1tPt;
         float _l1tEta;
@@ -132,6 +160,8 @@ class Ntuplizer : public edm::EDAnalyzer {
         edm::EDGetTokenT<l1t::TauBxCollection> _L1TauTag  ;
         edm::EDGetTokenT<l1t::TauBxCollection> _L1EmuTauTag  ;
         edm::EDGetTokenT<std::vector<reco::Vertex>> _VtxTag;
+        edm::EDGetTokenT<reco::CaloJetCollection> _hltL2CaloJet_ForIsoPix_Tag;
+        edm::EDGetTokenT<reco::JetTagCollection> _hltL2CaloJet_ForIsoPix_IsoTag;
 
         //!Contains the parameters
         tVParameterSet _parameters;
@@ -163,7 +193,9 @@ _triggerObjects (consumes<pat::TriggerObjectStandAloneCollection> (iConfig.getPa
 _triggerBits    (consumes<edm::TriggerResults>                    (iConfig.getParameter<edm::InputTag>("triggerResultsLabel"))),
 _L1TauTag       (consumes<l1t::TauBxCollection>                   (iConfig.getParameter<edm::InputTag>("L1Tau"))),
 _L1EmuTauTag    (consumes<l1t::TauBxCollection>                   (iConfig.getParameter<edm::InputTag>("L1EmuTau"))),
-_VtxTag         (consumes<std::vector<reco::Vertex>>              (iConfig.getParameter<edm::InputTag>("Vertexes")))
+_VtxTag         (consumes<std::vector<reco::Vertex>>              (iConfig.getParameter<edm::InputTag>("Vertexes"))),
+_hltL2CaloJet_ForIsoPix_Tag(consumes<reco::CaloJetCollection>     (iConfig.getParameter<edm::InputTag>("L2CaloJet_ForIsoPix_Collection"))),
+_hltL2CaloJet_ForIsoPix_IsoTag(consumes<reco::JetTagCollection>   (iConfig.getParameter<edm::InputTag>("L2CaloJet_ForIsoPix_IsoCollection")))
 {
     this -> _treeName = iConfig.getParameter<std::string>("treeName");
     this -> _processName = iConfig.getParameter<edm::InputTag>("triggerResultsLabel");
@@ -223,6 +255,7 @@ void Ntuplizer::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
         if (!found) parameter.hltPathIndex = -1;
     }
 
+
 }
 
 void Ntuplizer::Initialize() {
@@ -232,6 +265,7 @@ void Ntuplizer::Initialize() {
     this -> _tauPt = -1.;
     this -> _tauEta = -1.;
     this -> _tauPhi = -1.;
+    this -> _tauDM = -1;
 
     this -> _byLooseCombinedIsolationDeltaBetaCorr3Hits = 0;
     this -> _byMediumCombinedIsolationDeltaBetaCorr3Hits = 0;
@@ -251,13 +285,39 @@ void Ntuplizer::Initialize() {
     this -> _byTightIsolationMVArun2v1DBdR03oldDMwLT = 0;
     this -> _byVTightIsolationMVArun2v1DBdR03oldDMwLT = 0;
 
+    this -> _againstMuonLoose3 = 0;
+    this -> _againstMuonTight3 = 0;
+    this -> _againstElectronVLooseMVA6 = 0;
+    this -> _againstElectronLooseMVA6 = 0;
+    this -> _againstElectronMediumMVA6 = 0;
+    this -> _againstElectronTightMVA6 = 0;
+    this -> _againstElectronVTightMVA6 = 0;
+
     this -> _muonPt = -1.;
     this -> _muonEta = -1.;
     this -> _muonPhi = -1.;
     this -> _isMatched = false;
+
     this -> _hltPt = -1;
     this -> _hltEta = 666;
     this -> _hltPhi = 666;
+    this -> _hltL2CaloJetPt = -1;
+    this -> _hltL2CaloJetEta = 666;
+    this -> _hltL2CaloJetPhi = 666;
+    this -> _hltL2CaloJetIso = -1;
+    this -> _hltL2CaloJetIsoPixPt = -1;
+    this -> _hltL2CaloJetIsoPixEta = 666;
+    this -> _hltL2CaloJetIsoPixPhi = 666;
+    this -> _hltPFTauTrackPt = -1;
+    this -> _hltPFTauTrackEta = 666;
+    this -> _hltPFTauTrackPhi = 666;
+    this -> _hltPFTauTrackRegPt = -1;
+    this -> _hltPFTauTrackRegEta = 666;
+    this -> _hltPFTauTrackRegPhi = 666;
+    this -> _hltPFTau35TrackPt1RegPt = -1;
+    this -> _hltPFTau35TrackPt1RegEta = 666;
+    this -> _hltPFTau35TrackPt1RegPhi = 666;
+
     this -> _l1tPt = -1;
     this -> _l1tEta = 666;
     this -> _l1tPhi = 666;
@@ -292,6 +352,7 @@ void Ntuplizer::beginJob()
     this -> _tree -> Branch("tauPt",  &_tauPt,  "tauPt/F");
     this -> _tree -> Branch("tauEta", &_tauEta, "tauEta/F");
     this -> _tree -> Branch("tauPhi", &_tauPhi, "tauPhi/F");
+    this -> _tree -> Branch("tauDM", &_tauDM, "tauDM/I");
 
     this -> _tree -> Branch("byLooseCombinedIsolationDeltaBetaCorr3Hits", &_byLooseCombinedIsolationDeltaBetaCorr3Hits, "byLooseCombinedIsolationDeltaBetaCorr3Hits/O");
     this -> _tree -> Branch("byMediumCombinedIsolationDeltaBetaCorr3Hits", &_byMediumCombinedIsolationDeltaBetaCorr3Hits, "byMediumCombinedIsolationDeltaBetaCorr3Hits/O");
@@ -312,12 +373,41 @@ void Ntuplizer::beginJob()
     this -> _tree -> Branch("byVTightIsolationMVArun2v1DBdR03oldDMwLT", &_byVTightIsolationMVArun2v1DBdR03oldDMwLT, "byVTightIsolationMVArun2v1DBdR03oldDMwLT/O");
 
 
+    this -> _tree -> Branch("againstMuonLoose3", &_againstMuonLoose3, "againstMuonLoose3/O");;
+    this -> _tree -> Branch("againstMuonTight3", &_againstMuonTight3, "againstMuonTight3/O");
+    this -> _tree -> Branch("againstElectronVLooseMVA6", &_againstElectronVLooseMVA6, "againstElectronVLooseMVA6/O");
+    this -> _tree -> Branch("againstElectronLooseMVA6", &_againstElectronLooseMVA6, "againstElectronLooseMVA6/O");
+    this -> _tree -> Branch("againstElectronMediumMVA6", &_againstElectronMediumMVA6, "againstElectronMediumMVA6/O");
+    this -> _tree -> Branch("againstElectronTightMVA6", &_againstElectronTightMVA6, "againstElectronTightMVA6/O");
+    this -> _tree -> Branch("againstElectronVTightMVA6", &_againstElectronVTightMVA6, "againstElectronVTightMVA6/O");
+
     this -> _tree -> Branch("muonPt",  &_muonPt,  "muonPt/F");
     this -> _tree -> Branch("muonEta", &_muonEta, "muonEta/F");
     this -> _tree -> Branch("muonPhi", &_muonPhi, "muonPhi/F");
+    
     this -> _tree -> Branch("hltPt",  &_hltPt,  "hltPt/F");
     this -> _tree -> Branch("hltEta", &_hltEta, "hltEta/F");
     this -> _tree -> Branch("hltPhi", &_hltPhi, "hltPhi/F");
+
+    this -> _tree -> Branch("hltL2CaloJetPt",  &_hltL2CaloJetPt,  "hltL2CaloJetPt/F");
+    this -> _tree -> Branch("hltL2CaloJetEta", &_hltL2CaloJetEta, "hltL2CaloJetEta/F");
+    this -> _tree -> Branch("hltL2CaloJetPhi", &_hltL2CaloJetPhi, "hltL2CaloJetPhi/F");
+    this -> _tree -> Branch("hltL2CaloJetIso", &_hltL2CaloJetIso, "hltL2CaloJetIso/F");
+    this -> _tree -> Branch("hltL2CaloJetIsoPixPt",  &_hltL2CaloJetIsoPixPt,  "hltL2CaloJetIsoPixPt/F");
+    this -> _tree -> Branch("hltL2CaloJetIsoPixEta", &_hltL2CaloJetIsoPixEta, "hltL2CaloJetIsoPixEta/F");
+    this -> _tree -> Branch("hltL2CaloJetIsoPixPhi", &_hltL2CaloJetIsoPixPhi, "hltL2CaloJetIsoPixPhi/F");
+
+    this -> _tree -> Branch("hltPFTauTrackPt",  &_hltPFTauTrackPt,  "hltPFTauTrackPt/F");
+    this -> _tree -> Branch("hltPFTauTrackEta", &_hltPFTauTrackEta, "hltPFTauTrackEta/F");;
+    this -> _tree -> Branch("hltPFTauTrackPhi", &_hltPFTauTrackPhi, "hltPFTauTrackPhi/F");
+    this -> _tree -> Branch("hltPFTauTrackRegPt",  &_hltPFTauTrackRegPt,  "hltPFTauTrackRegPt/F");
+    this -> _tree -> Branch("hltPFTauTrackRegEta", &_hltPFTauTrackRegEta, "hltPFTauTrackRegEta/F");;
+    this -> _tree -> Branch("hltPFTauTrackRegPhi", &_hltPFTauTrackRegPhi, "hltPFTauTrackRegPhi/F");
+    this -> _tree -> Branch("hltPFTau35TrackPt1RegPt",  &_hltPFTau35TrackPt1RegPt,  "hltPFTau35TrackPt1RegPt/F");
+    this -> _tree -> Branch("hltPFTau35TrackPt1RegEta", &_hltPFTau35TrackPt1RegEta, "hltPFTau35TrackPt1RegEta/F");;
+    this -> _tree -> Branch("hltPFTau35TrackPt1RegPhi", &_hltPFTau35TrackPt1RegPhi, "hltPFTau35TrackPt1RegPhi/F");
+
+
     this -> _tree -> Branch("l1tPt",  &_l1tPt,  "l1tPt/F");
     this -> _tree -> Branch("l1tEta", &_l1tEta, "l1tEta/F");
     this -> _tree -> Branch("l1tPhi", &_l1tPhi, "l1tPhi/F");
@@ -378,12 +468,20 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     edm::Handle<pat::TriggerObjectStandAloneCollection> triggerObjects;
     edm::Handle<edm::TriggerResults> triggerBits;
     edm::Handle<std::vector<reco::Vertex> >  vertexes;
+    edm::Handle< reco::CaloJetCollection > L2CaloJets_ForIsoPix_Handle;
+    edm::Handle< reco::JetTagCollection > L2CaloJets_ForIsoPix_IsoHandle;
+
 
     iEvent.getByToken(this -> _muonsTag, muonHandle);
     iEvent.getByToken(this -> _tauTag,   tauHandle);
     iEvent.getByToken(this -> _triggerObjects, triggerObjects);
     iEvent.getByToken(this -> _triggerBits, triggerBits);
     iEvent.getByToken(this -> _VtxTag,vertexes);
+    
+    try {iEvent.getByToken(_hltL2CaloJet_ForIsoPix_Tag, L2CaloJets_ForIsoPix_Handle);}  catch (...) {;}
+    try {iEvent.getByToken(_hltL2CaloJet_ForIsoPix_IsoTag, L2CaloJets_ForIsoPix_IsoHandle);}  catch (...) {;}
+
+
 
 //! TagAndProbe on HLT taus
     const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
@@ -402,12 +500,19 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
       obj.unpackPathNames(names);
       const edm::TriggerNames::Strings& triggerNames = names.triggerNames();
 
+      /*const std::vector<std::string>& eventLabels = obj.filterLabels();
+      for(unsigned int i=0; i<eventLabels.size();i++)	
+      cout<<eventLabels[i]<<endl;*/
+
+
         const float dR = deltaR (*tau, obj);
         if ( dR < 0.5)
         {
+
             this -> _isMatched = true;
             this -> _hasTriggerTauType = obj.hasTriggerObjectType(trigger::TriggerTau);	   
             this -> _hasTriggerMuonType = obj.hasTriggerObjectType(trigger::TriggerMuon);
+
 
             //obj.unpackPathNames(names);
             //const edm::TriggerNames::Strings& triggerNames = names.triggerNames();
@@ -416,19 +521,23 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
             bool foundTrigger = false;
             for (const tParameterSet& parameter : this -> _parameters)
             {
-                if ((parameter.hltPathIndex >= 0)&&(obj.hasPathName(triggerNames[parameter.hltPathIndex], true, false)))
+	      //if ((parameter.hltPathIndex >= 0)&&(obj.hasPathName(triggerNames[parameter.hltPathIndex], true, false)))
+	      if ((parameter.hltPathIndex >= 0)&&(obj.hasPathName(triggerNames[parameter.hltPathIndex], true, false)))
+
                 {
 
                     foundTrigger = true;
                     //Path found, now looking for the label 1, if present in the parameter set
-                    //std::cout << "==== FOUND PATH " << triggerNames[parameter.hltPathIndex] << " ====" << std::endl;
+                    std::cout << "==== FOUND PATH " << triggerNames[parameter.hltPathIndex] << " ====" << std::endl;
 
-                    //Retrieving filter list for the event
-		    
-		    //Filters are bugged for now
-                    //const std::vector<std::string>& filters = (parameter.leg1 == 15)? (parameter.hltFilters1):(parameter.hltFilters2);
-                    //if (this -> hasFilters(obj, filters))
-		    if(this -> _hasTriggerTauType)
+		    const std::vector<std::string>& eventLabels = obj.filterLabels();
+		    for(unsigned int i=0; i<eventLabels.size();i++)	
+		      cout<<eventLabels[i]<<endl;
+
+                    //Retrieving filter list for the event		    		   
+                    const std::vector<std::string>& filters = (parameter.leg1 == 15)? (parameter.hltFilters1):(parameter.hltFilters2);
+                    if (this -> hasFilters(obj, filters))
+		    //if(this -> _hasTriggerTauType)
                     {
 		      //std::cout << "#### FOUND TAU WITH HLT PATH " << x << " ####" << std::endl;
                         this -> _hltPt = obj.pt();
@@ -441,8 +550,59 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
                 x++;
             }
             if (foundTrigger) this -> _foundJet++;
+
+	    const std::vector<std::string>& L2CaloJetIsoPix_filters = {"hltL2TauIsoFilter"};
+	    if (this -> hasFilters(obj, L2CaloJetIsoPix_filters) && obj.pt()>_hltL2CaloJetIsoPixPt){
+	      this -> _hltL2CaloJetIsoPixPt = obj.pt();
+	      this -> _hltL2CaloJetIsoPixEta = obj.eta();
+	      this -> _hltL2CaloJetIsoPixPhi = obj.phi();
+	    }
+
+	    const std::vector<std::string>& PFTauTrack_filters = {"hltPFTauTrack"};
+	    if (this -> hasFilters(obj, PFTauTrack_filters) && obj.pt()>_hltPFTauTrackPt){
+	      this -> _hltPFTauTrackPt = obj.pt();
+	      this -> _hltPFTauTrackEta = obj.eta();
+	      this -> _hltPFTauTrackPhi = obj.phi();
+	    }
+
+	    const std::vector<std::string>& PFTauTrackReg_filters = {"hltPFTauTrackReg"};
+	    if (this -> hasFilters(obj, PFTauTrackReg_filters) && obj.pt()>_hltPFTauTrackRegPt){
+	      this -> _hltPFTauTrackRegPt = obj.pt();
+	      this -> _hltPFTauTrackRegEta = obj.eta();
+	      this -> _hltPFTauTrackRegPhi = obj.phi();
+	    }
+
+	    const std::vector<std::string>& PFTau35TrackPt1Reg_filters = {"hltSinglePFTau35TrackPt1Reg"};
+	    if (this -> hasFilters(obj, PFTau35TrackPt1Reg_filters) && obj.pt()>_hltPFTau35TrackPt1RegPt){
+	      this -> _hltPFTau35TrackPt1RegPt = obj.pt();
+	      this -> _hltPFTau35TrackPt1RegEta = obj.eta();
+	      this -> _hltPFTau35TrackPt1RegPhi = obj.phi();
+	    }
+
+
         }
     }
+
+
+    if(L2CaloJets_ForIsoPix_Handle.isValid() && L2CaloJets_ForIsoPix_IsoHandle.isValid()){
+
+      for (auto const &  jet : *L2CaloJets_ForIsoPix_IsoHandle){
+	edm::Ref<reco::CaloJetCollection> jetRef = edm::Ref<reco::CaloJetCollection>(L2CaloJets_ForIsoPix_Handle,jet.first.key());
+	
+	const float dR = deltaR (*tau, *(jet.first));
+	
+	if ( dR < 0.5 && jet.first->pt()>_hltL2CaloJetPt)
+	  {
+	    this -> _hltL2CaloJetPt = jet.first->pt();
+	    this -> _hltL2CaloJetEta = jet.first->eta();
+	    this -> _hltL2CaloJetPhi = jet.first->phi();
+	    this -> _hltL2CaloJetIso = jet.second;
+	  }
+
+      }
+
+    }
+
 
 
     //! TagAndProbe on L1T taus
@@ -510,6 +670,7 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     this -> _tauPt = tau -> pt();
     this -> _tauEta = tau -> eta();
     this -> _tauPhi = tau -> phi();
+    this -> _tauDM = tau -> decayMode();
 
     this -> _byLooseCombinedIsolationDeltaBetaCorr3Hits = tau->tauID("byLooseCombinedIsolationDeltaBetaCorr3Hits");
     this -> _byMediumCombinedIsolationDeltaBetaCorr3Hits = tau->tauID("byMediumCombinedIsolationDeltaBetaCorr3Hits");
@@ -528,6 +689,14 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     this -> _byMediumIsolationMVArun2v1DBdR03oldDMwLT = tau->tauID("byMediumIsolationMVArun2v1DBdR03oldDMwLT");
     this -> _byTightIsolationMVArun2v1DBdR03oldDMwLT = tau->tauID("byTightIsolationMVArun2v1DBdR03oldDMwLT");
     this -> _byVTightIsolationMVArun2v1DBdR03oldDMwLT = tau->tauID("byVTightIsolationMVArun2v1DBdR03oldDMwLT");
+
+    this -> _againstMuonLoose3 = tau->tauID("againstMuonLoose3");
+    this -> _againstMuonTight3 = tau->tauID("againstMuonTight3");
+    this -> _againstElectronVLooseMVA6 = tau->tauID("againstElectronVLooseMVA6");
+    this -> _againstElectronLooseMVA6 = tau->tauID("againstElectronLooseMVA6");
+    this -> _againstElectronMediumMVA6 = tau->tauID("againstElectronMediumMVA6");
+    this -> _againstElectronTightMVA6 = tau->tauID("againstElectronTightMVA6");
+    this -> _againstElectronVTightMVA6 = tau->tauID("againstElectronVTightMVA6");
 
     if(muonHandle.isValid()) this -> _muonPt=muon->pt();
     if(muonHandle.isValid()) this -> _muonEta=muon->eta();
