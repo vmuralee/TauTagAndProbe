@@ -89,6 +89,38 @@ HLTLIST = cms.VPSet(
         leg1 = cms.int32(13),
         leg2 = cms.int32(15)
     ),
+
+    cms.PSet (
+        HLT = cms.string("HLT_IsoMu24_eta2p1_MediumChargedIsoPFTau40_Trk1_eta2p1_Reg_CrossL1_v"),
+        path1 = cms.vstring ("hltL3crIsoL1sBigOrMuXXerIsoTauYYerL1f0L2f10QL3f20QL3trkIsoFiltered0p07", "hltOverlapFilterIsoMu24MediumChargedIsoPFTau40MonitoringReg"),
+        path2 = cms.vstring ("hltSelectedPFTau40TrackPt1MediumChargedIsolationL1HLTMatchedReg", "hltOverlapFilterIsoMu24MediumChargedIsoPFTau40MonitoringReg"),
+        leg1 = cms.int32(13),
+        leg2 = cms.int32(15)
+    ),
+    cms.PSet (
+        HLT = cms.string("HLT_IsoMu24_eta2p1_MediumChargedIsoPFTau40_Trk1_TightID_eta2p1_Reg_CrossL1_v"),
+        path1 = cms.vstring ("hltL3crIsoL1sBigOrMuXXerIsoTauYYerL1f0L2f10QL3f20QL3trkIsoFiltered0p07", "hltOverlapFilterIsoMu24MediumChargedIsoAndTightOOSCPhotonsPFTau40MonitoringReg"),
+        path2 = cms.vstring ("hltSelectedPFTau40TrackPt1MediumChargedIsolationAndTightOOSCPhotonsL1HLTMatchedReg", "hltOverlapFilterIsoMu24MediumChargedIsoAndTightOOSCPhotonsPFTau40MonitoringReg"),
+        leg1 = cms.int32(13),
+        leg2 = cms.int32(15)
+    ),
+    cms.PSet (
+        HLT = cms.string("HLT_IsoMu24_eta2p1_TightChargedIsoPFTau40_Trk1_eta2p1_Reg_CrossL1_v"),
+        path1 = cms.vstring ("hltL3crIsoL1sBigOrMuXXerIsoTauYYerL1f0L2f10QL3f20QL3trkIsoFiltered0p07", "hltOverlapFilterIsoMu24TightChargedIsoPFTau40MonitoringReg"),
+        path2 = cms.vstring ("hltSelectedPFTau40TrackPt1TightChargedIsolationL1HLTMatchedReg", "hltOverlapFilterIsoMu24TightChargedIsoPFTau40MonitoringReg"),
+        leg1 = cms.int32(13),
+        leg2 = cms.int32(15)
+    ),
+    cms.PSet (
+        HLT = cms.string("HLT_IsoMu24_eta2p1_TightChargedIsoPFTau40_Trk1_TightID_eta2p1_Reg_CrossL1_v"),
+        path1 = cms.vstring ("hltL3crIsoL1sBigOrMuXXerIsoTauYYerL1f0L2f10QL3f20QL3trkIsoFiltered0p07", "hltOverlapFilterIsoMu24TightChargedIsoAndTightOOSCPhotonsPFTau40MonitoringReg"),
+        path2 = cms.vstring ("hltSelectedPFTau40TrackPt1TightChargedIsolationAndTightOOSCPhotonsL1HLTMatchedReg", "hltOverlapFilterIsoMu24TightChargedIsoAndTightOOSCPhotonsPFTau40MonitoringReg"),
+        leg1 = cms.int32(13),
+        leg2 = cms.int32(15)
+    ),
+
+
+
     cms.PSet (
         HLT = cms.string("HLT_IsoMu24_eta2p1_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_v"),
         path1 = cms.vstring ("hltL3crIsoL1sMu22erIsoTau40erL1f0L2f10QL3f20QL3trkIsoFiltered0p07"),
@@ -308,6 +340,13 @@ HLTLIST = cms.VPSet(
         leg2 = cms.int32(999)
     ),
 
+    cms.PSet (
+        HLT = cms.string("HLT_IsoMu27_v"),
+        path1 = cms.vstring (""),
+        path2 = cms.vstring (""),
+        leg1 = cms.int32(13),
+        leg2 = cms.int32(-1)
+    ),
 )
 
 
@@ -323,12 +362,34 @@ ZeroBias = cms.EDAnalyzer("ZeroBias",
     triggerList = HLTLIST,
     triggerSet = cms.InputTag("slimmedPatTrigger"),
     triggerResultsLabel = cms.InputTag("TriggerResults", "", "HLT"),
-    L2CaloJet_L1TauSeeded_Collection = cms.InputTag("hltL2TauJetsL1IsoTauSeeded", "", "TEST"),
-    L2CaloJet_ForIsoPix_Collection = cms.InputTag("hltL2TausForPixelIsolation", "", "TEST"),
-    L2CaloJet_ForIsoPix_IsoCollection = cms.InputTag("hltL2TauPixelIsoTagProducer", "", "TEST"),                      
-    L2CaloJet_IsoPix_Collection = cms.InputTag("hltL2TauJetsIso", "", "TEST")
+    L2CaloJet_L1TauSeeded_Collection = cms.InputTag("hltL2TauJetsL1IsoTauSeeded", "", "MYHLT"),
+    L2CaloJet_ForIsoPix_Collection = cms.InputTag("hltL2TausForPixelIsolation", "", "MYHLT"),
+    L2CaloJet_ForIsoPix_IsoCollection = cms.InputTag("hltL2TauPixelIsoTagProducer", "", "MYHLT"),                      
+    L2CaloJet_IsoPix_Collection = cms.InputTag("hltL2TauJetsIso", "", "MYHLT"),
+    TrackCollection = cms.InputTag("hltPixelTracksRegForTau", "", "MYHLT"),
+    PFRegCandCollection = cms.InputTag("hltParticleFlowReg", "", "MYHLT"),
+    AK4PFRegJetCollection = cms.InputTag("hltAK4PFJetsReg", "", "MYHLT"),
+    PFTauSansRefRegCollection = cms.InputTag("hltPFTausSansRefReg", "", "MYHLT"),
+    PFJetRegionCollection = cms.InputTag("hltTauPFJets08RegionReg", "jets", "MYHLT"),
+    PFJetChargedHadronAssociation = cms.InputTag("hltTauPFJetsRecoTauChargedHadronsReg", "", "MYHLT"),
+    JetPiZeroAssociation = cms.InputTag("hltPFTauPiZerosReg", "", "MYHLT")
 )
+
 
 NtupleZeroBiasSeq = cms.Sequence(
     ZeroBias
+)
+
+
+
+
+
+patTriggerUnpacker = cms.EDProducer("PATTriggerObjectStandAloneUnpacker",
+                                    patTriggerObjectsStandAlone = cms.InputTag("slimmedPatTrigger"),
+                                    triggerResults = cms.InputTag('TriggerResults', '', "HLT"),
+                                    unpackFilterLabels = cms.bool(True)
+                                    )
+
+patTriggerUnpackerSeq = cms.Sequence(
+    patTriggerUnpacker
 )

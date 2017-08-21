@@ -5,6 +5,17 @@ print "Running on data"
 # filter HLT paths for T&P
 import HLTrigger.HLTfilters.hltHighLevel_cfi as hlt
 
+HLTLIST_TAG = cms.VPSet(
+    #MuTau SingleL1
+    cms.PSet (
+        HLT = cms.string("HLT_IsoMu27_v"),
+        path1 = cms.vstring ("hltL3crIsoL1sMu22Or25L1f0L2f10QL3f27QL3trkIsoFiltered0p07"),
+        path2 = cms.vstring (""),
+        leg1 = cms.int32(13),
+        leg2 = cms.int32(13)
+    ),
+)
+
 
 HLTLIST = cms.VPSet(
     cms.PSet (
@@ -151,6 +162,7 @@ Ntuplizer = cms.EDAnalyzer("Ntuplizer",
     muons = cms.InputTag("TagAndProbe"),
     taus = cms.InputTag("TagAndProbe"),
     triggerList = HLTLIST,
+    triggerList_tag = HLTLIST_TAG,
     triggerSet = cms.InputTag("patTriggerUnpacker"),
     triggerResultsLabel = cms.InputTag("TriggerResults", "", "HLT"),
     L1Tau = cms.InputTag("caloStage2Digis", "Tau", "RECO"),

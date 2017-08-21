@@ -3,6 +3,18 @@ import FWCore.ParameterSet.Config as cms
 print "Running on MC"
 
 
+HLTLIST_TAG = cms.VPSet(
+    #MuTau SingleL1
+    cms.PSet (
+        HLT = cms.string("HLT_IsoMu27_v"),
+        path1 = cms.vstring ("hltL3crIsoL1sMu22Or25L1f0L2f10QL3f27QL3trkIsoFiltered0p07"),
+        path2 = cms.vstring (""),
+        leg1 = cms.int32(13),
+        leg2 = cms.int32(13)
+    ),
+)
+
+
 HLTLIST = cms.VPSet(
     #MuTau SingleL1
     cms.PSet (
@@ -150,7 +162,7 @@ HLTLIST = cms.VPSet(
 import HLTrigger.HLTfilters.hltHighLevel_cfi as hlt
 hltFilter = hlt.hltHighLevel.clone(
     TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),
-    HLTPaths = ['HLT_IsoMu24_eta2p1_v*'],
+    HLTPaths = ['HLT_IsoMu27_v*'],
     andOr = cms.bool(True), # how to deal with multiple triggers: True (OR) accept if ANY is true, False (AND) accept if ALL are true
     throw = cms.bool(True) #if True: throws exception if a trigger path is invalid
 )
@@ -171,7 +183,7 @@ goodTaus = cms.EDFilter("PATTauRefSelector",
         src = cms.InputTag("slimmedTaus"),
         cut = cms.string(
                 #'pt > 18 && abs(eta) < 2.5 ' #kinematics
-                'pt > 20 && abs(eta) < 2.5 ' #kinematics
+                'pt > 20 && abs(eta) < 2.1 ' #kinematics
                 '&& abs(charge) > 0 && abs(charge) < 2 ' #sometimes 2 prongs have charge != 1
                 '&& tauID("decayModeFinding") > 0.5 ' # tau ID
                 '&& tauID("byTightIsolationMVArun2v1DBoldDMwLT") > 0.5 ' # tau iso - NOTE: can as well use boolean discriminators with WP
@@ -187,6 +199,15 @@ genMatchedTaus = cms.EDFilter("genMatchTauFilter",
         taus = cms.InputTag("goodTaus")
     )
 
+
+TagAndProbe = cms.EDFilter("TauTagAndProbeFilter",
+        taus  = cms.InputTag("goodTaus"),
+        muons = cms.InputTag("goodMuons"),
+        met   = cms.InputTag("slimmedMETs"),
+        useMassCuts = cms.bool(True)
+)
+
+
 # Ntuplizer.taus = cms.InputTag("genMatchedTaus")
 Ntuplizer = cms.EDAnalyzer("Ntuplizer",
     treeName = cms.string("TagAndProbe"),
@@ -198,6 +219,7 @@ Ntuplizer = cms.EDAnalyzer("Ntuplizer",
     L1EmuTau = cms.InputTag("simCaloStage2Digis", "MP"),
     Vertexes = cms.InputTag("offlineSlimmedPrimaryVertices"),
     triggerList = HLTLIST,
+    triggerList_tag = HLTLIST_TAG,
     L2CaloJet_ForIsoPix_Collection = cms.InputTag("hltL2TausForPixelIsolation", "", "TEST"),
     L2CaloJet_ForIsoPix_IsoCollection = cms.InputTag("hltL2TauPixelIsoTagProducer", "", "TEST")   
 )
@@ -206,7 +228,8 @@ TAndPseq = cms.Sequence(
     hltFilter      +
     goodMuons      +
     goodTaus       +
-    genMatchedTaus 
+    TagAndProbe
+    + genMatchedTaus 
 )
 
 NtupleSeq = cms.Sequence(
