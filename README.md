@@ -58,6 +58,4 @@ To be launched with
 ./fit.exe run/hlt_turnOn_fitter.par
 ```
 The "Michelangelo" turn-on plot can then be produced adapting the script test/fitter/results/plot_turnOn_Data_vs_MC.py
-```
-./fit.exe run/hlt_turnOn_fitter.par
-```
+
