@@ -6,10 +6,7 @@ Set of tools to evaluate tau trigger performance on T&amp;P
 cmsrel CMSSW_9_2_5_patch2
 cd CMSSW_9_2_5_patch2/src
 cmsenv
-git clone https://github.com/tstreble/TauTagAndProbe
-cd TauTagAndProbe
-git checkout master_HLT
-cd ..
+git clone https://github.com/davignon/TauTagAndProbe
 scram b -j4
 ```
 
