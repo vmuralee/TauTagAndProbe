@@ -165,6 +165,7 @@ class Ntuplizer : public edm::EDAnalyzer {
 
         //!Contains the parameters
         tVParameterSet _parameters;
+        tVParameterSet _parameters_Tag;
 
         edm::InputTag _processName;
         //! Maximum
@@ -220,6 +221,18 @@ _hltL2CaloJet_ForIsoPix_IsoTag(consumes<reco::JetTagCollection>   (iConfig.getPa
         this -> _triggerNamesTree -> Fill();
     }
 
+    const std::vector<edm::ParameterSet>& HLTList_Tag = iConfig.getParameter <std::vector<edm::ParameterSet> > ("triggerList_tag");
+    for (const edm::ParameterSet& parameterSet : HLTList_Tag) {
+        tParameterSet pSet;
+        pSet.hltPath = parameterSet.getParameter<std::string>("HLT");
+        pSet.hltFilters1 = parameterSet.getParameter<std::vector<std::string> >("path1");
+        pSet.hltFilters2 = parameterSet.getParameter<std::vector<std::string> >("path2");
+        pSet.leg1 = parameterSet.getParameter<int>("leg1");
+        pSet.leg2 = parameterSet.getParameter<int>("leg2");
+        this -> _parameters_Tag.push_back(pSet);
+    }
+    
+
 
     this -> Initialize();
     return;
@@ -255,6 +268,24 @@ void Ntuplizer::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
         if (!found) parameter.hltPathIndex = -1;
     }
 
+
+
+    std::cout << " ===== LOOKING FOR THE PATH INDEXES FOR TAG=====" << std::endl;
+    for (tParameterSet& parameter : this -> _parameters_Tag){
+        const std::string& hltPath = parameter.hltPath;
+        bool found = false;
+        for(unsigned int j=0; j < triggerNames.size(); j++)
+        {
+	  std::cout << triggerNames[j] << std::endl;
+            if (triggerNames[j].find(hltPath) != std::string::npos) {
+                found = true;
+                parameter.hltPathIndex = j;
+
+                std::cout << "### FOUND AT INDEX #" << j << " --> " << triggerNames[j] << std::endl;
+            }
+        }
+        if (!found) parameter.hltPathIndex = -1;
+    }
 
 }
 
@@ -493,6 +524,7 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
 
     this -> _tauTriggerBitSet.reset();
 
+    bool foundMuTrigger = false;
 
     for (pat::TriggerObjectStandAlone  obj : *triggerObjects)
     {
@@ -500,9 +532,25 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
       obj.unpackPathNames(names);
       const edm::TriggerNames::Strings& triggerNames = names.triggerNames();
 
-      /*const std::vector<std::string>& eventLabels = obj.filterLabels();
+      const std::vector<std::string>& eventLabels = obj.filterLabels();
       for(unsigned int i=0; i<eventLabels.size();i++)	
-      cout<<eventLabels[i]<<endl;*/
+	cout<<eventLabels[i]<<endl;
+
+      if(obj.hasTriggerObjectType(trigger::TriggerMuon)){
+
+        const float dR = deltaR (*muon, obj);
+        if ( dR < 0.5 && fabs(obj.eta())<2.1 ){
+
+	  for (const tParameterSet& parameter : this -> _parameters_Tag)
+            {
+	      if ((parameter.hltPathIndex >= 0)&&(obj.hasPathName(triggerNames[parameter.hltPathIndex], true, false)))	
+		foundMuTrigger = true;
+	    }
+
+	}
+
+      }
+      
 
 
         const float dR = deltaR (*tau, obj);
@@ -528,11 +576,11 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
 
                     foundTrigger = true;
                     //Path found, now looking for the label 1, if present in the parameter set
-                    std::cout << "==== FOUND PATH " << triggerNames[parameter.hltPathIndex] << " ====" << std::endl;
+                    //std::cout << "==== FOUND PATH " << triggerNames[parameter.hltPathIndex] << " ====" << std::endl;
 
-		    const std::vector<std::string>& eventLabels = obj.filterLabels();
-		    for(unsigned int i=0; i<eventLabels.size();i++)	
-		      cout<<eventLabels[i]<<endl;
+		    //const std::vector<std::string>& eventLabels = obj.filterLabels();
+		    //for(unsigned int i=0; i<eventLabels.size();i++)	
+		    // cout<<eventLabels[i]<<endl;
 
                     //Retrieving filter list for the event		    		   
                     const std::vector<std::string>& filters = (parameter.leg1 == 15)? (parameter.hltFilters1):(parameter.hltFilters2);
@@ -709,7 +757,9 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
 
     this -> _tauTriggerBits = this -> _tauTriggerBitSet.to_ulong();
     //std::cout << "++++++++++ FILL ++++++++++" << std::endl;
-    this -> _tree -> Fill();
+
+    if(foundMuTrigger)
+      this -> _tree -> Fill();
 
 }
 
