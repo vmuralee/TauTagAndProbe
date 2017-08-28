@@ -64,7 +64,7 @@ bool TurnonManager::readConfig(const std::string& config)
     int nTurnons = m_params.GetValue("Turnon.N", 1);
     for(int i=0; i<nTurnons; i++)
     {
-        stringstream sName, sFile, sTree, sXVar, sCut, sSelectionVars, sSelection, sWeightVar, sBinning, sFitRange, sCBMax, sCBAlpha, sCBN, sCBMean, sCBSigma;
+        stringstream sName, sFile, sTree, sXVar, sCut, sSelectionVars, sSelection, sWeightVar, sBinning, sFitRange, sCBMax, sCBAlpha, sCBN, sCBMean, sCBSigma, sCBMturn, sCBP, sCBWidth;
         sName         << "Turnon." << i+1 << ".Name";
         sFile         << "Turnon." << i+1 << ".File";
         sTree         << "Turnon." << i+1 << ".Tree";
@@ -80,6 +80,9 @@ bool TurnonManager::readConfig(const std::string& config)
         sCBN          << "Turnon." << i+1 << ".CB.N";
         sCBMean       << "Turnon." << i+1 << ".CB.Mean";
         sCBSigma      << "Turnon." << i+1 << ".CB.Sigma";
+        sCBMturn      << "Turnon." << i+1 << ".CB.Mturn";
+        sCBP          << "Turnon." << i+1 << ".CB.P";
+        sCBWidth      << "Turnon." << i+1 << ".CB.Width";
 
         string name          = m_params.GetValue(sName         .str().c_str(), "dummy");
         string file          = m_params.GetValue(sFile         .str().c_str(), "dummy");
@@ -97,7 +100,9 @@ bool TurnonManager::readConfig(const std::string& config)
         string cbN           = m_params.GetValue(sCBN          .str().c_str(), "10. 1.001 50.");
         string cbMean        = m_params.GetValue(sCBMean       .str().c_str(), "20. 0. 50.");
         string cbSigma       = m_params.GetValue(sCBSigma      .str().c_str(), "2. 0.01 10.");
-
+        string cbMturn       = m_params.GetValue(sCBMturn      .str().c_str(), "20. 10. 50.");
+        string cbP           = m_params.GetValue(sCBP          .str().c_str(), "0.8 0.4 1.");
+        string cbWidth       = m_params.GetValue(sCBWidth      .str().c_str(), "10. 1. 50.");
 
         vector<double> bins           = Utilities::stringToVector<double>(binning);
 	cout<<"bins in TurnonManager = "<<endl;
@@ -108,6 +113,9 @@ bool TurnonManager::readConfig(const std::string& config)
         vector<double> cbNValues      = Utilities::stringToVector<double>(cbN);
         vector<double> cbMeanValues   = Utilities::stringToVector<double>(cbMean);
         vector<double> cbSigmaValues  = Utilities::stringToVector<double>(cbSigma);
+        vector<double> cbMturnValues  = Utilities::stringToVector<double>(cbMturn);
+        vector<double> cbPValues      = Utilities::stringToVector<double>(cbP);
+        vector<double> cbWidthValues  = Utilities::stringToVector<double>(cbWidth);
         vector<string> selectionVarsList;
         Utilities::tokenize(selectionVars, selectionVarsList); 
 
@@ -128,7 +136,10 @@ bool TurnonManager::readConfig(const std::string& config)
                            cbAlphaValues[0], cbAlphaValues[1], cbAlphaValues[2],
                            cbNValues[0],     cbNValues[1],     cbNValues[2],
                            cbMeanValues[0],   cbMeanValues[1],  cbMeanValues[2],
-                           cbSigmaValues[0], cbSigmaValues[1], cbSigmaValues[2]
+                           cbSigmaValues[0], cbSigmaValues[1], cbSigmaValues[2],
+			   cbMturnValues[0],cbMturnValues[1], cbMturnValues[2],
+			   cbPValues[0], cbPValues[1], cbPValues[2],
+			   cbWidthValues[0], cbWidthValues[1], cbWidthValues[2]
                            );
     }
 

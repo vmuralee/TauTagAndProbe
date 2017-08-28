@@ -42,10 +42,13 @@ TurnonFit::TurnonFit(const std::string& name):m_name(name),
     m_alpha   ("alpha",    "#alpha",   3.,     0.01,   50.),
     m_n       ("n",        "n",        10.,    1.001,  50.),
     m_mean    ("mean",     "mean",     20.,    0.,     50.),
-    m_sigma   ("sigma",    "#sigma",   2.,     0.01,   10.)
+    m_sigma   ("sigma",    "#sigma",   2.,     0.01,   10.),
+    m_mturn   ("mturn",    "mturn",    20.,    10.,    50.),
+    m_p       ("p",        "p",        0.8,    0.4,    1.),
+    m_width   ("width",    "width",    10.,    1.,     50.)
 /*****************************************************************/
 {
-    stringstream sxvar, smax, salpha, sn, smean, ssigma;
+  stringstream sxvar, smax, salpha, sn, smean, ssigma, smturn, sp, swidth;
     sxvar  << "xVar_"  << m_name;
     smax   << "max_"   << m_name;
     salpha << "alpha_" << m_name;
@@ -58,6 +61,9 @@ TurnonFit::TurnonFit(const std::string& name):m_name(name),
     m_n    .SetName(sn.str().c_str());
     m_mean .SetName(smean.str().c_str());
     m_sigma.SetName(ssigma.str().c_str());
+    m_mturn.SetName(smturn.str().c_str());
+    m_p    .SetName(sp.str().c_str());
+    m_width.SetName(swidth.str().c_str());
 }
 
 
@@ -77,7 +83,10 @@ void TurnonFit::setCrystalBall(double max, double max0, double max1,
         double alpha, double alpha0, double alpha1,
         double n, double n0, double n1,
         double mean, double mean0, double mean1, 
-        double sigma, double sigma0, double sigma1)
+        double sigma, double sigma0, double sigma1,
+	double mturn, double mturn0, double mturn1,
+	double p, double p0, double p1,
+	double width, double width0, double width1)
 /*****************************************************************/
 {
     m_max.setVal(max);
@@ -90,10 +99,16 @@ void TurnonFit::setCrystalBall(double max, double max0, double max1,
     m_mean.setRange(mean0, mean1);
     m_sigma.setVal(sigma);
     m_sigma.setRange(sigma0, sigma1);
+    m_mturn.setVal(mturn);
+    m_mturn.setRange(mturn0, mturn1);
+    m_p.setVal(p);
+    m_p.setRange(p0,p1);
+    m_width.setVal(width);
+    m_width.setRange(width0,width1);
 
     stringstream cbName;
     cbName << "cb_" << m_name;
-    m_function = new FuncCB(cbName.str().c_str(), cbName.str().c_str(), m_xVar, m_mean, m_sigma, m_alpha, m_n, m_max) ;
+    m_function = new FuncCB(cbName.str().c_str(), cbName.str().c_str(), m_xVar, m_mean, m_sigma, m_alpha, m_n, m_max,m_mturn,m_p,m_width) ;
 }
 
 
@@ -257,6 +272,9 @@ void TurnonFit::printParameters()
     cout<<"    n    : "<<m_n.getVal()    <<" ["<<m_n.getMin()    <<", "<<m_n.getMax()<<"]\n";
     cout<<"    mean : "<<m_mean.getVal() <<" ["<<m_mean.getMin() <<", "<<m_mean.getMax()<<"]\n";
     cout<<"    sigma: "<<m_sigma.getVal()<<" ["<<m_sigma.getMin()<<", "<<m_sigma.getMax()<<"]\n";
+    cout<<"    mturn: "<<m_mturn.getVal()<<" ["<<m_mturn.getMin()<<", "<<m_mturn.getMax()<<"]\n";
+    cout<<"        p: "<<m_p.getVal()<<" ["<<m_p.getMin()<<", "<<m_p.getMax()<<"]\n";
+    cout<<"   mwidth: "<<m_width.getVal()<<" ["<<m_width.getMin()<<", "<<m_width.getMax()<<"]\n";
     cout<<"\n\n";
 }
 
