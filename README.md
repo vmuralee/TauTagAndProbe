@@ -58,7 +58,7 @@ The Row of the path correspond to the bit number in the tauTriggerBits variable.
 In the example presented here, the decision of the MediumChargedIsoPFTau20 leg can be checked for instance by requiring (tauTriggerBits>>2)&1 (matching with tag muon + offline tau of 0.5 included).
 
 
-### Plotting
+### Plotting: mostly turn-ons
 Any basic check can be performed using those Ntuples (efficiency vs pT, eta-phi...) using custom code developed by the user.
 
 A more fancy package is available to produce turn-on plots with CB fits.
@@ -74,4 +74,8 @@ To be launched with
 ./fit.exe run/hlt_turnOn_fitter.par
 ```
 The "Michelangelo" turn-on plot can then be produced adapting the script test/fitter/results/plot_turnOn_Data_vs_MC.py
+
+### Resolutions:
+UNDER DEVELOPMENT
+
 
