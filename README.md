@@ -15,13 +15,15 @@ Run test.py to produce ntuples including offline taus + various online quantitie
 ### Running on Monte Carlo
 For Monte Carlo (MC), we implemented a truth matching rather than a Tag & Probe technique which would dramatically and artificially decrease the available statistics.
 The MC-specific producers are in two parts:
-1- to get the unpacked L1 quantities and the reco information, use:
+
+1. To get the unpacked L1 quantities and the reco information, use:
 ```
 cmsRun test_noTagAndProbe_multipleTaus.py
 ```
 This runs on MiniAOD and will write ntuples that are referred as "offline".
 A wrapper for this is: ```submitOnTier3_multipleTaus.py```, where you can specify the name of the dataset to run on, the global tag, etc.
-2- to re-emulate the L1 objects with a specific config, you have to run on RAW, and use:
+
+2. To re-emulate the L1 objects with a specific config, you have to run on RAW, and use:
 ```
 cmsRun reEmulL1_MC_L1Only.py
 ```
