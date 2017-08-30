@@ -12,9 +12,26 @@ scram b -j4
 
 Run test.py to produce ntuples including offline taus + various online quantities
 
+### Running on Monte Carlo
+For Monte Carlo (MC), we implemented a truth matching rather than a Tag & Probe technique which would dramatically and artificially decrease the available statistics.
+The MC-specific producers are in two parts:
+1- to get the unpacked L1 quantities and the reco information, use:
+```
+cmsRun test_noTagAndProbe_multipleTaus.py
+```
+This runs on MiniAOD and will write ntuples that are referred as "offline".
+A wrapper for this is: ```submitOnTier3_multipleTaus.py```, where you can specify the name of the dataset to run on, the global tag, etc.
+2- to re-emulate the L1 objects with a specific config, you have to run on RAW, and use:
+```
+cmsRun reEmulL1_MC_L1Only.py
+```
+The correspond wrapper is: ```submitOnTier3_reEmulL1_MC.py```, where you can specify the name of the dataset to run on, the global tag, etc. Also be mindful that you can specify the emulator version to be run in reEmulL1_MC_L1Only.py by specifying the correct:
+```
+process.load("L1Trigger.L1TCalorimeter.caloStage2Params_2017_vX_X_XXX_cfi")
+```
 
 ### Ntuples content
-The Ntuple produced that way contain basic tau offline quantities (kinematics, DM, various discriminators) + bits corresponding to various HLT triggers (tauTriggerBits variable) + L1-HLT specific variables (for expert user)
+The Ntuple produced that way contain basic tau offline quantities (kinematics, DM, various discriminators) + bits corresponding to various HLT triggers (tauTriggerBits variable) + L1-HLT specific variables (for expert user).
 
 The events stored pass basic mu+tauh T&P selections (OS requirement not applied for filter! isOS variable stored in Ntuple).
 
