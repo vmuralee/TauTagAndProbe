@@ -89,14 +89,14 @@ private:
   std::vector<float> _tauPhi;
   std::vector<int>   _tauCharge;
   std::vector<int>   _tauDecayMode;
-  float _hltPt;
-  float _hltEta;
-  float _hltPhi;
-  int _l1tQual;
-  float _l1tPt;
-  float _l1tEta;
-  float _l1tPhi;
-  int _l1tIso;
+  std::vector<float> _hltPt;
+  std::vector<float> _hltEta;
+  std::vector<float> _hltPhi;
+  std::vector<int> _l1tQual;
+  std::vector<float> _l1tPt;
+  std::vector<float> _l1tEta;
+  std::vector<float> _l1tPhi;
+  std::vector<int> _l1tIso;
   int _l1tEmuQual;
   float _l1tEmuPt;
   float _l1tEmuEta;
@@ -279,14 +279,14 @@ void Ntuplizer_noTagAndProbe_multipleTaus::Initialize() {
   this -> _tauCharge.clear();
   this -> _tauDecayMode.clear();
   this -> _isMatched.clear();
-  this -> _hltPt = -1;
-  this -> _hltEta = 666;
-  this -> _hltPhi = 666;
-  this -> _l1tPt = -1;
-  this -> _l1tEta = 666;
-  this -> _l1tPhi = 666;
-  this -> _l1tQual = -1;
-  this -> _l1tIso = -1;
+  this -> _hltPt.clear();
+  this -> _hltEta.clear();
+  this -> _hltPhi.clear();
+  this -> _l1tPt.clear();
+  this -> _l1tEta.clear();
+  this -> _l1tPhi.clear();
+  this -> _l1tQual.clear();
+  this -> _l1tIso.clear();
   this -> _l1tEmuPt = -1;
   this -> _l1tEmuEta = 666;
   this -> _l1tEmuPhi = 666;
@@ -365,14 +365,14 @@ void Ntuplizer_noTagAndProbe_multipleTaus::beginJob()
   this -> _tree -> Branch("tauPhi", &_tauPhi);
   this -> _tree -> Branch("tauCharge",  &_tauCharge);
   this -> _tree -> Branch("tauDecayMode",  &_tauDecayMode);
-  this -> _tree -> Branch("hltPt",  &_hltPt,  "hltPt/F");
-  this -> _tree -> Branch("hltEta", &_hltEta, "hltEta/F");
-  this -> _tree -> Branch("hltPhi", &_hltPhi, "hltPhi/F");
-  this -> _tree -> Branch("l1tPt",  &_l1tPt,  "l1tPt/F");
-  this -> _tree -> Branch("l1tEta", &_l1tEta, "l1tEta/F");
-  this -> _tree -> Branch("l1tPhi", &_l1tPhi, "l1tPhi/F");
-  this -> _tree -> Branch("l1tQual", &_l1tQual, "l1tQual/I");
-  this -> _tree -> Branch("l1tIso", &_l1tIso, "l1tIso/I");
+  this -> _tree -> Branch("hltPt",  &_hltPt);
+  this -> _tree -> Branch("hltEta", &_hltEta);
+  this -> _tree -> Branch("hltPhi", &_hltPhi);
+  this -> _tree -> Branch("l1tPt",  &_l1tPt);
+  this -> _tree -> Branch("l1tEta", &_l1tEta);
+  this -> _tree -> Branch("l1tPhi", &_l1tPhi);
+  this -> _tree -> Branch("l1tQual", &_l1tQual);
+  this -> _tree -> Branch("l1tIso", &_l1tIso);
   this -> _tree -> Branch("l1tEmuPt",  &_l1tEmuPt,  "l1tEmuPt/F");
   this -> _tree -> Branch("l1tEmuEta", &_l1tEmuEta, "l1tEmuEta/F");
   this -> _tree -> Branch("l1tEmuPhi", &_l1tEmuPhi, "l1tEmuPhi/F");
@@ -477,65 +477,6 @@ void Ntuplizer_noTagAndProbe_multipleTaus::analyze(const edm::Event& iEvent, con
   iEvent.getByToken(this -> _l1tJetTag, l1tJetHandle);
   iEvent.getByToken(this -> _VtxTag,vertexes);
 
-  //! TagAndProbe on HLT taus
-  const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
-
-  for(UInt_t iTau = 0 ; iTau < tauHandle->size() ; ++iTau)
-    {
-      const pat::TauRef tau = (*tauHandle)[iTau] ;
-
-      for (pat::TriggerObjectStandAlone  obj : *triggerObjects)
-	{
-	  const float dR = deltaR (*tau, obj);
-	  if ( dR < 0.5)
-	    {
-	      this -> _isMatched.push_back(true);
-	      this -> _hasTriggerTauType = obj.hasTriggerObjectType(trigger::TriggerTau);
-	      this -> _hasTriggerMuonType = obj.hasTriggerObjectType(trigger::TriggerMuon);
-
-	      obj.unpackPathNames(names);
-	      const edm::TriggerNames::Strings& triggerNames = names.triggerNames();
-	      //Looking for the path
-	      unsigned int x = 0;
-	      bool foundTrigger = false;
-	      for (const tParameterSet& parameter : this -> _parameters)
-		{
-		  if ((parameter.hltPathIndex >= 0)&&(obj.hasPathName(triggerNames[parameter.hltPathIndex], true, false)))
-		    {
-		      foundTrigger = true;
-		      //Path found, now looking for the label 1, if present in the parameter set
-		      //std::cout << "==== FOUND PATH " << triggerNames[parameter.hltPathIndex] << " ====" << std::endl;
-		      //Retrieving filter list for the event
-		      const std::vector<std::string>& filters = (parameter.leg1 == 15)? (parameter.hltFilters1):(parameter.hltFilters2);
-		      if (this -> hasFilters(obj, filters))
-			{
-			  //std::cout << "#### FOUND TAU WITH HLT PATH " << x << " ####" << std::endl;
-			  this -> _hltPt = obj.pt();
-			  this -> _hltEta = obj.eta();
-			  this -> _hltPhi = obj.phi();
-			  this -> _tauTriggerBitSet[x] = true;
-			  //std::cout << this -> _tauTriggerBitSet.to_string() << std::endl;
-			}
-		    }
-		  x++;
-		}
-	      if (foundTrigger) this -> _foundJet++;
-	    }
-	}
-    }
-
-
-  // const pat::TauRef tau = (*tauHandle)[0] ;
-
-  this -> _tauTriggerBitSet.reset();
-
-
-
-
-
-
-  //! TagAndProbe on L1T taus
-
   for(BXVector<l1t::Jet>::const_iterator jet = l1tJetHandle -> begin(0); jet != l1tJetHandle -> end(0) ; jet++)
     {
       this -> _l1tPtJet        . push_back(jet -> pt());
@@ -555,73 +496,13 @@ void Ntuplizer_noTagAndProbe_multipleTaus::analyze(const edm::Event& iEvent, con
   edm::Handle< BXVector<l1t::Tau> >  L1TauHandle;
   iEvent.getByToken(_L1TauTag, L1TauHandle);
 
-  float minDR = 0.5; //Uncomment for new match algo
-
-  //cout<<"ill try this: "<<endl;
-
-  for(UInt_t iTau = 0 ; iTau < tauHandle->size() ; ++iTau)
+  for (l1t::TauBxCollection::const_iterator bx0TauIt = L1TauHandle->begin(0); bx0TauIt != L1TauHandle->end(0) ; bx0TauIt++)
     {
-      const pat::TauRef tau = (*tauHandle)[iTau] ;
-
-      for (l1t::TauBxCollection::const_iterator bx0TauIt = L1TauHandle->begin(0); bx0TauIt != L1TauHandle->end(0) ; bx0TauIt++)
-	{
-	  const float dR = deltaR(*tau, *bx0TauIt);
-	  const l1t::Tau& l1tTau = *bx0TauIt;
-	  
-	  //dump check
-	  //cout<<"FW Tau, pT = "<<l1tTau.pt()<<", eta = "<<l1tTau.eta()<<", phi = "<<l1tTau.phi()<<endl;
-	  
-	  if (dR < minDR) //Uncomment for new match algo
-	    //if (dR < 0.5) //Uncomment for old match algo
-	    {
-	      minDR = dR; //Uncomment for new match algo
-	      this -> _l1tPt = l1tTau.pt();
-	      this -> _l1tEta = l1tTau.eta();
-	      this -> _l1tPhi = l1tTau.phi();
-	      this -> _l1tIso = l1tTau.hwIso();
-	      this -> _l1tQual = l1tTau.hwQual();
-	    }
-	}
-    }      
-
-  edm::Handle< BXVector<l1t::Tau> >  L1EmuTauHandle;
-  try {iEvent.getByToken(_L1EmuTauTag, L1EmuTauHandle);} catch (...) {;}
-
-  if (L1EmuTauHandle.isValid())
-    {
-
-      for(UInt_t iTau = 0 ; iTau < tauHandle->size() ; ++iTau)
-	{
-	  const pat::TauRef tau = (*tauHandle)[iTau] ;
-	  
-	  minDR = 0.5;
-	
-	  for (l1t::TauBxCollection::const_iterator bx0EmuTauIt = L1EmuTauHandle->begin(0); bx0EmuTauIt != L1EmuTauHandle->end(0) ; bx0EmuTauIt++)
-	    {
-	      const float dR = deltaR(*tau, *bx0EmuTauIt);
-	      const l1t::Tau& l1tEmuTau = *bx0EmuTauIt;
-	    
-	      cout<<"Emul Tau, pT = "<<l1tEmuTau.pt()<<", eta = "<<l1tEmuTau.eta()<<", phi = "<<l1tEmuTau.phi()<<endl;
-	    
-	      if (dR < minDR) //Uncomment for new match algo
-		{
-		  minDR = dR; //Uncomment for new match algo
-		  this -> _l1tEmuPt        = l1tEmuTau.pt();
-		  this -> _l1tEmuEta       = l1tEmuTau.eta();
-		  this -> _l1tEmuPhi       = l1tEmuTau.phi();
-		  this -> _l1tEmuIso       = l1tEmuTau.hwIso();
-		  this -> _l1tEmuNTT       = l1tEmuTau.nTT();
-		  this -> _l1tEmuQual      = l1tEmuTau.hwQual();
-		  this -> _l1tEmuHasEM     = l1tEmuTau.hasEM();
-		  this -> _l1tEmuIsMerged  = l1tEmuTau.isMerged();
-		  this -> _l1tEmuTowerIEta = l1tEmuTau.towerIEta();
-		  this -> _l1tEmuTowerIPhi = l1tEmuTau.towerIPhi();
-		  this -> _l1tEmuRawEt     = l1tEmuTau.rawEt();
-		  this -> _l1tEmuIsoEt     = l1tEmuTau.isoEt();
-		
-		}
-	    }
-	}
+      this -> _l1tPt .push_back (bx0TauIt->pt());
+      this -> _l1tEta .push_back (bx0TauIt->eta());
+      this -> _l1tPhi .push_back (bx0TauIt->phi());
+      this -> _l1tIso .push_back (bx0TauIt->hwIso());
+      this -> _l1tQual .push_back (bx0TauIt->hwQual());
     }
 
   for(UInt_t iTau = 0 ; iTau < tauHandle->size() ; ++iTau)
@@ -633,20 +514,10 @@ void Ntuplizer_noTagAndProbe_multipleTaus::analyze(const edm::Event& iEvent, con
       this -> _tauCharge.push_back( tau -> charge() );
       this -> _tauDecayMode.push_back( tau -> decayMode() );
     }
-      //here
-  // this -> _tauPt = tau -> pt();
-  // this -> _tauEta = tau -> eta();
-  // this -> _tauPhi = tau -> phi();
-  // this -> _tauCharge = tau -> charge();
-  // this -> _tauDecayMode = tau -> decayMode();
 
   this -> _Nvtx = vertexes->size();
 
-  //float deltaPt = this -> _hltPt - this -> _tauPt;
-  //if (this -> _foundJet > 1 ) std::cout << "deltaPt: " << deltaPt << " con foundJet " << this -> _foundJet << " hltPt " << this -> _hltPt << endl;
-
   this -> _tauTriggerBits = this -> _tauTriggerBitSet.to_ulong();
-  //std::cout << "++++++++++ FILL ++++++++++" << std::endl;
 
   const edm::View<pat::Jet>* jets = jetHandle.product();
   edm::ESHandle<JetCorrectorParametersCollection> JetCorParColl;
@@ -669,11 +540,8 @@ bool Ntuplizer_noTagAndProbe_multipleTaus::hasFilters(const pat::TriggerObjectSt
       bool found = false;
       for (const std::string& label : eventLabels)
         {
-	  //if (label == std::string("hltOverlapFilterIsoMu17MediumIsoPFTau40Reg"))
 	  if (label == filter)
             {
-
-	      //std::cout << "#### FOUND FILTER " << label << " == " << filter << " ####" << std::endl;
 	      found = true;
             }
         }
