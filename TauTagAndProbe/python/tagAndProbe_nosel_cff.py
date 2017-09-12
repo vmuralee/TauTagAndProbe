@@ -159,6 +159,7 @@ TagAndProbe = cms.EDFilter("TauTagAndProbeFilter",
 
 Ntuplizer = cms.EDAnalyzer("Ntuplizer",
     treeName = cms.string("TagAndProbe"),
+    genCollection = cms.InputTag(""),
     muons = cms.InputTag("TagAndProbe"),
     taus = cms.InputTag("TagAndProbe"),
     triggerList = HLTLIST,

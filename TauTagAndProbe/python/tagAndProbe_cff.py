@@ -224,6 +224,7 @@ patTriggerUnpacker = cms.EDProducer("PATTriggerObjectStandAloneUnpacker",
 
 Ntuplizer = cms.EDAnalyzer("Ntuplizer",
     treeName = cms.string("TagAndProbe"),
+    genCollection = cms.InputTag(""),
     muons = cms.InputTag("TagAndProbe"),
     taus = cms.InputTag("TagAndProbe"),
     triggerList = HLTLIST,
