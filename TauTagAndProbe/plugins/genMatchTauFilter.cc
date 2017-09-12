@@ -40,7 +40,6 @@ genMatchTauFilter::~genMatchTauFilter()
 bool genMatchTauFilter::filter(edm::Event & iEvent, edm::EventSetup const& iSetup)
 {
     std::unique_ptr<pat::TauRefVector>  resultTau  ( new pat::TauRefVector  );
-      //auto_ptr<pat::TauRefVector>  resultTau  ( new pat::TauRefVector  );
     Handle<pat::TauRefVector> tauHandle;
     iEvent.getByToken (_tauTag, tauHandle);
 
@@ -57,7 +56,7 @@ bool genMatchTauFilter::filter(edm::Event & iEvent, edm::EventSetup const& iSetu
     if (goodTaus == 0) return false;
     
     iEvent.put(std::move(resultTau));
-      //iEvent.put(resultTau);
+
     return true;
 }
 

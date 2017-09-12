@@ -1,5 +1,5 @@
-#ifndef NTUPLIZER_NOTAGANDPROBE_MULTIPLETAUS_H
-#define NTUPLIZER_NOTAGANDPROBE_MULTIPLETAUS_H
+#ifndef NTUPLIZER_NOTAGANDPROBE_MULTIPLETAUS_AOD_H
+#define NTUPLIZER_NOTAGANDPROBE_MULTIPLETAUS_AOD_H
 
 #include <cmath>
 #include <vector>
@@ -39,13 +39,17 @@
 
 #include "DataFormats/Common/interface/TriggerResults.h"
 
-#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
-
-
 #include "tParameterSet.h"
 
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include <DataFormats/Common/interface/View.h>
+
+#include "DataFormats/TauReco/interface/PFTau.h"
+#include "DataFormats/TauReco/interface/PFTauFwd.h"
+#include "DataFormats/TauReco/interface/PFTauDiscriminator.h"
+
+#include "DataFormats/JetReco/interface/PFJetCollection.h"
+#include <TLorentzVector.h>
 
 
 //Set this variable to decide the number of triggers that you want to check simultaneously
@@ -60,12 +64,12 @@
   ██████  ███████  ██████ ███████ ██   ██ ██   ██ ██   ██    ██    ██  ██████  ██   ████
 */
 
-class Ntuplizer_noTagAndProbe_multipleTaus : public edm::EDAnalyzer {
+class Ntuplizer_noTagAndProbe_multipleTaus_AOD : public edm::EDAnalyzer {
 public:
   /// Constructor
-  explicit Ntuplizer_noTagAndProbe_multipleTaus(const edm::ParameterSet&);
+  explicit Ntuplizer_noTagAndProbe_multipleTaus_AOD(const edm::ParameterSet&);
   /// Destructor
-  virtual ~Ntuplizer_noTagAndProbe_multipleTaus();
+  virtual ~Ntuplizer_noTagAndProbe_multipleTaus_AOD();
 
 private:
   //----edm control---
@@ -76,7 +80,8 @@ private:
   virtual void endRun(edm::Run const&, edm::EventSetup const&);
   void Initialize();
   bool hasFilters(const pat::TriggerObjectStandAlone&  obj , const std::vector<std::string>& filtersToLookFor);
-  int FillJet(const edm::View<pat::Jet> *jets, const edm::Event& event, JetCorrectionUncertainty* jecUnc);  
+  int FillJet(const edm::View<reco::Jet> *jets, const edm::Event& event, JetCorrectionUncertainty* jecUnc);  
+  // int FillJet(const edm::View<pat::Jet> *jets, const edm::Event& event, JetCorrectionUncertainty* jecUnc);  
 
   TTree *_tree;
   TTree *_triggerNamesTree;
@@ -86,7 +91,6 @@ private:
   ULong64_t       _indexevents;
   Int_t           _runNumber;
   Int_t           _lumi;
-  float _MC_weight;
   unsigned long _tauTriggerBits;
   std::vector<float> _tauPt;
   std::vector<float> _tauEta;
@@ -170,13 +174,12 @@ private:
   std::vector<Int_t> _jetID; //1=loose, 2=tight, 3=tightlepveto
   std::vector<Float_t> _jetrawf;
 
-  edm::EDGetTokenT<GenEventInfoProduct> _genTag;
-  edm::EDGetTokenT<pat::TauRefVector>   _tauTag;
-  edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> _triggerObjects;
+  edm::EDGetTokenT<reco::PFTauCollection>   _tauTag;
+  //edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> _triggerObjects;
   edm::EDGetTokenT<edm::TriggerResults> _triggerBits;
   edm::EDGetTokenT<l1t::TauBxCollection> _L1TauTag  ;
   edm::EDGetTokenT<l1t::TauBxCollection> _L1EmuTauTag  ;
-  edm::EDGetTokenT<edm::View<pat::Jet>> _JetTag;
+  edm::EDGetTokenT<edm::View<reco::Jet>> _JetTag;
   edm::EDGetTokenT<BXVector<l1t::Jet>> _l1tJetTag;
   // edm::EDGetTokenT<BXVector<l1t::Jet>> _l1tEmuJetTag;
   edm::EDGetTokenT<std::vector<reco::Vertex>> _VtxTag;
@@ -204,15 +207,14 @@ private:
 */
 
 // ----Constructor and Destructor -----
-Ntuplizer_noTagAndProbe_multipleTaus::Ntuplizer_noTagAndProbe_multipleTaus(const edm::ParameterSet& iConfig) :
-  _genTag         (consumes<GenEventInfoProduct>                    (iConfig.getParameter<edm::InputTag>("genCollection"))),
-  _tauTag         (consumes<pat::TauRefVector>                      (iConfig.getParameter<edm::InputTag>("taus"))),
-  _triggerObjects (consumes<pat::TriggerObjectStandAloneCollection> (iConfig.getParameter<edm::InputTag>("triggerSet"))),
+Ntuplizer_noTagAndProbe_multipleTaus_AOD::Ntuplizer_noTagAndProbe_multipleTaus_AOD(const edm::ParameterSet& iConfig) :
+  _tauTag         (consumes<reco::PFTauCollection>                      (iConfig.getParameter<edm::InputTag>("taus"))),
+  //_triggerObjects (consumes<pat::TriggerObjectStandAloneCollection> (iConfig.getParameter<edm::InputTag>("triggerSet"))),
   _triggerBits    (consumes<edm::TriggerResults>                    (iConfig.getParameter<edm::InputTag>("triggerResultsLabel"))),
   _L1TauTag       (consumes<l1t::TauBxCollection>                   (iConfig.getParameter<edm::InputTag>("L1Tau"))),
   _L1EmuTauTag    (consumes<l1t::TauBxCollection>                   (iConfig.getParameter<edm::InputTag>("L1EmuTau"))),
-_JetTag         (consumes<edm::View<pat::Jet>>                    (iConfig.getParameter<edm::InputTag>("jetCollection"))),
-_l1tJetTag      (consumes<BXVector<l1t::Jet>>                     (iConfig.getParameter<edm::InputTag>("l1tJetCollection"))),
+  _JetTag         (consumes<edm::View<reco::Jet>>                    (iConfig.getParameter<edm::InputTag>("jetCollection"))),
+  _l1tJetTag      (consumes<BXVector<l1t::Jet>>                     (iConfig.getParameter<edm::InputTag>("l1tJetCollection"))),
   _VtxTag         (consumes<std::vector<reco::Vertex>>              (iConfig.getParameter<edm::InputTag>("Vertexes")))
 {
   this -> _treeName = iConfig.getParameter<std::string>("treeName");
@@ -243,10 +245,10 @@ _l1tJetTag      (consumes<BXVector<l1t::Jet>>                     (iConfig.getPa
   return;
 }
 
-Ntuplizer_noTagAndProbe_multipleTaus::~Ntuplizer_noTagAndProbe_multipleTaus()
+Ntuplizer_noTagAndProbe_multipleTaus_AOD::~Ntuplizer_noTagAndProbe_multipleTaus_AOD()
 {}
 
-void Ntuplizer_noTagAndProbe_multipleTaus::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
+void Ntuplizer_noTagAndProbe_multipleTaus_AOD::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
 {
   Bool_t changedConfig = false;
 
@@ -275,11 +277,10 @@ void Ntuplizer_noTagAndProbe_multipleTaus::beginRun(edm::Run const& iRun, edm::E
 
 }
 
-void Ntuplizer_noTagAndProbe_multipleTaus::Initialize() {
+void Ntuplizer_noTagAndProbe_multipleTaus_AOD::Initialize() {
   this -> _indexevents = 0;
   this -> _runNumber = 0;
   this -> _lumi = 0;
-  this -> _MC_weight = 1;
   this -> _tauPt.clear();
   this -> _tauEta.clear();
   this -> _tauPhi.clear();
@@ -357,7 +358,7 @@ void Ntuplizer_noTagAndProbe_multipleTaus::Initialize() {
 }
 
 
-void Ntuplizer_noTagAndProbe_multipleTaus::beginJob()
+void Ntuplizer_noTagAndProbe_multipleTaus_AOD::beginJob()
 {
   edm::Service<TFileService> fs;
   this -> _tree = fs -> make<TTree>(this -> _treeName.c_str(), this -> _treeName.c_str());
@@ -366,7 +367,6 @@ void Ntuplizer_noTagAndProbe_multipleTaus::beginJob()
   this -> _tree -> Branch("EventNumber",&_indexevents,"EventNumber/l");
   this -> _tree -> Branch("RunNumber",&_runNumber,"RunNumber/I");
   this -> _tree -> Branch("lumi",&_lumi,"lumi/I");
-  this -> _tree -> Branch("MC_weight",&_MC_weight,"MC_weight/F");
   this -> _tree -> Branch("tauTriggerBits", &_tauTriggerBits, "tauTriggerBits/l");
   this -> _tree -> Branch("tauPt",  &_tauPt);
   this -> _tree -> Branch("tauEta", &_tauEta);
@@ -406,7 +406,6 @@ void Ntuplizer_noTagAndProbe_multipleTaus::beginJob()
   this -> _tree -> Branch("hasTriggerMuonType", &_hasTriggerMuonType, "hasTriggerMuonType/O");
   this -> _tree -> Branch("hasTriggerTauType", &_hasTriggerTauType, "hasTriggerTauType/O");
   this -> _tree -> Branch("isMatched", &_isMatched);
-  // this -> _tree -> Branch("isMatched", &_isMatched, "isMatched/O");
   this -> _tree -> Branch("isOS", &_isOS, "isOS/O");
   this -> _tree -> Branch("foundJet", &_foundJet, "foundJet/I");
   this -> _tree -> Branch("Nvtx", &_Nvtx, "Nvtx/I");
@@ -446,19 +445,19 @@ void Ntuplizer_noTagAndProbe_multipleTaus::beginJob()
 }
 
 
-void Ntuplizer_noTagAndProbe_multipleTaus::endJob()
+void Ntuplizer_noTagAndProbe_multipleTaus_AOD::endJob()
 {
   return;
 }
 
 
-void Ntuplizer_noTagAndProbe_multipleTaus::endRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
+void Ntuplizer_noTagAndProbe_multipleTaus_AOD::endRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
 {
   return;
 }
 
 
-void Ntuplizer_noTagAndProbe_multipleTaus::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
+void Ntuplizer_noTagAndProbe_multipleTaus_AOD::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
 {
   this -> Initialize();
 
@@ -466,28 +465,43 @@ void Ntuplizer_noTagAndProbe_multipleTaus::analyze(const edm::Event& iEvent, con
   _runNumber = iEvent.id().run();
   _lumi = iEvent.luminosityBlock();
 
-  edm::Handle<GenEventInfoProduct> genEvt;
-  try {iEvent.getByToken(_genTag, genEvt);}  catch (...) {;}
-  if(genEvt.isValid()) this->_MC_weight = genEvt->weight();
-
   //cout<<"EventNumber = "<<_indexevents<<endl;
 
   // std::auto_ptr<pat::MuonRefVector> resultMuon(new pat::MuonRefVector);
 
   // search for the tag in the event
-  edm::Handle<pat::TauRefVector>  tauHandle;
-  edm::Handle<pat::TriggerObjectStandAloneCollection> triggerObjects;
+  edm::Handle<reco::PFTauCollection>  tauHandle;
+  //edm::Handle<pat::TriggerObjectStandAloneCollection> triggerObjects;
   edm::Handle<edm::TriggerResults> triggerBits;
-  edm::Handle<edm::View<pat::Jet>> jetHandle;
+  edm::Handle<edm::View<reco::Jet>> jetHandle;
   edm::Handle<BXVector<l1t::Jet>> l1tJetHandle;
   edm::Handle<std::vector<reco::Vertex> >  vertexes;
 
   iEvent.getByToken(this -> _tauTag,   tauHandle);
-  iEvent.getByToken(this -> _triggerObjects, triggerObjects);
+  //iEvent.getByToken(this -> _triggerObjects, triggerObjects);
   iEvent.getByToken(this -> _triggerBits, triggerBits);
   iEvent.getByToken(this -> _JetTag, jetHandle);
   iEvent.getByToken(this -> _l1tJetTag, l1tJetHandle);
   iEvent.getByToken(this -> _VtxTag,vertexes);
+
+  //! TagAndProbe on HLT taus
+  const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
+  // const reco::PFTau tau = (*tauHandle)[0] ;
+  // const pat::TauRef tau = (*tauHandle)[0] ;
+
+  for(UInt_t iTau = 0 ; iTau < tauHandle->size() ; ++iTau)
+    {
+      const reco::PFTau tau = (*tauHandle)[iTau] ;
+      
+      this -> _tauPt.push_back( tau. pt() );
+      this -> _tauEta.push_back( tau . eta() );
+      this -> _tauPhi.push_back( tau . phi() );
+      this -> _tauCharge.push_back( tau . charge() );
+      this -> _tauDecayMode.push_back( tau . decayMode() );
+
+    }
+
+  this -> _tauTriggerBitSet.reset();
 
   for(BXVector<l1t::Jet>::const_iterator jet = l1tJetHandle -> begin(0); jet != l1tJetHandle -> end(0) ; jet++)
     {
@@ -517,21 +531,11 @@ void Ntuplizer_noTagAndProbe_multipleTaus::analyze(const edm::Event& iEvent, con
       this -> _l1tQual .push_back (bx0TauIt->hwQual());
     }
 
-  for(UInt_t iTau = 0 ; iTau < tauHandle->size() ; ++iTau)
-    {
-      const pat::TauRef tau = (*tauHandle)[iTau] ;
-      this -> _tauPt.push_back( tau -> pt() );
-      this -> _tauEta.push_back( tau -> eta() );
-      this -> _tauPhi.push_back( tau -> phi() );
-      this -> _tauCharge.push_back( tau -> charge() );
-      this -> _tauDecayMode.push_back( tau -> decayMode() );
-    }
-
   this -> _Nvtx = vertexes->size();
 
   this -> _tauTriggerBits = this -> _tauTriggerBitSet.to_ulong();
 
-  const edm::View<pat::Jet>* jets = jetHandle.product();
+  const edm::View<reco::Jet>* jets = jetHandle.product();
   edm::ESHandle<JetCorrectorParametersCollection> JetCorParColl;
   eSetup.get<JetCorrectionsRecord>().get("AK4PFchs",JetCorParColl); 
   JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
@@ -543,7 +547,7 @@ void Ntuplizer_noTagAndProbe_multipleTaus::analyze(const edm::Event& iEvent, con
 
 }
 
-bool Ntuplizer_noTagAndProbe_multipleTaus::hasFilters(const pat::TriggerObjectStandAlone&  obj , const std::vector<std::string>& filtersToLookFor) {
+bool Ntuplizer_noTagAndProbe_multipleTaus_AOD::hasFilters(const pat::TriggerObjectStandAlone&  obj , const std::vector<std::string>& filtersToLookFor) {
 
   const std::vector<std::string>& eventLabels = obj.filterLabels();
   for (const std::string& filter : filtersToLookFor)
@@ -563,43 +567,52 @@ bool Ntuplizer_noTagAndProbe_multipleTaus::hasFilters(const pat::TriggerObjectSt
   return true;
 }
 
-int Ntuplizer_noTagAndProbe_multipleTaus::FillJet(const edm::View<pat::Jet> *jets, const edm::Event& event, JetCorrectionUncertainty* jecUnc){
+int Ntuplizer_noTagAndProbe_multipleTaus_AOD::FillJet(const edm::View<reco::Jet> *jets, const edm::Event& event, JetCorrectionUncertainty* jecUnc){
   int nJets=0;
   vector <pair<float, int>> softLeptInJet; // pt, idx
-  for(edm::View<pat::Jet>::const_iterator ijet = jets->begin(); ijet!=jets->end();++ijet){
+  for(edm::View<reco::Jet>::const_iterator ijet = jets->begin(); ijet!=jets->end();++ijet){
     nJets++;
     _jets_px.push_back( (float) ijet->px());
     _jets_py.push_back( (float) ijet->py());
     _jets_pz.push_back( (float) ijet->pz());
     _jets_e.push_back( (float) ijet->energy());    
     _jets_mT.push_back( (float) ijet->mt());
-    _jets_Flavour.push_back(ijet->partonFlavour());
-    _jets_HadronFlavour.push_back(ijet->hadronFlavour());
-    _jets_PUJetID.push_back(ijet->userFloat("pileupJetId:fullDiscriminant"));
-    _jets_PUJetIDupdated.push_back(ijet->hasUserFloat("pileupJetIdUpdated:fullDiscriminant") ? ijet->userFloat("pileupJetIdUpdated:fullDiscriminant") : -999);
-    float vtxPx = ijet->userFloat ("vtxPx");
-    float vtxPy = ijet->userFloat ("vtxPy");
-    _jets_vtxPt.  push_back(TMath::Sqrt(vtxPx*vtxPx + vtxPy*vtxPy));
-    _jets_vtxMass.push_back(ijet->userFloat("vtxMass"));
-    _jets_vtx3dL. push_back(ijet->userFloat("vtx3DVal"));
-    _jets_vtxNtrk.push_back(ijet->userFloat("vtxNtracks"));
-    _jets_vtx3deL.push_back(ijet->userFloat("vtx3DSig"));
+    // _jets_Flavour.push_back(ijet->partonFlavour());
+    // _jets_HadronFlavour.push_back(ijet->hadronFlavour());
+    // _jets_PUJetID.push_back(ijet->userFloat("pileupJetId:fullDiscriminant"));
+    // _jets_PUJetIDupdated.push_back(ijet->hasUserFloat("pileupJetIdUpdated:fullDiscriminant") ? ijet->userFloat("pileupJetIdUpdated:fullDiscriminant") : -999);
+    // float vtxPx = ijet->userFloat ("vtxPx");
+    // float vtxPy = ijet->userFloat ("vtxPy");
+    // _jets_vtxPt.  push_back(TMath::Sqrt(vtxPx*vtxPx + vtxPy*vtxPy));
+    // _jets_vtxMass.push_back(ijet->userFloat("vtxMass"));
+    // _jets_vtx3dL. push_back(ijet->userFloat("vtx3DVal"));
+    // _jets_vtxNtrk.push_back(ijet->userFloat("vtxNtracks"));
+    // _jets_vtx3deL.push_back(ijet->userFloat("vtx3DSig"));
 
-    _bdiscr.push_back(ijet->bDiscriminator("pfJetProbabilityBJetTags"));
-    _bdiscr2.push_back(ijet->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
-    _bdiscr3.push_back(ijet->bDiscriminator("pfCombinedMVAV2BJetTags"));
+    // _bdiscr.push_back(ijet->bDiscriminator("pfJetProbabilityBJetTags"));
+    // _bdiscr2.push_back(ijet->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
+    // _bdiscr3.push_back(ijet->bDiscriminator("pfCombinedMVAV2BJetTags"));
 
  
     //PF jet ID
-    float NHF = ijet->neutralHadronEnergyFraction();
-    float NEMF = ijet->neutralEmEnergyFraction();
-    float CHF = ijet->chargedHadronEnergyFraction();
-    float MUF = ijet->muonEnergyFraction();
-    float CEMF = ijet->chargedEmEnergyFraction();
-    int NumNeutralParticles =ijet->neutralMultiplicity();
-    int chargedMult = ijet->chargedMultiplicity();
-    int NumConst = ijet->chargedMultiplicity()+NumNeutralParticles;
-    float CHM = ijet->chargedMultiplicity();
+    float NHF = 0.;
+    float NEMF = 0.;
+    float CHF = 0.;
+    float MUF = 0.;
+    float CEMF = 0.;
+    int NumNeutralParticles = 0;
+    int chargedMult = 0;
+    int NumConst = 0;
+    float CHM = 0.;
+    // float NHF = ijet->neutralHadronEnergyFraction();
+    // float NEMF = ijet->neutralEmEnergyFraction();
+    // float CHF = ijet->chargedHadronEnergyFraction();
+    // float MUF = ijet->muonEnergyFraction();
+    // float CEMF = ijet->chargedEmEnergyFraction();
+    // int NumNeutralParticles =ijet->neutralMultiplicity();
+    // int chargedMult = ijet->chargedMultiplicity();
+    // int NumConst = ijet->chargedMultiplicity()+NumNeutralParticles;
+    // float CHM = ijet->chargedMultiplicity();
     float absjeta = fabs(ijet->eta());
 
     _jets_chEmEF .push_back(CEMF);  
@@ -636,12 +649,12 @@ int Ntuplizer_noTagAndProbe_multipleTaus::FillJet(const edm::View<pat::Jet> *jet
     if (tightLepVetoJetID) ++jetid;
 
     _jetID.push_back(jetid);
-    float jecFactor = ijet->jecFactor("Uncorrected") ;
-    float jetRawPt = jecFactor * ijet->pt();
-    //float jetRawPt2 = ijet->pt() / jecFactor; // this is wrong
-    _jets_rawPt.push_back ( jetRawPt );
-    _jets_area.push_back (ijet->jetArea());
-    _jetrawf.push_back(jecFactor);
+    // float jecFactor = ijet->jecFactor("Uncorrected") ;
+    // float jetRawPt = jecFactor * ijet->pt();
+    // //float jetRawPt2 = ijet->pt() / jecFactor; // this is wrong
+    // _jets_rawPt.push_back ( jetRawPt );
+    // _jets_area.push_back (ijet->jetArea());
+    // _jetrawf.push_back(jecFactor);
   
     // loop on jet contituents to retrieve info for b jet regression
     int nDau = ijet -> numberOfDaughters();
@@ -711,6 +724,6 @@ int Ntuplizer_noTagAndProbe_multipleTaus::FillJet(const edm::View<pat::Jet> *jet
 
 
 #include <FWCore/Framework/interface/MakerMacros.h>
-DEFINE_FWK_MODULE(Ntuplizer_noTagAndProbe_multipleTaus);
+DEFINE_FWK_MODULE(Ntuplizer_noTagAndProbe_multipleTaus_AOD);
 
-#endif //NTUPLIZER_NOTAGANDPROBE_MULTIPLETAUS_H
+#endif //NTUPLIZER_NOTAGANDPROBE_MULTIPLETAUS_AOD_H
