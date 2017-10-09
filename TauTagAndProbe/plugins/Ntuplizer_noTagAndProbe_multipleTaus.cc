@@ -39,6 +39,9 @@
 
 #include "DataFormats/Common/interface/TriggerResults.h"
 
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
+
+
 #include "tParameterSet.h"
 
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
@@ -83,6 +86,7 @@ private:
   ULong64_t       _indexevents;
   Int_t           _runNumber;
   Int_t           _lumi;
+  float _MC_weight;
   unsigned long _tauTriggerBits;
   std::vector<float> _tauPt;
   std::vector<float> _tauEta;
@@ -166,6 +170,7 @@ private:
   std::vector<Int_t> _jetID; //1=loose, 2=tight, 3=tightlepveto
   std::vector<Float_t> _jetrawf;
 
+  edm::EDGetTokenT<GenEventInfoProduct> _genTag;
   edm::EDGetTokenT<pat::TauRefVector>   _tauTag;
   edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> _triggerObjects;
   edm::EDGetTokenT<edm::TriggerResults> _triggerBits;
@@ -200,6 +205,7 @@ private:
 
 // ----Constructor and Destructor -----
 Ntuplizer_noTagAndProbe_multipleTaus::Ntuplizer_noTagAndProbe_multipleTaus(const edm::ParameterSet& iConfig) :
+  _genTag         (consumes<GenEventInfoProduct>                    (iConfig.getParameter<edm::InputTag>("genCollection"))),
   _tauTag         (consumes<pat::TauRefVector>                      (iConfig.getParameter<edm::InputTag>("taus"))),
   _triggerObjects (consumes<pat::TriggerObjectStandAloneCollection> (iConfig.getParameter<edm::InputTag>("triggerSet"))),
   _triggerBits    (consumes<edm::TriggerResults>                    (iConfig.getParameter<edm::InputTag>("triggerResultsLabel"))),
@@ -273,6 +279,7 @@ void Ntuplizer_noTagAndProbe_multipleTaus::Initialize() {
   this -> _indexevents = 0;
   this -> _runNumber = 0;
   this -> _lumi = 0;
+  this -> _MC_weight = 1;
   this -> _tauPt.clear();
   this -> _tauEta.clear();
   this -> _tauPhi.clear();
@@ -359,6 +366,7 @@ void Ntuplizer_noTagAndProbe_multipleTaus::beginJob()
   this -> _tree -> Branch("EventNumber",&_indexevents,"EventNumber/l");
   this -> _tree -> Branch("RunNumber",&_runNumber,"RunNumber/I");
   this -> _tree -> Branch("lumi",&_lumi,"lumi/I");
+  this -> _tree -> Branch("MC_weight",&_MC_weight,"MC_weight/F");
   this -> _tree -> Branch("tauTriggerBits", &_tauTriggerBits, "tauTriggerBits/l");
   this -> _tree -> Branch("tauPt",  &_tauPt);
   this -> _tree -> Branch("tauEta", &_tauEta);
@@ -457,6 +465,10 @@ void Ntuplizer_noTagAndProbe_multipleTaus::analyze(const edm::Event& iEvent, con
   _indexevents = iEvent.id().event();
   _runNumber = iEvent.id().run();
   _lumi = iEvent.luminosityBlock();
+
+  edm::Handle<GenEventInfoProduct> genEvt;
+  try {iEvent.getByToken(_genTag, genEvt);}  catch (...) {;}
+  if(genEvt.isValid()) this->_MC_weight = genEvt->weight();
 
   //cout<<"EventNumber = "<<_indexevents<<endl;
 

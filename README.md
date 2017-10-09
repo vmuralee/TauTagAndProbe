@@ -12,7 +12,11 @@ scram b -j4
 
 Run test.py to produce ntuples including offline taus + various online quantities
 
-### Running on Monte Carlo
+### Running on Monte Carlo for HLT
+Simply switch the flag isMC accordingly in test.py
+It is important to use T&P mu-tau selections as the efficiency is computed using the tau leg of the mu+tau paths.
+
+### Running on Monte Carlo for L1
 For Monte Carlo (MC), we implemented a truth matching rather than a Tag & Probe technique which would dramatically and artificially decrease the available statistics.
 The MC-specific producers are in two parts:
 

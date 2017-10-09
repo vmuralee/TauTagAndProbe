@@ -47,6 +47,9 @@ HLTLIST = cms.VPSet(
         leg1 = cms.int32(13),
         leg2 = cms.int32(15)
     ),
+
+    #MuTau CrossL1
+
     cms.PSet (
         HLT = cms.string("HLT_IsoMu24_eta2p1_LooseChargedIsoPFTau35_Trk1_eta2p1_Reg_CrossL1_v"),
         path1 = cms.vstring ("hltL3crIsoL1sBigOrMuXXerIsoTauYYerL1f0L2f10QL3f20QL3trkIsoFiltered0p07", "hltOverlapFilterIsoMu24LooseChargedIsoPFTau35MonitoringReg"),
@@ -129,7 +132,6 @@ HLTLIST = cms.VPSet(
         leg2 = cms.int32(15)
     ),
 
-    #MuTau CrossL1
     cms.PSet (
         HLT = cms.string("HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v"),
         path1 = cms.vstring ("hltL3crIsoL1sMu18erTau24erIorMu20erTau24erL1f0L2f10QL3f20QL3trkIsoFiltered0p07", "hltOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded"),
@@ -347,6 +349,30 @@ HLTLIST = cms.VPSet(
         leg1 = cms.int32(13),
         leg2 = cms.int32(-1)
     ),
+
+    cms.PSet (
+        HLT = cms.string("HLT_IsoMu27_LooseChargedIsoPFTau20_SingleL1_v"),
+        path1 = cms.vstring ("hltL3crIsoL1sMu22Or25L1f0L2f10QL3f27QL3trkIsoFiltered0p07", "hltOverlapFilterIsoMu27LooseChargedIsoPFTau20"),
+        path2 = cms.vstring ("hltPFTau20TrackLooseChargedIsoAgainstMuon", "hltOverlapFilterIsoMu27LooseChargedIsoPFTau20"),
+        leg1 = cms.int32(13),
+        leg2 = cms.int32(15)
+    ),
+
+    cms.PSet (
+        HLT = cms.string("HLT_IsoMu27_MediumChargedIsoPFTau20_SingleL1_v"),
+        path1 = cms.vstring ("hltL3crIsoL1sMu22Or25L1f0L2f10QL3f27QL3trkIsoFiltered0p07", "hltOverlapFilterIsoMu27MediumChargedIsoPFTau20"),
+        path2 = cms.vstring ("hltPFTau20TrackMediumChargedIsoAgainstMuon", "hltOverlapFilterIsoMu27MediumChargedIsoPFTau20"),
+        leg1 = cms.int32(13),
+        leg2 = cms.int32(15)
+    ),
+
+    cms.PSet (
+        HLT = cms.string("HLT_IsoMu27_TightChargedIsoPFTau20_SingleL1_v"),
+        path1 = cms.vstring ("hltL3crIsoL1sMu22Or25L1f0L2f10QL3f27QL3trkIsoFiltered0p07", "hltOverlapFilterIsoMu27TightChargedIsoPFTau20"),
+        path2 = cms.vstring ("hltPFTau20TrackTightChargedIsoAgainstMuon", "hltOverlapFilterIsoMu27TightChargedIsoPFTau20"),
+        leg1 = cms.int32(13),
+        leg2 = cms.int32(15)
+    ),
 )
 
 
@@ -359,6 +385,10 @@ ZeroBias = cms.EDAnalyzer("ZeroBias",
     L1EmuTau = cms.InputTag("simCaloStage2Digis", "MP"),
     l1tJetCollection = cms.InputTag("caloStage2Digis","Jet"),
     l1tEmuJetCollection = cms.InputTag("simCaloStage2Digis","MP"),
+    L1EG = cms.InputTag("caloStage2Digis", "EGamma"),
+    L1EmuEG = cms.InputTag("simCaloStage2Digis", "MP"),
+    L1Mu = cms.InputTag("hltGtStage2Digis"),
+    L1EmuMu = cms.InputTag("simGtStage2Digis"),
     triggerList = HLTLIST,
     triggerSet = cms.InputTag("slimmedPatTrigger"),
     triggerResultsLabel = cms.InputTag("TriggerResults", "", "HLT"),
@@ -366,7 +396,8 @@ ZeroBias = cms.EDAnalyzer("ZeroBias",
     L2CaloJet_ForIsoPix_Collection = cms.InputTag("hltL2TausForPixelIsolation", "", "MYHLT"),
     L2CaloJet_ForIsoPix_IsoCollection = cms.InputTag("hltL2TauPixelIsoTagProducer", "", "MYHLT"),                      
     L2CaloJet_IsoPix_Collection = cms.InputTag("hltL2TauJetsIso", "", "MYHLT"),
-    TrackCollection = cms.InputTag("hltPixelTracksRegForTau", "", "MYHLT"),
+    PixelTrackCollection = cms.InputTag("hltPixelTracksRegForTau", "", "MYHLT"),
+    MergedTrackCollection = cms.InputTag("hltMergedTracksTauReg", "", "MYHLT"),
     PFRegCandCollection = cms.InputTag("hltParticleFlowReg", "", "MYHLT"),
     AK4PFRegJetCollection = cms.InputTag("hltAK4PFJetsReg", "", "MYHLT"),
     PFTauSansRefRegCollection = cms.InputTag("hltPFTausSansRefReg", "", "MYHLT"),

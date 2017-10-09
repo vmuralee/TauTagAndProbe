@@ -62,6 +62,7 @@ genMatchedTaus = cms.EDFilter("genMatchTauFilter",
 # Ntuplizer.taus = cms.InputTag("genMatchedTaus")
 Ntuplizer_noTagAndProbe_multipleTaus = cms.EDAnalyzer("Ntuplizer_noTagAndProbe_multipleTaus",
     treeName = cms.string("TagAndProbe"),
+    genCollection = cms.InputTag("generator"),
     taus  = cms.InputTag("genMatchedTaus"),
     triggerSet = cms.InputTag("selectedPatTrigger"),
     triggerResultsLabel = cms.InputTag("TriggerResults", "", "HLT"),
