@@ -276,7 +276,7 @@ void Ntuplizer::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
         bool found = false;
         for(unsigned int j=0; j < triggerNames.size(); j++)
         {
-	  std::cout << triggerNames[j] << std::endl;
+	  //std::cout << triggerNames[j] << std::endl;
             if (triggerNames[j].find(hltPath) != std::string::npos) {
                 found = true;
                 parameter.hltPathIndex = j;
@@ -295,7 +295,7 @@ void Ntuplizer::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
         bool found = false;
         for(unsigned int j=0; j < triggerNames.size(); j++)
         {
-	  std::cout << triggerNames[j] << std::endl;
+	  // std::cout << triggerNames[j] << std::endl;
             if (triggerNames[j].find(hltPath) != std::string::npos) {
                 found = true;
                 parameter.hltPathIndex = j;
@@ -587,7 +587,6 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
         const float dR = deltaR (*tau, obj);
         if ( dR < 0.5)
         {
-
             this -> _isMatched = true;
             this -> _hasTriggerTauType = obj.hasTriggerObjectType(trigger::TriggerTau);	   
             this -> _hasTriggerMuonType = obj.hasTriggerObjectType(trigger::TriggerMuon);
@@ -618,7 +617,7 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
                     if (this -> hasFilters(obj, filters))
 		    //if(this -> _hasTriggerTauType)
                     {
-		      //std::cout << "#### FOUND TAU WITH HLT PATH " << x << " ####" << std::endl;
+		      std::cout << "#### FOUND TAU WITH HLT PATH " << x << " ####" << std::endl;
                         this -> _hltPt = obj.pt();
                         this -> _hltEta = obj.eta();
                         this -> _hltPhi = obj.phi();

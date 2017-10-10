@@ -6,18 +6,38 @@ Set of tools to evaluate tau trigger performance on T&amp;P
 cmsrel CMSSW_9_2_5_patch2
 cd CMSSW_9_2_5_patch2/src
 cmsenv
-git clone https://github.com/tstreble/TauTagAndProbe
-cd TauTagAndProbe
-git checkout master_HLT
-cd ..
+git clone https://github.com/davignon/TauTagAndProbe
 scram b -j4
 ```
 
 Run test.py to produce ntuples including offline taus + various online quantities
 
+### Running on Monte Carlo for HLT
+Simply switch the flag isMC accordingly in test.py
+It is important to use T&P mu-tau selections as the efficiency is computed using the tau leg of the mu+tau paths.
+
+### Running on Monte Carlo for L1
+For Monte Carlo (MC), we implemented a truth matching rather than a Tag & Probe technique which would dramatically and artificially decrease the available statistics.
+The MC-specific producers are in two parts:
+
+1. To get the unpacked L1 quantities and the reco information, use:
+```
+cmsRun test_noTagAndProbe_multipleTaus.py
+```
+This runs on MiniAOD and will write ntuples that are referred as "offline".
+A wrapper for this is: ```submitOnTier3_multipleTaus.py```, where you can specify the name of the dataset to run on, the global tag, etc.
+
+2. To re-emulate the L1 objects with a specific config, you have to run on RAW, and use:
+```
+cmsRun reEmulL1_MC_L1Only.py
+```
+The correspond wrapper is: ```submitOnTier3_reEmulL1_MC.py```, where you can specify the name of the dataset to run on, the global tag, etc. Also be mindful that you can specify the emulator version to be run in reEmulL1_MC_L1Only.py by specifying the correct:
+```
+process.load("L1Trigger.L1TCalorimeter.caloStage2Params_2017_vX_X_XXX_cfi")
+```
 
 ### Ntuples content
-The Ntuple produced that way contain basic tau offline quantities (kinematics, DM, various discriminators) + bits corresponding to various HLT triggers (tauTriggerBits variable) + L1-HLT specific variables (for expert user)
+The Ntuple produced that way contain basic tau offline quantities (kinematics, DM, various discriminators) + bits corresponding to various HLT triggers (tauTriggerBits variable) + L1-HLT specific variables (for expert user).
 
 The events stored pass basic mu+tauh T&P selections (OS requirement not applied for filter! isOS variable stored in Ntuple).
 
@@ -42,7 +62,7 @@ The Row of the path correspond to the bit number in the tauTriggerBits variable.
 In the example presented here, the decision of the MediumChargedIsoPFTau20 leg can be checked for instance by requiring (tauTriggerBits>>2)&1 (matching with tag muon + offline tau of 0.5 included).
 
 
-### Plotting
+### Plotting: mostly turn-ons
 Any basic check can be performed using those Ntuples (efficiency vs pT, eta-phi...) using custom code developed by the user.
 
 A more fancy package is available to produce turn-on plots with CB fits.
@@ -58,4 +78,8 @@ To be launched with
 ./fit.exe run/hlt_turnOn_fitter.par
 ```
 The "Michelangelo" turn-on plot can then be produced adapting the script test/fitter/results/plot_turnOn_Data_vs_MC.py
+
+### Resolutions:
+UNDER DEVELOPMENT
+
 
