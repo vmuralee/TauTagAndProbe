@@ -24,12 +24,15 @@
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
+#include "HLTrigger/HLTcore/interface/HLTPrescaleProvider.h"
 #include "DataFormats/L1Trigger/interface/Tau.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/JetReco/interface/CaloJet.h"
 #include "DataFormats/BTauReco/interface/JetTag.h"
 
 #include "DataFormats/Common/interface/TriggerResults.h"
+
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 
 #include "tParameterSet.h"
 
@@ -74,6 +77,10 @@ class Ntuplizer : public edm::EDAnalyzer {
         ULong64_t       _indexevents;
         Int_t           _runNumber;
         Int_t           _lumi;
+        Int_t           _PS_column;
+
+        float           _MC_weight;
+
         unsigned long _tauTriggerBits;
         float _tauPt;
         float _tauEta;
@@ -153,6 +160,8 @@ class Ntuplizer : public edm::EDAnalyzer {
         float _muonPhi;
         int _Nvtx;
 
+        edm::EDGetTokenT<GenEventInfoProduct> _genTag;
+
         edm::EDGetTokenT<pat::MuonRefVector>  _muonsTag;
         edm::EDGetTokenT<pat::TauRefVector>   _tauTag;
         edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> _triggerObjects;
@@ -174,6 +183,7 @@ class Ntuplizer : public edm::EDAnalyzer {
 
 
         HLTConfigProvider _hltConfig;
+        HLTPrescaleProvider* _hltPrescale;
 
 
 };
@@ -188,6 +198,7 @@ class Ntuplizer : public edm::EDAnalyzer {
 
 // ----Constructor and Destructor -----
 Ntuplizer::Ntuplizer(const edm::ParameterSet& iConfig) :
+_genTag         (consumes<GenEventInfoProduct>                    (iConfig.getParameter<edm::InputTag>("genCollection"))),
 _muonsTag       (consumes<pat::MuonRefVector>                     (iConfig.getParameter<edm::InputTag>("muons"))),
 _tauTag         (consumes<pat::TauRefVector>                      (iConfig.getParameter<edm::InputTag>("taus"))),
 _triggerObjects (consumes<pat::TriggerObjectStandAloneCollection> (iConfig.getParameter<edm::InputTag>("triggerSet"))),
@@ -198,6 +209,9 @@ _VtxTag         (consumes<std::vector<reco::Vertex>>              (iConfig.getPa
 _hltL2CaloJet_ForIsoPix_Tag(consumes<reco::CaloJetCollection>     (iConfig.getParameter<edm::InputTag>("L2CaloJet_ForIsoPix_Collection"))),
 _hltL2CaloJet_ForIsoPix_IsoTag(consumes<reco::JetTagCollection>   (iConfig.getParameter<edm::InputTag>("L2CaloJet_ForIsoPix_IsoCollection")))
 {
+
+    this -> _hltPrescale = new HLTPrescaleProvider(iConfig,consumesCollector(),*this);
+
     this -> _treeName = iConfig.getParameter<std::string>("treeName");
     this -> _processName = iConfig.getParameter<edm::InputTag>("triggerResultsLabel");
 
@@ -250,6 +264,11 @@ void Ntuplizer::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
         return;
     }
 
+    if(!this -> _hltPrescale->init(iRun, iSetup, this -> _processName.process(), changedConfig)){
+        edm::LogError("HLTMatchingFilter") << "Initialization of HLTPrescaleProvider failed!!";
+        return;
+    }
+
     const edm::TriggerNames::Strings& triggerNames = this -> _hltConfig.triggerNames();
     std::cout << " ===== LOOKING FOR THE PATH INDEXES =====" << std::endl;
     for (tParameterSet& parameter : this -> _parameters){
@@ -293,6 +312,10 @@ void Ntuplizer::Initialize() {
     this -> _indexevents = 0;
     this -> _runNumber = 0;
     this -> _lumi = 0;
+    this -> _PS_column = -1;
+
+    this -> _MC_weight = 1;
+
     this -> _tauPt = -1.;
     this -> _tauEta = -1.;
     this -> _tauPhi = -1.;
@@ -379,6 +402,10 @@ void Ntuplizer::beginJob()
     this -> _tree -> Branch("EventNumber",&_indexevents,"EventNumber/l");
     this -> _tree -> Branch("RunNumber",&_runNumber,"RunNumber/I");
     this -> _tree -> Branch("lumi",&_lumi,"lumi/I");
+    this -> _tree -> Branch("PS_column",&_PS_column,"PS_column/I");
+
+    this -> _tree -> Branch("MC_weight",&_MC_weight,"MC_weight/F");
+
     this -> _tree -> Branch("tauTriggerBits", &_tauTriggerBits, "tauTriggerBits/l");
     this -> _tree -> Branch("tauPt",  &_tauPt,  "tauPt/F");
     this -> _tree -> Branch("tauEta", &_tauEta, "tauEta/F");
@@ -477,6 +504,7 @@ void Ntuplizer::endJob()
 
 void Ntuplizer::endRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
 {
+    delete _hltPrescale;
     return;
 }
 
@@ -488,10 +516,13 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     _indexevents = iEvent.id().event();
     _runNumber = iEvent.id().run();
     _lumi = iEvent.luminosityBlock();
+    _PS_column = this->_hltPrescale->prescaleSet(iEvent,eSetup);
+
+    edm::Handle<GenEventInfoProduct> genEvt;
+    try {iEvent.getByToken(_genTag, genEvt);}  catch (...) {;}
+    if(genEvt.isValid()) this->_MC_weight = genEvt->weight();
 
     //cout<<"EventNumber = "<<_indexevents<<endl;
-
-    // std::auto_ptr<pat::MuonRefVector> resultMuon(new pat::MuonRefVector);
 
     // search for the tag in the event
     edm::Handle<pat::MuonRefVector> muonHandle;
@@ -532,9 +563,9 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
       obj.unpackPathNames(names);
       const edm::TriggerNames::Strings& triggerNames = names.triggerNames();
 
-      const std::vector<std::string>& eventLabels = obj.filterLabels();
+      /*const std::vector<std::string>& eventLabels = obj.filterLabels();
       for(unsigned int i=0; i<eventLabels.size();i++)	
-	// cout<<eventLabels[i]<<endl;
+      cout<<eventLabels[i]<<endl;*/
 
       if(obj.hasTriggerObjectType(trigger::TriggerMuon)){
 

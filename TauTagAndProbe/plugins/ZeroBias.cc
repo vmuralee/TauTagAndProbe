@@ -26,6 +26,8 @@
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 #include "DataFormats/L1Trigger/interface/Tau.h"
 #include "DataFormats/L1Trigger/interface/Jet.h"
+#include "DataFormats/L1Trigger/interface/EGamma.h"
+#include "DataFormats/L1Trigger/interface/Muon.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/JetReco/interface/CaloJet.h"
 #include "DataFormats/BTauReco/interface/JetTag.h"
@@ -90,6 +92,7 @@ private:
   std::vector<float> _l1tEta;
   std::vector<float> _l1tPhi;
   std::vector<int> _l1tIso;
+
   std::vector<int> _l1tEmuQual;
   std::vector<float> _l1tEmuPt;
   std::vector<float> _l1tEmuEta;
@@ -121,6 +124,34 @@ private:
   std::vector<int> _l1tEmuTowerIPhiJet;
   std::vector<int> _l1tEmuRawEtJet; 
 
+  std::vector<int> _l1tEGQual;
+  std::vector<float> _l1tEGPt;
+  std::vector<float> _l1tEGEta;
+  std::vector<float> _l1tEGPhi;
+  std::vector<int> _l1tEGIso;
+
+  std::vector<int> _l1tEmuEGQual;
+  std::vector<float> _l1tEmuEGPt;
+  std::vector<float> _l1tEmuEGEta;
+  std::vector<float> _l1tEmuEGPhi;
+  std::vector<int> _l1tEmuEGIso;
+  std::vector<int> _l1tEmuEGNTT;
+  std::vector<int> _l1tEmuEGTowerIEta;
+  std::vector<int> _l1tEmuEGTowerIPhi;
+  std::vector<int> _l1tEmuEGRawEt;
+  std::vector<int> _l1tEmuEGIsoEt;
+
+  std::vector<int> _l1tMuQual;
+  std::vector<float> _l1tMuPt;
+  std::vector<float> _l1tMuEta;
+  std::vector<float> _l1tMuPhi;
+
+  std::vector<int> _l1tEmuMuQual;
+  std::vector<float> _l1tEmuMuPt;
+  std::vector<float> _l1tEmuMuEta;
+  std::vector<float> _l1tEmuMuPhi;
+  std::vector<int> _l1tEmuMuIso;
+
   std::vector<float> _hltTauPt;
   std::vector<float> _hltTauEta;
   std::vector<float> _hltTauPhi;
@@ -151,6 +182,11 @@ private:
   std::vector<float> _hltPixelTrack_Pt;
   std::vector<float> _hltPixelTrack_Eta;
   std::vector<float> _hltPixelTrack_Phi;
+
+  int _hltMergedTrackTauReg_N;
+  std::vector<float> _hltMergedTrackTauReg_Pt;
+  std::vector<float> _hltMergedTrackTauReg_Eta;
+  std::vector<float> _hltMergedTrackTauReg_Phi;
 
   int _hltPFRegCand_N;
   std::vector<float> _hltPFRegCand_Pt;
@@ -199,8 +235,12 @@ private:
 
   edm::EDGetTokenT<l1t::TauBxCollection> _L1TauTag  ;
   edm::EDGetTokenT<l1t::TauBxCollection> _L1EmuTauTag  ;
-  edm::EDGetTokenT<BXVector<l1t::Jet> > _l1tJetTag;
-  edm::EDGetTokenT<BXVector<l1t::Jet> > _l1tEmuJetTag;
+  edm::EDGetTokenT<l1t::JetBxCollection> _l1tJetTag;
+  edm::EDGetTokenT<l1t::JetBxCollection> _l1tEmuJetTag;
+  edm::EDGetTokenT<l1t::EGammaBxCollection> _L1EGTag  ;
+  edm::EDGetTokenT<l1t::EGammaBxCollection> _L1EmuEGTag  ;
+  edm::EDGetTokenT<l1t::MuonBxCollection> _L1MuTag  ;
+  edm::EDGetTokenT<l1t::MuonBxCollection> _L1EmuMuTag  ;
   edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> _triggerObjects;
   edm::EDGetTokenT<edm::TriggerResults> _triggerBits;
 
@@ -208,6 +248,7 @@ private:
   edm::EDGetTokenT<reco::JetTagCollection> _hltL2CaloJet_ForIsoPix_IsoTag;
 
   edm::EDGetTokenT<reco::TrackCollection> _hltPixelTracksRegForTau_Tag;
+  edm::EDGetTokenT<reco::TrackCollection> _hltMergedTracksTauReg_Tag;
   edm::EDGetTokenT<reco::PFCandidateCollection> _hltPFRegCand_Tag;
   edm::EDGetTokenT<reco::PFJetCollection> _hltAK4PFRegJet_Tag;
   edm::EDGetTokenT<reco::PFTauCollection> _hltPFTauSansRefReg_Tag;
@@ -243,13 +284,18 @@ private:
 ZeroBias::ZeroBias(const edm::ParameterSet& iConfig) :
   _L1TauTag       (consumes<l1t::TauBxCollection>                   (iConfig.getParameter<edm::InputTag>("L1Tau"))),
   _L1EmuTauTag    (consumes<l1t::TauBxCollection>                   (iConfig.getParameter<edm::InputTag>("L1EmuTau"))),
-  _l1tJetTag      (consumes<BXVector<l1t::Jet> >                     (iConfig.getParameter<edm::InputTag>("l1tJetCollection"))),
-  _l1tEmuJetTag   (consumes<BXVector<l1t::Jet> >                     (iConfig.getParameter<edm::InputTag>("l1tEmuJetCollection"))),
+  _l1tJetTag      (consumes<l1t::JetBxCollection>                     (iConfig.getParameter<edm::InputTag>("l1tJetCollection"))),
+  _l1tEmuJetTag   (consumes<l1t::JetBxCollection>                     (iConfig.getParameter<edm::InputTag>("l1tEmuJetCollection"))),
+  _L1EGTag       (consumes<l1t::EGammaBxCollection>                   (iConfig.getParameter<edm::InputTag>("L1EG"))),
+  _L1EmuEGTag    (consumes<l1t::EGammaBxCollection>                   (iConfig.getParameter<edm::InputTag>("L1EmuEG"))),
+  _L1MuTag       (consumes<l1t::MuonBxCollection>                   (iConfig.getParameter<edm::InputTag>("L1Mu"))),
+  _L1EmuMuTag    (consumes<l1t::MuonBxCollection>                   (iConfig.getParameter<edm::InputTag>("L1EmuMu"))),
   _triggerObjects (consumes<pat::TriggerObjectStandAloneCollection> (iConfig.getParameter<edm::InputTag>("triggerSet"))),
   _triggerBits    (consumes<edm::TriggerResults>                    (iConfig.getParameter<edm::InputTag>("triggerResultsLabel"))),
   _hltL2CaloJet_ForIsoPix_Tag(consumes<reco::CaloJetCollection>     (iConfig.getParameter<edm::InputTag>("L2CaloJet_ForIsoPix_Collection"))),
   _hltL2CaloJet_ForIsoPix_IsoTag(consumes<reco::JetTagCollection>   (iConfig.getParameter<edm::InputTag>("L2CaloJet_ForIsoPix_IsoCollection"))),
-  _hltPixelTracksRegForTau_Tag(consumes<reco::TrackCollection>(iConfig.getParameter<edm::InputTag>("TrackCollection"))),
+  _hltPixelTracksRegForTau_Tag(consumes<reco::TrackCollection>(iConfig.getParameter<edm::InputTag>("PixelTrackCollection"))),
+  _hltMergedTracksTauReg_Tag(consumes<reco::TrackCollection>(iConfig.getParameter<edm::InputTag>("MergedTrackCollection"))),
   _hltPFRegCand_Tag(consumes<reco::PFCandidateCollection>(iConfig.getParameter<edm::InputTag>("PFRegCandCollection"))),
   _hltAK4PFRegJet_Tag(consumes<reco::PFJetCollection>(iConfig.getParameter<edm::InputTag>("AK4PFRegJetCollection"))),
   _hltPFTauSansRefReg_Tag(consumes<reco::PFTauCollection>(iConfig.getParameter<edm::InputTag>("PFTauSansRefRegCollection"))),
@@ -353,6 +399,7 @@ void ZeroBias::Initialize() {
   this -> _l1tPhi .clear();
   this -> _l1tQual .clear();
   this -> _l1tIso .clear();
+
   this -> _l1tEmuPt .clear();
   this -> _l1tEmuEta .clear();
   this -> _l1tEmuPhi .clear();
@@ -384,6 +431,33 @@ void ZeroBias::Initialize() {
   this -> _l1tEmuTowerIPhiJet .clear();
   this -> _l1tEmuRawEtJet     .clear();
 
+  this -> _l1tEGPt .clear();
+  this -> _l1tEGEta .clear();
+  this -> _l1tEGPhi .clear();
+  this -> _l1tEGQual .clear();
+  this -> _l1tEGIso .clear();
+
+  this -> _l1tEmuEGPt .clear();
+  this -> _l1tEmuEGEta .clear();
+  this -> _l1tEmuEGPhi .clear();
+  this -> _l1tEmuEGQual .clear();
+  this -> _l1tEmuEGIso .clear();
+  this -> _l1tEmuEGNTT .clear();
+  this -> _l1tEmuEGTowerIEta .clear();
+  this -> _l1tEmuEGTowerIPhi .clear();
+  this -> _l1tEmuEGRawEt .clear();
+  this -> _l1tEmuEGIsoEt .clear();
+
+  this -> _l1tMuPt .clear();
+  this -> _l1tMuEta .clear();
+  this -> _l1tMuPhi .clear();
+  this -> _l1tMuQual .clear();
+
+  this -> _l1tEmuMuPt .clear();
+  this -> _l1tEmuMuEta .clear();
+  this -> _l1tEmuMuPhi .clear();
+  this -> _l1tEmuMuQual .clear();
+
   this -> _hltTauPt .clear();
   this -> _hltTauEta .clear();
   this -> _hltTauPhi .clear();
@@ -414,6 +488,11 @@ void ZeroBias::Initialize() {
   this -> _hltPixelTrack_Pt.clear();
   this -> _hltPixelTrack_Eta.clear();
   this -> _hltPixelTrack_Phi.clear();
+
+  this -> _hltMergedTrackTauReg_N = 0;
+  this -> _hltMergedTrackTauReg_Pt.clear();
+  this -> _hltMergedTrackTauReg_Eta.clear();
+  this -> _hltMergedTrackTauReg_Phi.clear();
 
   this -> _hltPFRegCand_N = 0;
   this -> _hltPFRegCand_Pt.clear();
@@ -474,11 +553,13 @@ void ZeroBias::beginJob()
   this -> _tree -> Branch("RunNumber",  &_runNumber);
   this -> _tree -> Branch("lumi",  &_lumi);
   this -> _tree -> Branch("EventTriggerBits", &_EventTriggerBits, "EventTriggerBits/L");
+
   this -> _tree -> Branch("l1tPt",  &_l1tPt);
   this -> _tree -> Branch("l1tEta", &_l1tEta);
   this -> _tree -> Branch("l1tPhi", &_l1tPhi);
   this -> _tree -> Branch("l1tQual", &_l1tQual);
   this -> _tree -> Branch("l1tIso", &_l1tIso);
+
   this -> _tree -> Branch("l1tEmuPt",  &_l1tEmuPt);
   this -> _tree -> Branch("l1tEmuEta", &_l1tEmuEta);
   this -> _tree -> Branch("l1tEmuPhi", &_l1tEmuPhi);
@@ -510,6 +591,33 @@ void ZeroBias::beginJob()
   this -> _tree -> Branch("l1tEmuTowerIPhiJet", &_l1tEmuTowerIPhiJet);
   this -> _tree -> Branch("l1tEmuRawEtJet", &_l1tEmuRawEtJet);
 
+  this -> _tree -> Branch("l1tEGPt",  &_l1tEGPt);
+  this -> _tree -> Branch("l1tEGEta", &_l1tEGEta);
+  this -> _tree -> Branch("l1tEGPhi", &_l1tEGPhi);
+  this -> _tree -> Branch("l1tEGQual", &_l1tEGQual);
+  this -> _tree -> Branch("l1tEGIso", &_l1tEGIso);
+
+  this -> _tree -> Branch("l1tEmuEGPt",  &_l1tEmuEGPt);
+  this -> _tree -> Branch("l1tEmuEGEta", &_l1tEmuEGEta);
+  this -> _tree -> Branch("l1tEmuEGPhi", &_l1tEmuEGPhi);
+  this -> _tree -> Branch("l1tEmuEGQual", &_l1tEmuEGQual);
+  this -> _tree -> Branch("l1tEmuEGIso", &_l1tEmuEGIso);
+  this -> _tree -> Branch("l1tEmuEGNTT", &_l1tEmuEGNTT);
+  this -> _tree -> Branch("l1tEmuEGTowerIEta", &_l1tEmuEGTowerIEta);
+  this -> _tree -> Branch("l1tEmuEGTowerIPhi", &_l1tEmuEGTowerIPhi);
+  this -> _tree -> Branch("l1tEmuEGRawEt", &_l1tEmuEGRawEt);
+  this -> _tree -> Branch("l1tEmuEGIsoEt", &_l1tEmuEGIsoEt);
+
+  this -> _tree -> Branch("l1tMuPt",  &_l1tMuPt);
+  this -> _tree -> Branch("l1tMuEta", &_l1tMuEta);
+  this -> _tree -> Branch("l1tMuPhi", &_l1tMuPhi);
+  this -> _tree -> Branch("l1tMuQual", &_l1tMuQual);
+
+  this -> _tree -> Branch("l1tEmuMuPt",  &_l1tEmuMuPt);
+  this -> _tree -> Branch("l1tEmuMuEta", &_l1tEmuMuEta);
+  this -> _tree -> Branch("l1tEmuMuPhi", &_l1tEmuMuPhi);
+  this -> _tree -> Branch("l1tEmuMuQual", &_l1tEmuMuQual);
+
   this -> _tree -> Branch("hltTauPt",  &_hltTauPt);
   this -> _tree -> Branch("hltTauEta", &_hltTauEta);
   this -> _tree -> Branch("hltTauPhi", &_hltTauPhi);
@@ -540,6 +648,11 @@ void ZeroBias::beginJob()
   this -> _tree -> Branch("hltPixelTrack_Pt",   &_hltPixelTrack_Pt);
   this -> _tree -> Branch("hltPixelTrack_Eta",  &_hltPixelTrack_Eta);
   this -> _tree -> Branch("hltPixelTrack_Phi",  &_hltPixelTrack_Phi);
+
+  this -> _tree -> Branch("hltMergedTrackTauReg_N",    &_hltMergedTrackTauReg_N,    "hltMergedTrackTauReg_N/I");
+  this -> _tree -> Branch("hltMergedTrackTauReg_Pt",   &_hltMergedTrackTauReg_Pt);
+  this -> _tree -> Branch("hltMergedTrackTauReg_Eta",  &_hltMergedTrackTauReg_Eta);
+  this -> _tree -> Branch("hltMergedTrackTauReg_Phi",  &_hltMergedTrackTauReg_Phi);
 
   this -> _tree -> Branch("hltPFRegCand_N",    &_hltPFRegCand_N,    "hltPFRegCand_N/I");
   this -> _tree -> Branch("hltPFRegCand_Pt",   &_hltPFRegCand_Pt);
@@ -695,6 +808,95 @@ void ZeroBias::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
   }
   
 
+
+  edm::Handle< BXVector<l1t::EGamma> >  L1EGHandle;
+  try {iEvent.getByToken(_L1EGTag, L1EGHandle);}  catch (...) {;}
+
+  if(L1EGHandle.isValid()){
+    for (l1t::EGammaBxCollection::const_iterator bx0EGIt = L1EGHandle->begin(0); bx0EGIt != L1EGHandle->end(0) ; bx0EGIt++)
+      {
+	const l1t::EGamma& l1tEG = *bx0EGIt;
+	
+	//cout<<"FW EG, pT = "<<l1tEG.pt()<<", eta = "<<l1tEG.eta()<<", phi = "<<l1tEG.phi()<<endl;
+	
+	this -> _l1tEGPt.push_back(l1tEG.pt());
+	this -> _l1tEGEta.push_back(l1tEG.eta());
+	this -> _l1tEGPhi.push_back(l1tEG.phi());
+	this -> _l1tEGIso.push_back(l1tEG.hwIso());
+	this -> _l1tEGQual.push_back(l1tEG.hwQual());
+	
+      }
+  }
+
+  edm::Handle< BXVector<l1t::EGamma> >  L1EmuEGHandle;
+  try {iEvent.getByToken(_L1EmuEGTag, L1EmuEGHandle);} catch (...) {;}
+
+  if (L1EmuEGHandle.isValid())
+    {	
+      for (l1t::EGammaBxCollection::const_iterator bx0EmuEGIt = L1EmuEGHandle->begin(0); bx0EmuEGIt != L1EmuEGHandle->end(0) ; bx0EmuEGIt++)
+	{
+	  const l1t::EGamma& l1tEmuEG = *bx0EmuEGIt;
+	    
+	  //cout<<"Emul EG, pT = "<<l1tEmuEG.pt()<<", eta = "<<l1tEmuEG.eta()<<", phi = "<<l1tEmuEG.phi()<<endl;
+	    
+	  this -> _l1tEmuEGPt       .push_back(l1tEmuEG.pt());
+	  this -> _l1tEmuEGEta      .push_back(l1tEmuEG.eta());
+	  this -> _l1tEmuEGPhi      .push_back(l1tEmuEG.phi());
+	  this -> _l1tEmuEGIso      .push_back(l1tEmuEG.hwIso());
+	  this -> _l1tEmuEGNTT      .push_back(l1tEmuEG.nTT());
+	  this -> _l1tEmuEGQual     .push_back(l1tEmuEG.hwQual());
+	  this -> _l1tEmuEGTowerIEta.push_back(l1tEmuEG.towerIEta());
+	  this -> _l1tEmuEGTowerIPhi.push_back(l1tEmuEG.towerIPhi());
+	  this -> _l1tEmuEGRawEt    .push_back(l1tEmuEG.rawEt());
+	  this -> _l1tEmuEGIsoEt    .push_back(l1tEmuEG.isoEt());
+
+	}
+    }
+
+
+
+  edm::Handle< BXVector<l1t::Muon> >  L1MuHandle;
+  try {iEvent.getByToken(_L1MuTag, L1MuHandle);}  catch (...) {;}
+
+  if(L1MuHandle.isValid()){
+    for (l1t::MuonBxCollection::const_iterator bx0MuIt = L1MuHandle->begin(0); bx0MuIt != L1MuHandle->end(0) ; bx0MuIt++)
+      {
+	const l1t::Muon& l1tMu = *bx0MuIt;
+	
+	//cout<<"FW Mu, pT = "<<l1tMu.pt()<<", eta = "<<l1tMu.eta()<<", phi = "<<l1tMu.phi()<<endl;
+	
+	this -> _l1tMuPt.push_back(l1tMu.pt());
+	this -> _l1tMuEta.push_back(l1tMu.eta());
+	this -> _l1tMuPhi.push_back(l1tMu.phi());
+	this -> _l1tMuQual.push_back(l1tMu.hwQual());
+	
+      }
+  }
+
+  edm::Handle< BXVector<l1t::Muon> >  L1EmuMuHandle;
+  try {iEvent.getByToken(_L1EmuMuTag, L1EmuMuHandle);} catch (...) {;}
+
+  if (L1EmuMuHandle.isValid())
+    {	
+      for (l1t::MuonBxCollection::const_iterator bx0EmuMuIt = L1EmuMuHandle->begin(0); bx0EmuMuIt != L1EmuMuHandle->end(0) ; bx0EmuMuIt++)
+	{
+	  const l1t::Muon& l1tEmuMu = *bx0EmuMuIt;
+	    
+	  //cout<<"Emul Mu, pT = "<<l1tEmuMu.pt()<<", eta = "<<l1tEmuMu.eta()<<", phi = "<<l1tEmuMu.phi()<<endl;
+	    
+	  this -> _l1tEmuMuPt       .push_back(l1tEmuMu.pt());
+	  this -> _l1tEmuMuEta      .push_back(l1tEmuMu.eta());
+	  this -> _l1tEmuMuPhi      .push_back(l1tEmuMu.phi());
+	  this -> _l1tEmuMuQual     .push_back(l1tEmuMu.hwQual());
+
+	}
+    }
+
+
+
+
+
+
   edm::Handle<edm::TriggerResults> triggerBits;
   iEvent.getByToken(this -> _triggerBits, triggerBits);
   const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
@@ -784,7 +986,7 @@ void ZeroBias::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
 	  this -> _hltPFTauTrackReg_Phi.push_back(obj.phi());
 	}
 
-	const std::vector<std::string>& PFTau35TrackPt1Reg_filters = {"hltSinglePFTau35TrackPt1Reg"};
+	const std::vector<std::string>& PFTau35TrackPt1Reg_filters = {"hltDoublePFTau35TrackPt1Reg"};
 	if (this -> hasFilters(obj, PFTau35TrackPt1Reg_filters)){
 	  this -> _hltPFTau35TrackPt1Reg_N++;	  
 	  this -> _hltPFTau35TrackPt1Reg_Pt.push_back(obj.pt());
@@ -831,6 +1033,19 @@ void ZeroBias::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
       _hltPixelTrack_Pt.push_back(tracks[i].pt());
       _hltPixelTrack_Eta.push_back(tracks[i].eta());
       _hltPixelTrack_Phi.push_back(tracks[i].phi());
+    }
+  }
+
+  edm::Handle< reco::TrackCollection > MergedTracksTauReg_Handle;
+  try {iEvent.getByToken(_hltMergedTracksTauReg_Tag, MergedTracksTauReg_Handle);}  catch (...) {;}
+
+  if(MergedTracksTauReg_Handle.isValid()){
+    const reco::TrackCollection tracks = *(MergedTracksTauReg_Handle.product());
+    for(unsigned int i=0; i<tracks.size(); i++) {
+      _hltMergedTrackTauReg_N++;
+      _hltMergedTrackTauReg_Pt.push_back(tracks[i].pt());
+      _hltMergedTrackTauReg_Eta.push_back(tracks[i].eta());
+      _hltMergedTrackTauReg_Phi.push_back(tracks[i].phi());
     }
   }
 

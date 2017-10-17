@@ -211,6 +211,7 @@ TagAndProbe = cms.EDFilter("TauTagAndProbeFilter",
 # Ntuplizer.taus = cms.InputTag("genMatchedTaus")
 Ntuplizer = cms.EDAnalyzer("Ntuplizer",
     treeName = cms.string("TagAndProbe"),
+    genCollection = cms.InputTag("generator"),
     muons = cms.InputTag("goodMuons"),
     taus  = cms.InputTag("genMatchedTaus"),
     triggerSet = cms.InputTag("selectedPatTrigger"),
@@ -228,8 +229,8 @@ TAndPseq = cms.Sequence(
     hltFilter      +
     goodMuons      +
     goodTaus       +
-    TagAndProbe
-    + genMatchedTaus 
+    #TagAndProbe   +
+    genMatchedTaus 
 )
 
 NtupleSeq = cms.Sequence(
