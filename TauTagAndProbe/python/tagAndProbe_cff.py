@@ -211,6 +211,8 @@ goodMuons = cms.EDFilter("PATMuonRefSelector",
         filter = cms.bool(True)
 )
 
+
+
 ## good taus - apply analysis selection
 goodTaus = cms.EDFilter("PATTauRefSelector",
         src = cms.InputTag("slimmedTaus"),
@@ -231,16 +233,19 @@ bjets = cms.EDFilter("PATJetRefSelector",
         src = cms.InputTag("slimmedJets"),
         cut = cms.string(
                 'pt > 20 && abs(eta) < 2.4 ' #kinematics
-                '&& bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") > 0.800' # b tag with medium WP
+                '&& bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") > 0.8484' # b tag with medium WP
         ),
-        filter = cms.bool(True)
+        #filter = cms.bool(True)
 )
 
 TagAndProbe = cms.EDFilter("TauTagAndProbeFilter",
-        taus  = cms.InputTag("goodTaus"),
-        muons = cms.InputTag("goodMuons"),
-        met   = cms.InputTag("slimmedMETs"),
-        useMassCuts = cms.bool(True)
+                           taus  = cms.InputTag("goodTaus"),
+                           muons = cms.InputTag("goodMuons"),
+                           met   = cms.InputTag("slimmedMETs"),
+                           useMassCuts = cms.bool(True),
+                           electrons = cms.InputTag("slimmedElectrons"),
+                           eleLooseIdMap = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring16-HZZ-V1-wpLoose"),
+                           bjets = cms.InputTag("bjets")
 )
 
 
@@ -273,7 +278,7 @@ TAndPseq = cms.Sequence(
     muonNumberFilter +
     goodMuons        +
     goodTaus         +
-    #~bjets           +
+    bjets            +
     TagAndProbe
 )
 
