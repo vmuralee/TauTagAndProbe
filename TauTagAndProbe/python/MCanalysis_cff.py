@@ -195,6 +195,16 @@ hltFilter = hlt.hltHighLevel.clone(
     throw = cms.bool(True) #if True: throws exception if a trigger path is invalid
 )
 
+### ----------------------------------------------------------------------
+### gen info, only from MC
+### ----------------------------------------------------------------------
+genInfo = cms.EDProducer("GenFiller",
+         src = cms.InputTag("prunedGenParticles"),
+         storeLightFlavAndGlu = cms.bool(True) # if True, store also udcs and gluons (first copy)
+ )    
+
+
+
 ## good muons for T&P
 goodMuons = cms.EDFilter("PATMuonRefSelector",
         src = cms.InputTag("slimmedMuons"),
@@ -210,13 +220,10 @@ goodMuons = cms.EDFilter("PATMuonRefSelector",
 goodTaus = cms.EDFilter("PATTauRefSelector",
         src = cms.InputTag("slimmedTaus"),
         cut = cms.string(
-                #'pt > 18 && abs(eta) < 2.5 ' #kinematics
                 'pt > 20 && abs(eta) < 2.1 ' #kinematics
                 '&& abs(charge) > 0 && abs(charge) < 2 ' #sometimes 2 prongs have charge != 1
                 '&& tauID("decayModeFinding") > 0.5 ' # tau ID
-                '&& tauID("byTightIsolationMVArun2v1DBoldDMwLT") > 0.5 ' # tau iso - NOTE: can as well use boolean discriminators with WP
-                #'&& tauID("byCombinedIsolationDeltaBetaCorrRaw3Hits") < 2.5 ' # tau iso - NOTE: can as well use boolean discriminators with WP
-                #'&& tauID("byCombinedIsolationDeltaBetaCorrRaw3Hits") < 1.0 ' # tau iso - NOTE: can as well use boolean discriminators with WP
+                '&& tauID("byTightIsolationMVArun2v1DBoldDMwLT") > 0.5 ' # tau iso - NOTE: can as well use boolean discriminators with WP               
                 '&& tauID("againstMuonTight3") > 0.5 ' # anti Muon tight
                 '&& tauID("againstElectronVLooseMVA6") > 0.5 ' # anti-Ele loose
         ),
@@ -262,7 +269,9 @@ patTriggerUnpacker = cms.EDProducer("PATTriggerObjectStandAloneUnpacker",
 # Ntuplizer.taus = cms.InputTag("genMatchedTaus")
 Ntuplizer = cms.EDAnalyzer("Ntuplizer",
     treeName = cms.string("TagAndProbe"),
+    isMC = cms.bool(True),                           
     genCollection = cms.InputTag("generator"),
+    genPartCollection = cms.InputTag("genInfo"),                           
     muons = cms.InputTag("goodMuons"),
     taus  = cms.InputTag("genMatchedTaus"),
     triggerSet = cms.InputTag("patTriggerUnpacker"),
@@ -276,12 +285,14 @@ Ntuplizer = cms.EDAnalyzer("Ntuplizer",
     L2CaloJet_ForIsoPix_IsoCollection = cms.InputTag("hltL2TauPixelIsoTagProducer", "", "TEST")   
 )
 
+
 TAndPseq = cms.Sequence(
     hltFilter      +
     goodMuons      +
     goodTaus       +
-    bjets          +
-    #TagAndProbe   +
+    #bjets          +
+    #TagAndProbe    +
+    genInfo        +
     genMatchedTaus 
 )
 

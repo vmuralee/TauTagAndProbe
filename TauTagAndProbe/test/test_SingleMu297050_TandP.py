@@ -93,18 +93,18 @@ if not isMC:
     process.load('TauTagAndProbe.TauTagAndProbe.tagAndProbe_cff')
     process.source = cms.Source("PoolSource",
         fileNames = cms.untracked.vstring(
-            '/store/data/Run2017B/SingleMuon/RAW-RECO/MuTau-PromptReco-v1/000/297/488/00000/5CA074E9-C45B-E711-9BDD-02163E0133FE.root'
+            '/store/data/Run2017F/SingleMuon/USER/MuTau-PromptReco-v1/000/305/814/00000/0454A948-54BE-E711-9031-FA163E6983E4.root'
         ),
     )
 
 
 
 else:
-    process.GlobalTag.globaltag = '92X_upgrade2017_TSG_For83XSamples_V5'
+    process.GlobalTag.globaltag = '92X_upgrade2017_realistic_v12'
     process.load('TauTagAndProbe.TauTagAndProbe.MCanalysis_cff')
     process.source = cms.Source("PoolSource",
         fileNames = cms.untracked.vstring(            
-            '/store/user/tstreble/HTauTau_MC_92Xmenu_MuTau/VBFHToTauTau_M125_13TeV_powheg_pythia8/HTauTau_MC_92Xmenu/170724_143442/0000/outputFULL_1.root'
+            '/store/mc/RunIISummer17MiniAOD/VBFHToTauTau_M125_13TeV_powheg_pythia8/MINIAODSIM/NZSFlatPU28to62_HIG07_92X_upgrade2017_realistic_v10-v1/70000/0080A67C-FBA4-E711-A8FE-00259029E84C.root'
         )
     )
 
