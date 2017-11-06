@@ -280,6 +280,7 @@ TAndPseq = cms.Sequence(
     hltFilter      +
     goodMuons      +
     goodTaus       +
+    bjets          +
     #TagAndProbe   +
     genMatchedTaus 
 )
