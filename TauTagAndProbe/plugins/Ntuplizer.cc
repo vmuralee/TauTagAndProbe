@@ -262,7 +262,9 @@ _hltL2CaloJet_ForIsoPix_IsoTag(consumes<reco::JetTagCollection>   (iConfig.getPa
 }
 
 Ntuplizer::~Ntuplizer()
-{}
+{
+    delete _hltPrescale;
+}
 
 void Ntuplizer::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
 {
@@ -515,7 +517,6 @@ void Ntuplizer::endJob()
 
 void Ntuplizer::endRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
 {
-    delete _hltPrescale;
     return;
 }
 

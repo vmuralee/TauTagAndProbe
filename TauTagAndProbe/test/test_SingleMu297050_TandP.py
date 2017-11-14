@@ -76,13 +76,9 @@ for idmod in my_id_modules:
 
 egmMod = 'egmGsfElectronIDs'
 mvaMod = 'electronMVAValueMapProducer'
-regMod = 'electronRegressionValueMapProducer'
-egmSeq = 'egmGsfElectronIDSequence'
 setattr(process,egmMod,process.egmGsfElectronIDs.clone())
 setattr(process,mvaMod,process.electronMVAValueMapProducer.clone())
-setattr(process,regMod,process.electronRegressionValueMapProducer.clone())
-setattr(process,egmSeq,cms.Sequence(getattr(process,mvaMod)*getattr(process,egmMod)*getattr(process,regMod)))
-process.electrons = cms.Sequence(getattr(process,mvaMod)*getattr(process,egmMod)*getattr(process,regMod))
+process.electrons = cms.Sequence(getattr(process,mvaMod)*getattr(process,egmMod))
 
 
 
