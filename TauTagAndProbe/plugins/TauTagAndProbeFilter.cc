@@ -75,7 +75,7 @@ bool TauTagAndProbeFilter::filter(edm::Event & iEvent, edm::EventSetup const& iS
      
       const auto ele = electrons->ptrAt(i);
       int isLooseID = (*loose_id_decisions)[ele];
-      if(isLooseID && ele->p4().Pt()>10 && abs(ele->p4().Eta())<2.5)
+      if(isLooseID && ele->p4().Pt()>10 && fabs(ele->p4().Eta())<2.5)
 	return false;
 
     }
