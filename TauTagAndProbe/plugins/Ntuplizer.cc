@@ -21,6 +21,7 @@
 #include <FWCore/Utilities/interface/InputTag.h>
 #include <DataFormats/PatCandidates/interface/Muon.h>
 #include <DataFormats/PatCandidates/interface/Tau.h>
+#include <DataFormats/PatCandidates/interface/MET.h>
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
@@ -69,6 +70,7 @@ class Ntuplizer : public edm::EDAnalyzer {
         void Initialize();
         bool hasFilters(const pat::TriggerObjectStandAlone&  obj , const std::vector<std::string>& filtersToLookFor);
         int GenIndex(const pat::TauRef& tau, const edm::View<pat::GenericParticle>* genparts);
+  float ComputeMT (math::XYZTLorentzVector visP4, const pat::MET& met);
 
         bool _isMC;
 
@@ -89,7 +91,9 @@ class Ntuplizer : public edm::EDAnalyzer {
         float _tauEta;
         float _tauPhi;
         int _tauDM;
-        int _tau_genindex;
+        float _mT;
+        float _mVis;
+        int _tau_genindex;        
   
         bool _byLooseCombinedIsolationDeltaBetaCorr3Hits;
         bool _byMediumCombinedIsolationDeltaBetaCorr3Hits;
@@ -162,6 +166,7 @@ class Ntuplizer : public edm::EDAnalyzer {
         float _muonPt;
         float _muonEta;
         float _muonPhi;
+        float _MET;
         int _Nvtx;
 
         edm::EDGetTokenT<GenEventInfoProduct> _genTag;
@@ -169,6 +174,7 @@ class Ntuplizer : public edm::EDAnalyzer {
 
         edm::EDGetTokenT<pat::MuonRefVector>  _muonsTag;
         edm::EDGetTokenT<pat::TauRefVector>   _tauTag;
+        edm::EDGetTokenT<pat::METCollection>  _metTag;
         edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> _triggerObjects;
         edm::EDGetTokenT<edm::TriggerResults> _triggerBits;
         edm::EDGetTokenT<l1t::TauBxCollection> _L1TauTag  ;
@@ -207,6 +213,7 @@ _genTag         (consumes<GenEventInfoProduct>                    (iConfig.getPa
 _genPartTag     (consumes<edm::View<pat::GenericParticle>>        (iConfig.getParameter<edm::InputTag>("genPartCollection"))),
 _muonsTag       (consumes<pat::MuonRefVector>                     (iConfig.getParameter<edm::InputTag>("muons"))),
 _tauTag         (consumes<pat::TauRefVector>                      (iConfig.getParameter<edm::InputTag>("taus"))),
+_metTag         (consumes<pat::METCollection>                     (iConfig.getParameter<edm::InputTag>("met"))),
 _triggerObjects (consumes<pat::TriggerObjectStandAloneCollection> (iConfig.getParameter<edm::InputTag>("triggerSet"))),
 _triggerBits    (consumes<edm::TriggerResults>                    (iConfig.getParameter<edm::InputTag>("triggerResultsLabel"))),
 _L1TauTag       (consumes<l1t::TauBxCollection>                   (iConfig.getParameter<edm::InputTag>("L1Tau"))),
@@ -331,6 +338,8 @@ void Ntuplizer::Initialize() {
     _tauEta = -1.;
     _tauPhi = -1.;
     _tauDM = -1;
+    _mT = -1.;
+    _mVis = -1.;
     _tau_genindex = -1;
     
     _byLooseCombinedIsolationDeltaBetaCorr3Hits = 0;
@@ -362,6 +371,7 @@ void Ntuplizer::Initialize() {
     _muonPt = -1.;
     _muonEta = -1.;
     _muonPhi = -1.;
+    _MET = -1.;
     _isMatched = false;
     
     _hltPt = -1;
@@ -423,6 +433,8 @@ void Ntuplizer::beginJob()
     _tree -> Branch("tauEta", &_tauEta, "tauEta/F");
     _tree -> Branch("tauPhi", &_tauPhi, "tauPhi/F");
     _tree -> Branch("tauDM", &_tauDM, "tauDM/I");
+    _tree -> Branch("mT", &_mT, "mT/F");
+    _tree -> Branch("mVis", &_mVis, "mVis/F");
     _tree -> Branch("tau_genindex", &_tau_genindex, "tau_genindex/I");
     
     _tree -> Branch("byLooseCombinedIsolationDeltaBetaCorr3Hits", &_byLooseCombinedIsolationDeltaBetaCorr3Hits, "byLooseCombinedIsolationDeltaBetaCorr3Hits/O");
@@ -456,6 +468,8 @@ void Ntuplizer::beginJob()
     _tree -> Branch("muonEta", &_muonEta, "muonEta/F");
     _tree -> Branch("muonPhi", &_muonPhi, "muonPhi/F");
     
+    _tree -> Branch("MET", &_MET, "MET/F");
+
     _tree -> Branch("hltPt",  &_hltPt,  "hltPt/F");
     _tree -> Branch("hltEta", &_hltEta, "hltEta/F");
     _tree -> Branch("hltPhi", &_hltPhi, "hltPhi/F");
@@ -528,7 +542,8 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     _indexevents = iEvent.id().event();
     _runNumber = iEvent.id().run();
     _lumi = iEvent.luminosityBlock();
-    _PS_column = _hltPrescale->prescaleSet(iEvent,eSetup);
+    if(!_isMC)      
+      _PS_column = _hltPrescale->prescaleSet(iEvent,eSetup);
 
     edm::Handle<GenEventInfoProduct> genEvt;
     try {iEvent.getByToken(_genTag, genEvt);}  catch (...) {;}
@@ -538,6 +553,7 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     edm::Handle<edm::View<pat::GenericParticle> > genPartHandle;
     edm::Handle<pat::MuonRefVector> muonHandle;
     edm::Handle<pat::TauRefVector>  tauHandle;
+    edm::Handle<pat::METCollection> metHandle;
     edm::Handle<pat::TriggerObjectStandAloneCollection> triggerObjects;
     edm::Handle<edm::TriggerResults> triggerBits;
     edm::Handle<std::vector<reco::Vertex> >  vertexes;
@@ -548,6 +564,7 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
       iEvent.getByToken(_genPartTag, genPartHandle);
     iEvent.getByToken(_muonsTag, muonHandle);
     iEvent.getByToken(_tauTag,   tauHandle);
+    iEvent.getByToken (_metTag, metHandle);
     iEvent.getByToken(_triggerObjects, triggerObjects);
     iEvent.getByToken(_triggerBits, triggerBits);
     iEvent.getByToken(_VtxTag,vertexes);
@@ -561,6 +578,10 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
     const pat::TauRef tau = (*tauHandle)[0] ;
     const pat::MuonRef muon = (*muonHandle)[0] ;
+    const pat::MET& met = (*metHandle)[0];
+
+    _MET = met.pt();
+    _mT = this->ComputeMT (muon->p4(), met);
 
     if(muonHandle.isValid()) _isOS = (muon -> charge() / tau -> charge() < 0) ? true : false;
 
@@ -574,6 +595,11 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
 
       obj.unpackPathNames(names);
       const edm::TriggerNames::Strings& triggerNames = names.triggerNames();
+
+      const std::vector<std::string>& eventLabels = obj.filterLabels();
+      for(unsigned int i_filter=0;i_filter<eventLabels.size();i_filter++)
+	cout<<eventLabels[i_filter]<<endl;
+
 
       if(obj.hasTriggerObjectType(trigger::TriggerMuon)){
 
@@ -774,6 +800,7 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
       _muonPt=muon->pt();
       _muonEta=muon->eta();
       _muonPhi=muon->phi();
+      _mVis = (muon->p4() + tau->p4()).mass();
     }
 
     _Nvtx = vertexes->size();
@@ -865,6 +892,20 @@ int Ntuplizer::GenIndex(const pat::TauRef& tau, const edm::View<pat::GenericPart
   return genMatchInd;
 
 
+}
+
+
+
+
+float Ntuplizer::ComputeMT (math::XYZTLorentzVector visP4, const pat::MET& met)
+{
+  math::XYZTLorentzVector METP4 (met.pt()*TMath::Cos(met.phi()), met.pt()*TMath::Sin(met.phi()), 0, met.pt());
+  float scalSum = met.pt() + visP4.pt();
+
+  math::XYZTLorentzVector vecSum (visP4);
+  vecSum += METP4;
+  float vecSumPt = vecSum.pt();
+  return sqrt (scalSum*scalSum - vecSumPt*vecSumPt);
 }
 
 
