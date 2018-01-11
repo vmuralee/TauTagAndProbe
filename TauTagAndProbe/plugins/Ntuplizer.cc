@@ -28,6 +28,7 @@
 #include "HLTrigger/HLTcore/interface/HLTPrescaleProvider.h"
 #include "DataFormats/L1Trigger/interface/Tau.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
+#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "DataFormats/JetReco/interface/CaloJet.h"
 #include "DataFormats/BTauReco/interface/JetTag.h"
 #include <DataFormats/PatCandidates/interface/GenericParticle.h>
@@ -168,7 +169,8 @@ class Ntuplizer : public edm::EDAnalyzer {
         float _muonPhi;
         float _MET;
         int _Nvtx;
-
+		int _nTruePU;
+		
         edm::EDGetTokenT<GenEventInfoProduct> _genTag;
         edm::EDGetTokenT<edm::View<pat::GenericParticle> > _genPartTag;
 
@@ -180,6 +182,7 @@ class Ntuplizer : public edm::EDAnalyzer {
         edm::EDGetTokenT<l1t::TauBxCollection> _L1TauTag  ;
         edm::EDGetTokenT<l1t::TauBxCollection> _L1EmuTauTag  ;
         edm::EDGetTokenT<std::vector<reco::Vertex>> _VtxTag;
+        edm::EDGetTokenT<std::vector<PileupSummaryInfo>> _puTag;
         edm::EDGetTokenT<reco::CaloJetCollection> _hltL2CaloJet_ForIsoPix_Tag;
         edm::EDGetTokenT<reco::JetTagCollection> _hltL2CaloJet_ForIsoPix_IsoTag;
 
@@ -219,6 +222,7 @@ _triggerBits    (consumes<edm::TriggerResults>                    (iConfig.getPa
 _L1TauTag       (consumes<l1t::TauBxCollection>                   (iConfig.getParameter<edm::InputTag>("L1Tau"))),
 _L1EmuTauTag    (consumes<l1t::TauBxCollection>                   (iConfig.getParameter<edm::InputTag>("L1EmuTau"))),
 _VtxTag         (consumes<std::vector<reco::Vertex>>              (iConfig.getParameter<edm::InputTag>("Vertexes"))),
+_puTag			(consumes<std::vector<PileupSummaryInfo>>		  (iConfig.getParameter<edm::InputTag>("puInfo"))),
 _hltL2CaloJet_ForIsoPix_Tag(consumes<reco::CaloJetCollection>     (iConfig.getParameter<edm::InputTag>("L2CaloJet_ForIsoPix_Collection"))),
 _hltL2CaloJet_ForIsoPix_IsoTag(consumes<reco::JetTagCollection>   (iConfig.getParameter<edm::InputTag>("L2CaloJet_ForIsoPix_IsoCollection")))
 {
@@ -518,6 +522,7 @@ void Ntuplizer::beginJob()
     _tree -> Branch("isOS", &_isOS, "isOS/O");
     _tree -> Branch("foundJet", &_foundJet, "foundJet/I");
     _tree -> Branch("Nvtx", &_Nvtx, "Nvtx/I");
+    _tree -> Branch("nTruePU", &_nTruePU, "nTruePU/I");
 
     return;
 }
@@ -557,8 +562,11 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     edm::Handle<pat::TriggerObjectStandAloneCollection> triggerObjects;
     edm::Handle<edm::TriggerResults> triggerBits;
     edm::Handle<std::vector<reco::Vertex> >  vertexes;
+   	edm::Handle<std::vector<PileupSummaryInfo>> puInfo;
+
     edm::Handle< reco::CaloJetCollection > L2CaloJets_ForIsoPix_Handle;
     edm::Handle< reco::JetTagCollection > L2CaloJets_ForIsoPix_IsoHandle;
+
 
     if(_isMC)
       iEvent.getByToken(_genPartTag, genPartHandle);
@@ -568,6 +576,7 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
     iEvent.getByToken(_triggerObjects, triggerObjects);
     iEvent.getByToken(_triggerBits, triggerBits);
     iEvent.getByToken(_VtxTag,vertexes);
+    iEvent.getByToken(_puTag, puInfo);
     
     try {iEvent.getByToken(_hltL2CaloJet_ForIsoPix_Tag, L2CaloJets_ForIsoPix_Handle);}  catch (...) {;}
     try {iEvent.getByToken(_hltL2CaloJet_ForIsoPix_IsoTag, L2CaloJets_ForIsoPix_IsoHandle);}  catch (...) {;}
@@ -805,6 +814,15 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
 
     _Nvtx = vertexes->size();
     
+    if(vertexes->size()>0){
+    	_nTruePU = -99;
+    	if (puInfo.isValid()) {
+      		if (puInfo->size() > 0) {
+				_nTruePU = puInfo->at(1).getTrueNumInteractions();
+    		}
+   		}
+  	}
+  	
     _tauTriggerBits = _tauTriggerBitSet.to_ulong();
 
     //Gen-matching

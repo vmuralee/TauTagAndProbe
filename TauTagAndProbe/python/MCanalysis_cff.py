@@ -274,6 +274,7 @@ Ntuplizer = cms.EDAnalyzer("Ntuplizer",
     genPartCollection = cms.InputTag("genInfo"),                           
     muons = cms.InputTag("goodMuons"),
     taus  = cms.InputTag("genMatchedTaus"),
+    puInfo = cms.InputTag("slimmedAddPileupInfo"), 
     triggerSet = cms.InputTag("patTriggerUnpacker"),
     triggerResultsLabel = cms.InputTag("TriggerResults", "", "HLT"),
     L1Tau = cms.InputTag("caloStage2Digis", "Tau", "RECO"),
@@ -291,8 +292,8 @@ TAndPseq = cms.Sequence(
     goodMuons      +
     goodTaus       +
     bjets          +
-    TagAndProbe    #+
-    #genInfo        +
+    TagAndProbe    +
+    genInfo        #+
     #genMatchedTaus 
 )
 
