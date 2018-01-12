@@ -597,10 +597,6 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
       const edm::TriggerNames::Strings& triggerNames = names.triggerNames();
 
       const std::vector<std::string>& eventLabels = obj.filterLabels();
-      for(unsigned int i_filter=0;i_filter<eventLabels.size();i_filter++)
-	cout<<eventLabels[i_filter]<<endl;
-
-
       if(obj.hasTriggerObjectType(trigger::TriggerMuon)){
 
         const float dR = deltaR (*muon, obj);
