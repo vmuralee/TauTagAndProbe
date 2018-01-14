@@ -263,11 +263,8 @@ Ntuplizer = cms.EDAnalyzer("Ntuplizer",
     genPartCollection = cms.InputTag(""),
     muons = cms.InputTag("TagAndProbe"),
     taus = cms.InputTag("TagAndProbe"),
-<<<<<<< HEAD
     puInfo = cms.InputTag("slimmedAddPileupInfo"), 
-=======
     met   = cms.InputTag("slimmedMETs"),
->>>>>>> 8e724e4746b4b2affb8e71cc90a9bad19e15f08e
     triggerList = HLTLIST,
     triggerList_tag = HLTLIST_TAG,
     triggerSet = cms.InputTag("patTriggerUnpacker"),

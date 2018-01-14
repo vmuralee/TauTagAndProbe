@@ -292,11 +292,8 @@ Ntuplizer = cms.EDAnalyzer("Ntuplizer",
     genPartCollection = cms.InputTag("genInfo"),                           
     muons = cms.InputTag("goodMuons"),
     taus  = cms.InputTag("genMatchedTaus"),
-<<<<<<< HEAD
     puInfo = cms.InputTag("slimmedAddPileupInfo"), 
-=======
     met   = cms.InputTag("slimmedMETs"),
->>>>>>> 8e724e4746b4b2affb8e71cc90a9bad19e15f08e
     triggerSet = cms.InputTag("patTriggerUnpacker"),
     triggerResultsLabel = cms.InputTag("TriggerResults", "", "HLT"),
     L1Tau = cms.InputTag("caloStage2Digis", "Tau", "RECO"),
