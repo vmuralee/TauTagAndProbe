@@ -89,19 +89,20 @@ process.electrons = cms.Sequence(getattr(process,mvaMod)*getattr(process,egmMod)
 
 if not isMC:
     from Configuration.AlCa.autoCond import autoCond
-    process.GlobalTag.globaltag = '92X_dataRun2_HLT_v7'
+    process.GlobalTag.globaltag = '94X_dataRun2_ReReco_EOY17_v2' # 92X_dataRun2_HLT_v7'
     process.load('TauTagAndProbe.TauTagAndProbe.tagAndProbe_cff')
     process.source = cms.Source("PoolSource",
         fileNames = cms.untracked.vstring(
            # '/store/data/Run2017F/SingleMuon/USER/MuTau-PromptReco-v1/000/305/814/00000/0454A948-54BE-E711-9031-FA163E6983E4.root'
-            '/store/data/Run2017C/SingleMuon/MINIAOD/PromptReco-v2/000/300/576/00000/2E9321F4-8F7D-E711-8E33-02163E01A735.root'
+            #'/store/data/Run2017C/SingleMuon/MINIAOD/PromptReco-v2/000/300/576/00000/2E9321F4-8F7D-E711-8E33-02163E01A735.root'
+            '/store/data/Run2017E/SingleMuon/MINIAOD/17Nov2017-v1/50000/000DCB8B-2ADD-E711-9100-008CFAF35AC0.root'
         ),
     )
 
 
 
 else:
-    process.GlobalTag.globaltag = '92X_upgrade2017_realistic_v12'
+    process.GlobalTag.globaltag = '94X_mc2017_realistic_v10'  #'92X_upgrade2017_realistic_v12'
     process.load('TauTagAndProbe.TauTagAndProbe.MCanalysis_cff')
     process.source = cms.Source("PoolSource",
         fileNames = cms.untracked.vstring(            
