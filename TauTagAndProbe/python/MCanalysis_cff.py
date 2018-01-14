@@ -217,6 +217,10 @@ genInfo = cms.EDProducer("GenFiller",
          storeLightFlavAndGlu = cms.bool(True) # if True, store also udcs and gluons (first copy)
  )    
 
+## only events where slimmedMuons has exactly 1 muon
+muonNumberFilter = cms.EDFilter ("muonNumberFilter",
+    src = cms.InputTag("slimmedMuons")
+)
 
 
 ## good muons for T&P
@@ -307,6 +311,7 @@ Ntuplizer = cms.EDAnalyzer("Ntuplizer",
 
 TAndPseq = cms.Sequence(
     hltFilter      +
+    muonNumberFilter +
     goodMuons      +
     goodTaus       +
     bjets          +
