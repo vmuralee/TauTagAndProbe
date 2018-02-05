@@ -332,6 +332,10 @@ TAndPseq = cms.Sequence(
     #genMatchedTaus 
 )
 
+genMatchSeq = cms.Sequence(
+    genMatchedTaus
+)
+
 NtupleSeq = cms.Sequence(
     patTriggerUnpacker +
     Ntuplizer
