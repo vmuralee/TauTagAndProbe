@@ -210,6 +210,21 @@ HLTLIST = cms.VPSet(
         leg1 = cms.int32(13),
         leg2 = cms.int32(15)
     ),
+    #Mu+Tau HPS
+    cms.PSet (
+        HLT = cms.string("HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v"),
+        path1 = cms.vstring ("hltL3crIsoL1sMu18erTau24erIorMu20erTau24erL1f0L2f10QL3f20QL3trkIsoFiltered0p07", "hltHpsOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded"),
+        path2 = cms.vstring ("hltHpsSelectedPFTau27LooseChargedIsolationAgainstMuonL1HLTMatched", "hltHpsOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded"),
+        leg1 = cms.int32(13),
+        leg2 = cms.int32(15)
+    ),    
+    cms.PSet (
+        HLT = cms.string("HLT_IsoMu24_eta2p1_MediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_CrossL1_v"),
+        path1 = cms.vstring ("hltL3crIsoL1sBigOrMuXXerIsoTauYYerL1f0L2f10QL3f20QL3trkIsoFiltered0p07", "hltHpsOverlapFilterIsoMu24MediumChargedIsoPFTau35MonitoringReg"),
+        path2 = cms.vstring ("hltHpsSelectedPFTau35TrackPt1MediumChargedIsolationL1HLTMatchedReg", "hltHpsOverlapFilterIsoMu24MediumChargedIsoPFTau35MonitoringReg"),
+        leg1 = cms.int32(13),
+        leg2 = cms.int32(15)
+    ),
 )
 
 
@@ -286,6 +301,7 @@ TagAndProbe = cms.EDFilter("TauTagAndProbeFilter",
                            useMassCuts = cms.bool(False),
                            electrons = cms.InputTag("slimmedElectrons"),
                            eleLooseIdMap = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring16-HZZ-V1-wpLoose"),
+                           eleVeto = cms.bool(True),
                            bjets = cms.InputTag("bjets")
 )
 
@@ -329,7 +345,7 @@ TAndPseq = cms.Sequence(
     bjets          +
     TagAndProbe    +
     genInfo        #+
-    #genMatchedTaus 
+#    genMatchedTaus 
 )
 
 NtupleSeq = cms.Sequence(

@@ -245,6 +245,7 @@ TagAndProbe = cms.EDFilter("TauTagAndProbeFilter",
                            useMassCuts = cms.bool(False),
                            electrons = cms.InputTag("slimmedElectrons"),
                            eleLooseIdMap = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring16-HZZ-V1-wpLoose"),
+                           eleVeto = cms.boole(True),
                            bjets = cms.InputTag("bjets")
 )
 
