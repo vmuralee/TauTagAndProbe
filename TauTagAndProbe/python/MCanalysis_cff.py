@@ -322,7 +322,7 @@ Ntuplizer = cms.EDAnalyzer("Ntuplizer",
     genCollection = cms.InputTag("generator"),
     genPartCollection = cms.InputTag("genInfo"),                           
     muons = cms.InputTag("goodMuons"),
-    taus  = cms.InputTag("genMatchedTaus"),
+    taus  = cms.InputTag("goodTaus"),
     puInfo = cms.InputTag("slimmedAddPileupInfo"), 
     met   = cms.InputTag("slimmedMETs"),
     triggerSet = cms.InputTag("patTriggerUnpacker"),
@@ -346,6 +346,10 @@ TAndPseq = cms.Sequence(
     TagAndProbe    +
     genInfo        #+
 #    genMatchedTaus 
+)
+
+genMatchSeq = cms.Sequence(
+    genMatchedTaus
 )
 
 NtupleSeq = cms.Sequence(
