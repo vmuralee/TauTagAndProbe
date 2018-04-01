@@ -4,11 +4,12 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("TagAndProbe")
 
 #isMC = False
-isMC = True
+isMC = False
 #is2016 = True
 is2016 = False
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+process.load("Configuration.StandardSequences.GeometryDB_cff")
 
 #### handling of cms line options for tier3 submission
 #### the following are dummy defaults, so that one can normally use the config changing file list by hand etc.
@@ -24,7 +25,10 @@ options.register ('JSONfile',
                   VarParsing.VarParsing.multiplicity.singleton, # singleton or list
                   VarParsing.VarParsing.varType.string,          # string, int, or float
                   "JSON file (empty for no JSON)")
-options.outputFile = 'NTuple_MC.root'
+if isMC:
+    options.outputFile = 'NTuple_MC.root'
+else:
+    options.outputFile = 'NTuple_Data.root'
 options.inputFiles = []
 options.maxEvents  = -999
 options.parseArguments()
@@ -86,7 +90,7 @@ if not isMC: # will use 80X
     process.load('TauTagAndProbe.TauTagAndProbe.tagAndProbe_cff')
     process.source = cms.Source("PoolSource",
         fileNames = cms.untracked.vstring(
-            '/store/data/Run2016H/SingleMuon/MINIAOD/PromptReco-v2/000/282/092/00000/DE499C8E-1B8B-E611-8C93-02163E014207.root'
+            '/store/data/Run2017F/SingleMuon/MINIAOD/17Nov2017-v1/00000/3E7C07F9-E6F1-E711-841A-0CC47A4C8E46.root'
         ),
     )
 else:
@@ -110,7 +114,7 @@ if options.inputFiles:
     process.source.fileNames = cms.untracked.vstring(options.inputFiles)
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(-1)
+    input = cms.untracked.int32(10000)
 )
 
 if options.maxEvents >= -1:
@@ -123,6 +127,7 @@ process.options = cms.untracked.PSet(
 )
 
 process.p = cms.Path(
+    process.electrons +
     process.TAndPseq +
     process.NtupleSeq
 )
