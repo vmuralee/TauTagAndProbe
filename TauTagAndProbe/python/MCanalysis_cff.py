@@ -152,49 +152,6 @@ HLTLIST = cms.VPSet(
         leg1 = cms.int32(13),
         leg2 = cms.int32(15)
     ),
-    #Mu+Tau40
-    cms.PSet (
-        HLT = cms.string("HLT_IsoMu24_eta2p1_MediumChargedIsoPFTau40_Trk1_eta2p1_Reg_CrossL1_v"),
-        path1 = cms.vstring ("hltL3crIsoL1sBigOrMuXXerIsoTauYYerL1f0L2f10QL3f20QL3trkIsoFiltered0p07", "hltOverlapFilterIsoMu24MediumChargedIsoPFTau40MonitoringReg"),
-        path2 = cms.vstring ("hltSelectedPFTau40TrackPt1MediumChargedIsolationL1HLTMatchedReg", "hltOverlapFilterIsoMu24MediumChargedIsoPFTau40MonitoringReg"),
-        leg1 = cms.int32(13),
-        leg2 = cms.int32(15)
-    ),
-    cms.PSet (
-        HLT = cms.string("HLT_IsoMu24_eta2p1_MediumChargedIsoPFTau40_Trk1_TightID_eta2p1_Reg_CrossL1_v"),
-        path1 = cms.vstring ("hltL3crIsoL1sBigOrMuXXerIsoTauYYerL1f0L2f10QL3f24QL3trkIsoFiltered0p07", "hltOverlapFilterIsoMu24MediumChargedIsoAndTightOOSCPhotonsPFTau40MonitoringReg"),
-        path2 = cms.vstring ("hltSelectedPFTau40TrackPt1MediumChargedIsolationAndTightOOSCPhotonsL1HLTMatchedReg", "hltOverlapFilterIsoMu24MediumChargedIsoAndTightOOSCPhotonsPFTau40MonitoringReg"),
-        leg1 = cms.int32(13),
-        leg2 = cms.int32(15)
-    ),
-    cms.PSet (
-        HLT = cms.string("HLT_IsoMu24_eta2p1_TightChargedIsoPFTau40_Trk1_eta2p1_Reg_CrossL1_v"),
-        path1 = cms.vstring ("hltL3crIsoL1sBigOrMuXXerIsoTauYYerL1f0L2f10QL3f24QL3trkIsoFiltered0p07", "hltOverlapFilterIsoMu24TightChargedIsoPFTau40MonitoringReg"),
-        path2 = cms.vstring ("hltSelectedPFTau40TrackPt1TightChargedIsolationL1HLTMatchedReg", "hltOverlapFilterIsoMu24TightChargedIsoPFTau40MonitoringReg"),
-        leg1 = cms.int32(13),
-        leg2 = cms.int32(15)
-    ),
-    cms.PSet (
-        HLT = cms.string("HLT_IsoMu24_eta2p1_TightChargedIsoPFTau40_Trk1_TightID_eta2p1_Reg_CrossL1_v"),
-        path1 = cms.vstring ("hltL3crIsoL1sBigOrMuXXerIsoTauYYerL1f0L2f10QL3f24QL3trkIsoFiltered0p07", "hltOverlapFilterIsoMu24TightChargedIsoAndTightOOSCPhotonsPFTau40MonitoringReg"),
-        path2 = cms.vstring ("hltSelectedPFTau40TrackPt1TightChargedIsolationAndTightOOSCPhotonsL1HLTMatchedReg", "hltOverlapFilterIsoMu24TightChargedIsoAndTightOOSCPhotonsPFTau40MonitoringReg"),
-        leg1 = cms.int32(13),
-        leg2 = cms.int32(15)
-    ),
-        cms.PSet (
-        HLT = cms.string("HLT_IsoMu24_eta2p1_TightChargedIsoPFTau30_Trk1_TightID_eta2p1_Reg_CrossL1_v"),
-        path1 = cms.vstring ("hltL3crIsoL1sOrIsoMu24Tau30L1f0L2f10QL3f24QL3trkIsoFiltered0p07", "hltOverlapFilterIsoMu24TightChargedIsoAndTightOOSCPhotonsPFTau30MonitoringReg"),
-        path2 = cms.vstring ("hltIsoMu24SinglePFTau30TrackPt1TightChargedIsolationAndTightOOSCPhotonsL1HLTMatchedReg", "hltOverlapFilterIsoMu24TightChargedIsoAndTightOOSCPhotonsPFTau30MonitoringReg"),
-        leg1 = cms.int32(13),
-        leg2 = cms.int32(15)
-    ),
-    cms.PSet (
-        HLT = cms.string("HLT_IsoMu24_eta2p1_TightChargedIsoPFTau50_Trk1_TightID_eta2p1_Reg_CrossL1_v"),
-        path1 = cms.vstring ("hltL3crIsoL1sOrIsoMu24Tau50L1f0L2f10QL3f24QL3trkIsoFiltered0p07", "hltOverlapFilterIsoMu24TightChargedIsoAndTightOOSCPhotonsPFTau50MonitoringReg"),
-        path2 = cms.vstring ("hltIsoMu24SinglePFTau50TrackPt1TightChargedIsolationAndTightOOSCPhotonsL1HLTMatchedReg", "hltOverlapFilterIsoMu24TightChargedIsoAndTightOOSCPhotonsPFTau50MonitoringReg"),
-        leg1 = cms.int32(13),
-        leg2 = cms.int32(15)
-    ),
     #Mu+Tau20
     cms.PSet (
         HLT = cms.string("HLT_IsoMu27_LooseChargedIsoPFTau20_SingleL1_v"),
@@ -224,6 +181,13 @@ HLTLIST = cms.VPSet(
         path2 = cms.vstring ("hltHpsSelectedPFTau35TrackPt1MediumChargedIsolationL1HLTMatchedReg", "hltHpsOverlapFilterIsoMu24MediumChargedIsoPFTau35MonitoringReg"),
         leg1 = cms.int32(13),
         leg2 = cms.int32(15)
+    ),
+    cms.PSet (
+        HLT = cms.string("HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v"),
+        path1 = cms.vstring ("hltSelectedPFTau180MediumChargedIsolationL1HLTMatched"),
+        path2 = cms.vstring (""),
+        leg1 = cms.int32(15),
+        leg2 = cms.int32(999)
     ),
 )
 

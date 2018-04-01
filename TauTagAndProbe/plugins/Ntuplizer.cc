@@ -122,9 +122,9 @@ class Ntuplizer : public edm::EDAnalyzer {
         bool _againstElectronTightMVA6;
         bool _againstElectronVTightMVA6;
 
-        float _hltPt;
-        float _hltEta;
-        float _hltPhi;
+        vector<float> _hltPt;
+        vector<float> _hltEta;
+        vector<float> _hltPhi;
         float _hltL2CaloJetPt;
         float _hltL2CaloJetEta;
         float _hltL2CaloJetPhi;
@@ -378,9 +378,9 @@ void Ntuplizer::Initialize() {
     _MET = -1.;
     _isMatched = false;
     
-    _hltPt = -1;
-    _hltEta = 666;
-    _hltPhi = 666;
+    _hltPt.assign(NUMBER_OF_MAXIMUM_TRIGGERS,-1);
+    _hltEta.assign(NUMBER_OF_MAXIMUM_TRIGGERS,666);
+    _hltPhi.assign(NUMBER_OF_MAXIMUM_TRIGGERS,666);
     _hltL2CaloJetPt = -1;
     _hltL2CaloJetEta = 666;
     _hltL2CaloJetPhi = 666;
@@ -474,9 +474,9 @@ void Ntuplizer::beginJob()
     
     _tree -> Branch("MET", &_MET, "MET/F");
 
-    _tree -> Branch("hltPt",  &_hltPt,  "hltPt/F");
-    _tree -> Branch("hltEta", &_hltEta, "hltEta/F");
-    _tree -> Branch("hltPhi", &_hltPhi, "hltPhi/F");
+    _tree -> Branch("hltPt",  &_hltPt);
+    _tree -> Branch("hltEta", &_hltEta);
+    _tree -> Branch("hltPhi", &_hltPhi);
     
     _tree -> Branch("hltL2CaloJetPt",  &_hltL2CaloJetPt,  "hltL2CaloJetPt/F");
     _tree -> Branch("hltL2CaloJetEta", &_hltL2CaloJetEta, "hltL2CaloJetEta/F");
@@ -645,9 +645,9 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
                     const std::vector<std::string>& filters = (parameter.leg1 == 15)? (parameter.hltFilters1):(parameter.hltFilters2);
                     if (this -> hasFilters(obj, filters))
                     {
-                        _hltPt = obj.pt();
-                        _hltEta = obj.eta();
-                        _hltPhi = obj.phi();
+                        _hltPt[x] = obj.pt();
+                        _hltEta[x] = obj.eta();
+                        _hltPhi[x] = obj.phi();
                         _tauTriggerBitSet[x] = true;
                     }
                 }
@@ -816,10 +816,9 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
       std::vector<PileupSummaryInfo>::const_iterator PVI;
       for(PVI = puInfo->begin(); PVI != puInfo->end(); ++PVI) {
 	if(PVI->getBunchCrossing() == 0) { 
-	  float nTrueInt = PVI->getTrueNumInteractions();
-	  cout<<"nTrueInt="<<PVI->getTrueNumInteractions()<<endl;
+	  float nTrueInt = PVI->getTrueNumInteractions();	  
 	  _nTruePU = nTrueInt;  
-	  //break;
+	  break;
 	}
       }
 
