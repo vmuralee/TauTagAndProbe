@@ -24,7 +24,7 @@ HLT path used specified in python/MCAnalysis_cff.py (MC) or python/tagAndProbe_c
 
 Launch test.py
 
-To apply standard Z->mu+tauh TagAndProbe selections, mass cuts can be applied at production level by setting useMassCuts = cms.bool(True) in the TauTagAndProbeFilter module or reproducing those selections in the ntuple with mT>30 && 40<mVis && mVis<80 && isOS (the latter is recommended).
+To apply standard Z->mu+tauh TagAndProbe selections, mass cuts can be applied at production level by setting useMassCuts = cms.bool(True) in the TauTagAndProbeFilter module or reproducing those selections in the ntuple with mT<30 && 40<mVis && mVis<80 && isOS (the latter is recommended).
 
 
 ### Ntuples content
