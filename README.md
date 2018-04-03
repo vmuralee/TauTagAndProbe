@@ -9,6 +9,9 @@ cmsenv
 # MVA EleID Fall 2017
 git cms-merge-topic guitargeek:ElectronID_MVA2017_940pre3
 git clone https://github.com/tstreble/TauTagAndProbe
+cd TauTagAndProbe
+git checkout master_HLT
+cd -
 scram b -j4
 ```
 
