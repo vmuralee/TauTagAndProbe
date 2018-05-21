@@ -3,11 +3,9 @@ Set of tools to evaluate tau trigger performance on T&amp;P
 
 ### Install instructions
 ```
-cmsrel CMSSW_10_0_0_pre3
-cd CMSSW_10_0_0_pre3/src
+cmsrel CMSSW_10_1_2_patch2
+cd CMSSW_10_1_2_patch2/src
 cmsenv
-# MVA EleID Fall 2017
-git cms-merge-topic guitargeek:ElectronID_MVA2017_940pre3
 git clone https://github.com/tstreble/TauTagAndProbe
 cd TauTagAndProbe
 git checkout master_HLT
@@ -22,7 +20,7 @@ Set flag isMC and isMINIAOD according to sample in test/test.py
 
 HLT path used specified in python/MCAnalysis_cff.py (MC) or python/tagAndProbe_cff.py (data)
 
-Launch test.py
+Launch test_2018.py
 
 To apply standard Z->mu+tauh TagAndProbe selections, mass cuts can be applied at production level by setting useMassCuts = cms.bool(True) in the TauTagAndProbeFilter module or reproducing those selections in the ntuple with mT<30 && 40<mVis && mVis<80 && isOS (the latter is recommended).
 
