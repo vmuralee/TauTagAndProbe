@@ -141,6 +141,12 @@ class Ntuplizer : public edm::EDAnalyzer {
         float _hltPFTau35TrackPt1RegPt;
         float _hltPFTau35TrackPt1RegEta;
         float _hltPFTau35TrackPt1RegPhi;
+        float _hltHPSPFTauTrackPt;
+        float _hltHPSPFTauTrackEta;
+        float _hltHPSPFTauTrackPhi;
+        float _hltHPSPFTauTrackRegPt;
+        float _hltHPSPFTauTrackRegEta;
+        float _hltHPSPFTauTrackRegPhi;
 
         int _l1tQual;
         float _l1tPt;
@@ -397,6 +403,13 @@ void Ntuplizer::Initialize() {
     _hltPFTau35TrackPt1RegPt = -1;
     _hltPFTau35TrackPt1RegEta = 666;
     _hltPFTau35TrackPt1RegPhi = 666;
+
+    _hltHPSPFTauTrackPt = -1;
+    _hltHPSPFTauTrackEta = 666;
+    _hltHPSPFTauTrackPhi = 666;
+    _hltHPSPFTauTrackRegPt = -1;
+    _hltHPSPFTauTrackRegEta = 666;
+    _hltHPSPFTauTrackRegPhi = 666;
     
     _l1tPt = -1;
     _l1tEta = 666;
@@ -496,6 +509,12 @@ void Ntuplizer::beginJob()
     _tree -> Branch("hltPFTau35TrackPt1RegEta", &_hltPFTau35TrackPt1RegEta, "hltPFTau35TrackPt1RegEta/F");;
     _tree -> Branch("hltPFTau35TrackPt1RegPhi", &_hltPFTau35TrackPt1RegPhi, "hltPFTau35TrackPt1RegPhi/F");
     
+    _tree -> Branch("hltHPSPFTauTrackPt",  &_hltHPSPFTauTrackPt,  "hltHPSPFTauTrackPt/F");
+    _tree -> Branch("hltHPSPFTauTrackEta", &_hltHPSPFTauTrackEta, "hltHPSPFTauTrackEta/F");;
+    _tree -> Branch("hltHPSPFTauTrackPhi", &_hltHPSPFTauTrackPhi, "hltHPSPFTauTrackPhi/F");
+    _tree -> Branch("hltHPSPFTauTrackRegPt",  &_hltHPSPFTauTrackRegPt,  "hltHPSPFTauTrackRegPt/F");
+    _tree -> Branch("hltHPSPFTauTrackRegEta", &_hltHPSPFTauTrackRegEta, "hltHPSPFTauTrackRegEta/F");;
+    _tree -> Branch("hltHPSPFTauTrackRegPhi", &_hltHPSPFTauTrackRegPhi, "hltHPSPFTauTrackRegPhi/F");
     
     _tree -> Branch("l1tPt",  &_l1tPt,  "l1tPt/F");
     _tree -> Branch("l1tEta", &_l1tEta, "l1tEta/F");
@@ -683,6 +702,19 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
 	      _hltPFTau35TrackPt1RegPhi = obj.phi();
 	    }
 
+	    const std::vector<std::string>& HPSPFTauTrack_filters = {"hltHpsPFTauTrack"};
+	    if (this -> hasFilters(obj, HPSPFTauTrack_filters) && obj.pt()>_hltHPSPFTauTrackPt){
+	      _hltHPSPFTauTrackPt = obj.pt();
+	      _hltHPSPFTauTrackEta = obj.eta();
+	      _hltHPSPFTauTrackPhi = obj.phi();
+	    }
+
+	    const std::vector<std::string>& HPSPFTauTrackReg_filters = {"hltHpsPFTauTrackReg"};
+	    if (this -> hasFilters(obj, HPSPFTauTrackReg_filters) && obj.pt()>_hltHPSPFTauTrackRegPt){
+	      _hltHPSPFTauTrackRegPt = obj.pt();
+	      _hltHPSPFTauTrackRegEta = obj.eta();
+	      _hltHPSPFTauTrackRegPhi = obj.phi();
+	    }
 
         }
     }
