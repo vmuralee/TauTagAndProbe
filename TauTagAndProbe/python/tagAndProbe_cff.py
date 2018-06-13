@@ -214,7 +214,7 @@ HLTLIST = cms.VPSet(
         leg2 = cms.int32(15)
     ),
     cms.PSet (
-        HLT = cms.string("HLT_IsoMu27_TightChargedIsoPFTauHPS20_Trk1_eta2p1_SingleL_v"),
+        HLT = cms.string("HLT_IsoMu27_TightChargedIsoPFTauHPS20_Trk1_eta2p1_SingleL1_v"),
         path1 = cms.vstring ("hltL3crIsoL1sMu22Or25L1f0L2f10QL3f27QL3trkIsoFiltered0p07", "hltHpsOverlapFilterIsoMu27TightChargedIsoPFTau20"),
         path2 = cms.vstring ("hltHpsPFTau20TrackTightChargedIsoAgainstMuon", "hltHpsOverlapFilterIsoMu27TightChargedIsoPFTau20"),
         leg1 = cms.int32(13),
