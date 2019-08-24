@@ -3,7 +3,7 @@ import FWCore.PythonUtilities.LumiList as LumiList
 import FWCore.ParameterSet.Config as cms
 process = cms.Process("TagAndProbe")
 
-isMC = False
+isMC = True
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load("Configuration.StandardSequences.GeometryDB_cff")
@@ -70,13 +70,13 @@ for idmod in my_id_modules:
 
 egmMod = 'egmGsfElectronIDs'
 mvaMod = 'electronMVAValueMapProducer'
-regMod = 'electronRegressionValueMapProducer'
+#regMod = 'electronRegressionValueMapProducer'
 egmSeq = 'egmGsfElectronIDSequence'
 setattr(process,egmMod,process.egmGsfElectronIDs.clone())
 setattr(process,mvaMod,process.electronMVAValueMapProducer.clone())
-setattr(process,regMod,process.electronRegressionValueMapProducer.clone())
-setattr(process,egmSeq,cms.Sequence(getattr(process,mvaMod)*getattr(process,egmMod)*getattr(process,regMod)))
-process.electrons = cms.Sequence(getattr(process,mvaMod)*getattr(process,egmMod)*getattr(process,regMod))
+#setattr(process,regMod,process.electronRegressionValueMapProducer.clone())
+setattr(process,egmSeq,cms.Sequence(getattr(process,mvaMod)*getattr(process,egmMod)))#*getattr(process,regMod)))
+process.electrons = cms.Sequence(getattr(process,mvaMod)*getattr(process,egmMod))#*getattr(process,regMod))
 
 
 
@@ -96,12 +96,12 @@ if not isMC:
 
 
 else:
-    process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_miniAODv2' #MC 25 ns miniAODv2
+    process.GlobalTag.globaltag = '102X_upgrade2018_realistic_v15'#MC 25 ns miniAODv2
     # process.GlobalTag.globaltag = '76X_dataRun2_16Dec2015_v0'
     process.load('TauTagAndProbe.TauTagAndProbe.MCanalysis_cff')
     process.source = cms.Source("PoolSource",
         fileNames = cms.untracked.vstring(            
-            '/store/mc/RunIISpring16MiniAODv2/GluGluHToTauTau_M125_13TeV_powheg_pythia8/MINIAODSIM/FlatPU20to70HcalNZSRAW_withHLT_80X_mcRun2_asymptotic_v14-v1/50000/B0D22F36-9567-E611-A5FB-0CC47A4DEE76.root'
+            '/store/relval/CMSSW_10_6_1/RelValQQH1352T_13UP18/MINIAODSIM/PUpmx25ns_106X_upgrade2018_realistic_v6_ul18hlt_premix_hs-v1/20000/FFC76DEB-699B-454A-98CA-A3F13968889D.root'
         )
     )
 
