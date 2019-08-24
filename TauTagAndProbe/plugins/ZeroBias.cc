@@ -1104,8 +1104,9 @@ void ZeroBias::analyze(const edm::Event& iEvent, const edm::EventSetup& eSetup)
   
     reco::PFJetRefVector jets = reco::tau::castView<reco::PFJetRefVector>(jetView);
 
-    BOOST_FOREACH( reco::PFJetRef jetRef, jets ) {
-
+    //BOOST_FOREACH( reco::PFJetRef jetRef, jets ) {
+    for(size_t ij = 0; ij < jetView->size(); ij++){
+      const auto& jetRef = jetView->refAt(ij);
       //reco::PFJetRef jetRegionRef = (*PFJetRegion_Handle)[jetRef];
       const std::vector<reco::PFRecoTauChargedHadron>& chargedHadrons = (*chargedHadronAssoc)[jetRef];
       const std::vector<reco::RecoTauPiZero>& piZeros = (*piZeroAssoc)[jetRef];
